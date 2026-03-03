@@ -58,8 +58,8 @@ O backend segue uma arquitetura de **microserviços**, onde cada serviço é uma
                          └────┬─────┘
                               │
                          ┌────▼─────┐
-                         │  Nginx   │
-                         │ (Proxy)  │
+                         │   API    │
+                         │ Gateway  │
                          └────┬─────┘
                               │
             ┌─────────────────┼─────────────────┐
@@ -85,7 +85,7 @@ O backend segue uma arquitetura de **microserviços**, onde cada serviço é uma
 ### Comunicação entre serviços
 
 - **Síncrona:** HTTP/REST interno entre microserviços quando necessário
-- **Roteamento:** Nginx como reverse proxy — roteia por prefixo de URL para cada serviço
+- **Roteamento:** API Gateway — roteia por prefixo de URL para cada serviço
 
 ---
 
@@ -153,7 +153,7 @@ Gerencia notificações e comunicação com o cliente.
 | Sessão | Spring Session JDBC | — |
 | Utilitários | Lombok | — |
 | Build | Maven | — |
-| Proxy Reverso | Nginx | — |
+| API Gateway | Spring Cloud Gateway | — |
 | WhatsApp | Evolution API | — |
 | Containerização | Docker + Docker Compose | — |
 
@@ -163,7 +163,7 @@ Gerencia notificações e comunicação com o cliente.
 
 ```
 tons-backend/
-├── nginx/                          # Configuração do proxy reverso
+├── api-gateway/                    # API Gateway (Spring Cloud Gateway)
 │
 ├── usuarios-ms/                    # Microserviço de Usuários (:8081)
 │   └── src/main/java/br/com/tonspersonalizados/usuarios_ms/
