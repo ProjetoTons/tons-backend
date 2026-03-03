@@ -9,5 +9,6 @@ steps:
   persistCredentials: true
 
 - script: |
-    git push --prune https://$(System.AccessToken)@dev.azure.com/Hefestos/Tons%20Personalizados/_git/tons-backend +refs/remotes/origin/*:refs/heads/*
-  displayName: 'Espelhar GitHub para Azure DevOps'
+    git remote add target https://$(System.AccessToken)@dev.azure.com/Hefestos/Tons%20Personalizados/_git/tons-backend
+    git push target main --force
+  displayName: 'Sincronizar GitHub -> Azure'
