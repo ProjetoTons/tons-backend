@@ -1,6 +1,6 @@
 package br.com.tonspersonalizados.notificacao_ms.dto;
 
-public class NotificacaoDto {
+public class EmailDto {
 
     private String destinatario;
     private String assunto;
