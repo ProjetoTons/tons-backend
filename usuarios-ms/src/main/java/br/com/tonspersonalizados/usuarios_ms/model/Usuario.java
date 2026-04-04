@@ -16,15 +16,122 @@ public class Usuario {
     @Column(nullable = false)
     private String nome;
 
+
+    //private String email;
+    //private String senha;
+
     @Column(nullable = false, unique = true)
-    private String email;
+    private String cpf;
 
     @Column(nullable = false)
-    private String senha;
+    private String telefone;
 
-    public Usuario(String nome, String email, String senha) {
+    @CreationTimestamp
+    @Column(nullable = false)
+    private LocalDateTime dataDeCadastro;
+
+    @Column(nullable = false)
+    private LocalDateTime dataDeDeletado;
+
+
+
+    //relacionamentos:
+
+    @OneToOne // essas entidades tem relacionamento de 1:1
+    private Login login;
+
+    @ManyToOne // muitos usuarios é tipo usuario(uma role)
+    private  TipoUsuario tipoUsuario;
+
+    @OneToOne
+    private Endereco endereco;
+
+    @ManyToOne
+    private Empresa empresa;
+
+
+    public String getCpf() {
+        return cpf;
+    }
+
+    public void setCpf(String cpf) {
+        this.cpf = cpf;
+    }
+
+    public TipoUsuario getTipoUsuario() {
+        return tipoUsuario;
+    }
+
+    public void setTipoUsuario(TipoUsuario tipoUsuario) {
+        this.tipoUsuario = tipoUsuario;
+    }
+
+    public String getTelefone() {
+        return telefone;
+    }
+
+    public void setTelefone(String telefone) {
+        this.telefone = telefone;
+    }
+
+
+
+
+
+    public String getNome() {
+        return nome;
+    }
+
+    public void setNome(String nome) {
         this.nome = nome;
-        this.email = email;
-        this.senha = senha;
+    }
+
+    public Login getLogin() {
+        return login;
+    }
+
+    public void setLogin(Login login) {
+        this.login = login;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Endereco getEndereco() {
+        return endereco;
+    }
+
+    public void setEndereco(Endereco endereco) {
+        this.endereco = endereco;
+    }
+
+    public Empresa getEmpresa() {
+        return empresa;
+    }
+
+    public void setEmpresa(Empresa empresa) {
+        this.empresa = empresa;
+    }
+
+
+    public LocalDateTime getDataDeCadastro() {
+        return dataDeCadastro;
+    }
+
+    public void setDataDeCadastro(LocalDateTime dataDeCadastro) {
+        this.dataDeCadastro = dataDeCadastro;
+    }
+
+    public LocalDateTime getDataDeDeletado() {
+        return dataDeDeletado;
+    }
+
+    public void setDataDeDeletado(LocalDateTime dataDeDeletado) {
+        this.dataDeDeletado = dataDeDeletado;
     }
 }
