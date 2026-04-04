@@ -69,6 +69,7 @@ spring.mail.password=senha-de-app-16-caracteres
 spring.mail.properties.mail.smtp.auth=true
 spring.mail.properties.mail.smtp.starttls.enable=true
 spring.mail.properties.mail.smtp.starttls.required=true
+spring.mail.properties.mail.smtp.ssl.trust=smtp.gmail.com
 ```
 
 > ⚠️ **Segurança:** Em projetos reais, nunca coloque a senha direto no properties. Use variáveis de ambiente. Para projeto acadêmico, funciona.
@@ -80,6 +81,7 @@ spring.mail.properties.mail.smtp.starttls.required=true
 - `spring.mail.password` → A credencial para **provar ao servidor** que você tem permissão de enviar por aquele e-mail.
 - `mail.smtp.auth=true` → Diz ao servidor: **"eu vou me identificar"**. Sem isso, o Gmail rejeita a conexão.
 - `mail.smtp.starttls.enable/required` → Ativa a **criptografia TLS**. É como um "cadeado" na comunicação. O Gmail **exige** isso — se não ativar, ele recusa a conexão.
+- `mail.smtp.ssl.trust=smtp.gmail.com` → Diz ao JavaMail para **confiar no certificado SSL** do servidor `smtp.gmail.com`. Sem isso, o Java pode não reconhecer o certificado do Gmail no seu truststore local e lançar o erro `PKIX path building failed` — que significa que ele não conseguiu validar a identidade do servidor. Essa propriedade resolve o problema dizendo: **"pode confiar nesse servidor, eu garanto"**.
 
 ### Por que configurar aqui?
 Porque o Spring Boot lê essas propriedades automaticamente na inicialização e usa para construir o `JavaMailSender`. Você configura uma vez, e todo o projeto já sabe como se conectar ao servidor de e-mail.
