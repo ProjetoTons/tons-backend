@@ -30,20 +30,22 @@ public class Usuario {
     @Column(nullable = false)
     private LocalDateTime dataDeCadastro;
 
-    @Column(nullable = false)
+
     private LocalDateTime dataDeDeletado;
 
 
 
     //relacionamentos:
 
-    @OneToOne // essas entidades tem relacionamento de 1:1
+    @OneToOne(cascade = CascadeType.ALL) // ações relacionadas ao usuário serão aplicadas no login tbm.
+    @JoinColumn(name = "fk_login")
     private Login login;
 
     @ManyToOne // muitos usuarios é tipo usuario(uma role)
     private  TipoUsuario tipoUsuario;
 
-    @OneToOne
+    @OneToOne (cascade = CascadeType.ALL)
+    @JoinColumn(name = "fk_endereco")
     private Endereco endereco;
 
     @ManyToOne

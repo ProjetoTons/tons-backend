@@ -12,7 +12,7 @@ public class Endereco {
     private String cep;
 
     @Column(nullable = false)
-    private String logadouro;
+    private String logradouro;
 
     @Column(nullable = false)
     private String numero;
@@ -46,12 +46,12 @@ public class Endereco {
         this.usuario = usuario;
     }
 
-    public String getLogadouro() {
-        return logadouro;
+    public String getLogradouro() {
+        return logradouro;
     }
 
-    public void setLogadouro(String logadouro) {
-        this.logadouro = logadouro;
+    public void setLogradouro(String logadouro) {
+        this.logradouro = logadouro;
     }
 
     public Long getId() {

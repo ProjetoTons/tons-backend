@@ -21,6 +21,10 @@ public class Login {
     private Date expiracaoToken;
     private Integer tentativasLogin;
 
+    //relacionamento:
+    @OneToOne
+    private Usuario usuario;
+
 
     public String getEmail() {
         return email;
@@ -84,5 +88,13 @@ public class Login {
 
     public void setTokenRecuperarSenha(String tokenRecuperarSenha) {
         this.tokenRecuperarSenha = tokenRecuperarSenha;
+    }
+
+    public Usuario getUsuario() {
+        return usuario;
+    }
+
+    public void setUsuario(Usuario usuario) {
+        this.usuario = usuario;
     }
 }

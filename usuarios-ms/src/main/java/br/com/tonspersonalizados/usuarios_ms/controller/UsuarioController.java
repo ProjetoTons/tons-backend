@@ -1,8 +1,13 @@
 package br.com.tonspersonalizados.usuarios_ms.controller;
 
 
+import br.com.tonspersonalizados.usuarios_ms.dto.EnderecoRequestDto;
+import br.com.tonspersonalizados.usuarios_ms.dto.UsuarioRequestDto;
+import br.com.tonspersonalizados.usuarios_ms.model.Endereco;
+import br.com.tonspersonalizados.usuarios_ms.model.Login;
 import br.com.tonspersonalizados.usuarios_ms.model.Usuario;
 import br.com.tonspersonalizados.usuarios_ms.service.UsuarioService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,13 +23,38 @@ public class UsuarioController {
     }
 
     @PostMapping
-    public ResponseEntity<String> cadastrar(@RequestBody Usuario usuario) {
-        Boolean resultado = usuarioService.cadastrar(usuario);
-        if (resultado) {
-            return ResponseEntity.status(201).body("Usuário cadastrado com sucesso!");
+    public ResponseEntity<String> cadastrar(@RequestBody @Valid UsuarioRequestDto dto) {
+
+        Usuario usuario = new Usuario();
+        usuario.setNome(dto.getNome());
+        usuario.setCpf(dto.getCpf());
+        usuario.setTelefone(dto.getTelefone());
+
+        Login login = new Login();
+        login.setEmail(dto.getEmail());
+        login.setSenhaHash(dto.getSenha());
+        login.setUsuario(usuario);
+        usuario.setLogin(login);
+
+        Endereco endereco = new Endereco();
+        endereco.setNumero(dto.getEndereco().getNumero());
+        endereco.setLogradouro(dto.getEndereco().getLogadouro());
+        endereco.setCep(dto.getEndereco().getCep());
+        endereco.setComplemento(dto.getEndereco().getComplemento());
+        endereco.setUsuario(usuario);
+        usuario.setEndereco(endereco);
+
+        System.out.println(endereco.getCep());
+
+        if (dto.getCnpj() != null) {
+            //falta validar cnpj
         }
-        return ResponseEntity.status(400).body("Erro ao cadastrar usuário.");
+
+        usuarioService.cadastrar(usuario);
+
+        return ResponseEntity.status(201).body("Usuário cadastrado com sucesso!");
     }
+
 
     @GetMapping("/{nome}")
     public ResponseEntity<Usuario> buscarPorNome(@PathVariable String nome) {
