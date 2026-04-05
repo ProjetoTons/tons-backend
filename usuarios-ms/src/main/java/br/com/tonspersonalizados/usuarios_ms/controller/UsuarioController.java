@@ -3,9 +3,11 @@ package br.com.tonspersonalizados.usuarios_ms.controller;
 
 import br.com.tonspersonalizados.usuarios_ms.dto.EnderecoRequestDto;
 import br.com.tonspersonalizados.usuarios_ms.dto.UsuarioRequestDto;
+import br.com.tonspersonalizados.usuarios_ms.model.Empresa;
 import br.com.tonspersonalizados.usuarios_ms.model.Endereco;
 import br.com.tonspersonalizados.usuarios_ms.model.Login;
 import br.com.tonspersonalizados.usuarios_ms.model.Usuario;
+import br.com.tonspersonalizados.usuarios_ms.service.EmpresaService;
 import br.com.tonspersonalizados.usuarios_ms.service.UsuarioService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -17,8 +19,10 @@ import org.springframework.web.bind.annotation.*;
 public class UsuarioController {
 
     private final UsuarioService usuarioService;
+    private final EmpresaService empresaService;
 
-    public UsuarioController(UsuarioService usuarioService) {
+    public UsuarioController(EmpresaService empresaService, UsuarioService usuarioService) {
+        this.empresaService = empresaService;
         this.usuarioService = usuarioService;
     }
 
@@ -44,11 +48,17 @@ public class UsuarioController {
         endereco.setUsuario(usuario);
         usuario.setEndereco(endereco);
 
-        System.out.println(endereco.getCep());
 
         if (dto.getCnpj() != null) {
-            //falta validar cnpj
+
+            Empresa empresa = empresaService.buscarPorCnpj(dto.getCnpj());
+            if (empresa == null) {
+              return   ResponseEntity.status(404).body("Empresa não encontrada.");
+            }
+
+            usuario.setEmpresa(empresa);
         }
+
 
         usuarioService.cadastrar(usuario);
 
