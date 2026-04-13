@@ -1,21 +1,25 @@
 package br.com.tonspersonalizados.usuarios_ms.controller;
 
 
-import br.com.tonspersonalizados.usuarios_ms.dto.EnderecoRequestDto;
+import br.com.tonspersonalizados.usuarios_ms.dto.LoginRequestDto;
 import br.com.tonspersonalizados.usuarios_ms.dto.UsuarioRequestDto;
-import br.com.tonspersonalizados.usuarios_ms.model.Empresa;
-import br.com.tonspersonalizados.usuarios_ms.model.Endereco;
-import br.com.tonspersonalizados.usuarios_ms.model.Login;
-import br.com.tonspersonalizados.usuarios_ms.model.Usuario;
+import br.com.tonspersonalizados.usuarios_ms.dto.UsuarioResponseDto;
+import br.com.tonspersonalizados.usuarios_ms.dto.UsuarioTokenDto;
+import br.com.tonspersonalizados.usuarios_ms.entity.Empresa;
+import br.com.tonspersonalizados.usuarios_ms.entity.Endereco;
+import br.com.tonspersonalizados.usuarios_ms.entity.Login;
+import br.com.tonspersonalizados.usuarios_ms.entity.Usuario;
 import br.com.tonspersonalizados.usuarios_ms.service.EmpresaService;
 import br.com.tonspersonalizados.usuarios_ms.service.UsuarioService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+
 @RestController
-@RequestMapping("/usuario")
-@CrossOrigin(origins = "*")
+@RequestMapping("/usuarios")
+//@CrossOrigin(origins = "*")
 public class UsuarioController {
 
     private final UsuarioService usuarioService;
@@ -53,7 +57,7 @@ public class UsuarioController {
 
             Empresa empresa = empresaService.buscarPorCnpj(dto.getCnpj());
             if (empresa == null) {
-              return   ResponseEntity.status(404).body("Empresa não encontrada.");
+                return ResponseEntity.status(404).body("Empresa não encontrada.");
             }
 
             usuario.setEmpresa(empresa);
@@ -66,7 +70,26 @@ public class UsuarioController {
     }
 
 
-    @GetMapping("/{nome}")
+
+    @PostMapping("/login") //usando o post por mais seguro já que ele possui uma cripografia própria, melhor para transitar com a senha do usuário
+    public ResponseEntity<UsuarioResponseDto> login(@RequestBody @Valid LoginRequestDto loginDto){
+
+        UsuarioTokenDto loginValidado = usuarioService.login(loginDto);
+
+        UsuarioResponseDto responseDto = new UsuarioResponseDto();
+
+        // loginValidado.().setUltimoLogin(LocalDateTime.now());
+
+        // usuarioService.atualizar(loginValidado);
+
+        return ResponseEntity.ok(responseDto);
+
+    }
+
+
+    //fazer um endppint para cadastrar usuario
+
+    @GetMapping("/{nome}") //confirmar se vai precisar
     public ResponseEntity<Usuario> buscarPorNome(@PathVariable String nome) {
         Usuario usuario = usuarioService.buscarPorNome(nome);
         if (usuario != null) {
@@ -75,7 +98,7 @@ public class UsuarioController {
         return ResponseEntity.status(404).build();
     }
 
-    @GetMapping("/email/{email}")
+    @GetMapping("/email/{email}") //confirmar se vai precisar
     public ResponseEntity<Usuario> buscarPorEmail(@PathVariable String email) {
         Usuario usuario = usuarioService.buscarPorEmail(email);
         if (usuario != null) {
@@ -85,22 +108,19 @@ public class UsuarioController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<String> atualizar(@PathVariable Long id, @RequestBody Usuario usuario) {
-        usuario.setId(id);
+    public ResponseEntity<String> atualizar(@PathVariable Long id, @RequestBody @Valid UsuarioRequestDto usuario) {
+        usuarioService.atualizar(id, usuario);
 
-        Boolean resultado = usuarioService.atualizar(usuario);
-        if (resultado) {
-            return ResponseEntity.ok("Usuário atualizado com sucesso!");
-        }
-        return ResponseEntity.status(400).body("Erro ao atualizar usuário.");
+        return ResponseEntity.ok("Usuário atualizado com sucesso!");
     }
+
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deletar(@PathVariable Long id) {
-        Boolean resultado = usuarioService.deletar(id);
-        if (resultado) {
-            return ResponseEntity.ok("Usuário deletado com sucesso!");
-        }
-        return ResponseEntity.status(400).body("Erro ao deletar usuário.");
+
+        usuarioService.deletar(id);
+
+        return ResponseEntity.ok("Usuário deletado com sucesso!");
+
     }
 }

@@ -16,6 +16,7 @@ public class UsuarioRequestDto {
     private String cpf;
 
     @Email
+    @NotNull
     private String email;
 
     @NotNull

@@ -1,4 +1,4 @@
-package br.com.tonspersonalizados.usuarios_ms.model;
+package br.com.tonspersonalizados.usuarios_ms.entity;
 
 import jakarta.persistence.*;
 

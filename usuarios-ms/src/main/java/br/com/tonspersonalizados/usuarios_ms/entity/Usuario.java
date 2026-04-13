@@ -1,4 +1,4 @@
-package br.com.tonspersonalizados.usuarios_ms.model;
+package br.com.tonspersonalizados.usuarios_ms.entity;
 
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -34,7 +34,6 @@ public class Usuario {
     private LocalDateTime dataDeDeletado;
 
 
-
     //relacionamentos:
 
     @OneToOne(cascade = CascadeType.ALL) // ações relacionadas ao usuário serão aplicadas no login tbm.
@@ -50,6 +49,11 @@ public class Usuario {
 
     @ManyToOne
     private Empresa empresa;
+
+
+
+
+
 
 
     public String getCpf() {
@@ -75,9 +79,6 @@ public class Usuario {
     public void setTelefone(String telefone) {
         this.telefone = telefone;
     }
-
-
-
 
 
     public String getNome() {

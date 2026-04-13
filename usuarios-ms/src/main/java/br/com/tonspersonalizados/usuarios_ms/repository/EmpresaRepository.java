@@ -1,6 +1,6 @@
 package br.com.tonspersonalizados.usuarios_ms.repository;
 
-import br.com.tonspersonalizados.usuarios_ms.model.Empresa;
+import br.com.tonspersonalizados.usuarios_ms.entity.Empresa;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

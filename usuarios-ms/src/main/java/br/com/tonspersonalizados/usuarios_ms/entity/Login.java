@@ -1,4 +1,4 @@
-package br.com.tonspersonalizados.usuarios_ms.model;
+package br.com.tonspersonalizados.usuarios_ms.entity;
 
 import jakarta.persistence.*;
 
@@ -13,7 +13,9 @@ public class Login {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false, unique = true)
     private  String email;
+
     private String senhaHash;
     private LocalDateTime ultimoLogin;
     private LocalDateTime logout;
