@@ -47,9 +47,9 @@ public class SecurityConfiguracao {
             "/webjars/**",
             "/v3/api-docs/**",
             "/actuator/*",
-            "/usuarios/login/**",
+            "/usuarios",
+            "/usuarios/login",
             "/h2-console/**",
-            "/h2-console/**/**",
             "/error/**"
     };
 
@@ -87,11 +87,6 @@ public class SecurityConfiguracao {
                 http.getSharedObject(AuthenticationManagerBuilder.class);
         authenticationManagerBuilder.authenticationProvider(new AutenticacaoProvider(passwordEncoder(), autenticacaoService));
         return authenticationManagerBuilder.build();
-    }
-
-    @Bean
-    public AutenticacaoEntryPoint jwtAuthenticationEntryPointBean() {
-        return new AutenticacaoEntryPoint();
     }
 
     @Bean

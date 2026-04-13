@@ -4,16 +4,14 @@ import jakarta.validation.constraints.*;
 import org.hibernate.validator.constraints.br.CNPJ;
 import org.hibernate.validator.constraints.br.CPF;
 
+import java.time.LocalDate;
+import java.util.List;
 
-public class UsuarioRequestDto {
+public class FuncionarioRequestDto {
 
     @NotBlank
     @NotNull
     private String nome;
-
-    @NotNull
-    @CPF
-    private String cpf;
 
     @Email
     @NotNull
@@ -26,16 +24,20 @@ public class UsuarioRequestDto {
     @NotNull
     private String senha;
 
-    @CNPJ
-    private String cnpj;
+    @NotNull
+    private LocalDate dataNascimento;
 
+    @NotEmpty
+    private List<Long> acessos;
 
-    public String getCnpj() {
-        return cnpj;
+    //sem cpf para funcionario
+
+    public List<Long> getAcessos() {
+        return acessos;
     }
 
-    public String getCpf() {
-        return cpf;
+    public LocalDate getDataNascimento() {
+        return dataNascimento;
     }
 
     public String getEmail() {

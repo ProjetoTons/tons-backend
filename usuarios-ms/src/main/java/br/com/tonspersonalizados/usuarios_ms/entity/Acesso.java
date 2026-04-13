@@ -5,7 +5,8 @@ import jakarta.persistence.*;
 import java.util.List;
 
 @Entity
-public class TipoUsuario {
+@Table(name = "acessos")
+public class Acesso {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -18,7 +19,7 @@ public class TipoUsuario {
 
 
     //relacionamentos:
-    @OneToMany  // um tipo de usuario(role) pode ser atribuido a muitos usuários.
+    @ManyToMany  // muitos acessos podem ser atribuidos a muitos usuários.
     private List<Usuario> usuarios;
 
 
@@ -44,13 +45,5 @@ public class TipoUsuario {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public List<Usuario> getUsuarios() {
-        return usuarios;
-    }
-
-    public void setUsuarios(List<Usuario> usuarios) {
-        this.usuarios = usuarios;
     }
 }

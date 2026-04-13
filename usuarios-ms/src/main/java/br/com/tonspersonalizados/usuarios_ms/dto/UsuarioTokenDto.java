@@ -10,6 +10,25 @@ public class UsuarioTokenDto {
     private String telefone;
     private String token;
 
+    public String getEmail() {
+        return email;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public String getTelefone() {
+        return telefone;
+    }
+
+    public String getToken() {
+        return token;
+    }
 
     public void setEmail(String email) {
         this.email = email;

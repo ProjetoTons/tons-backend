@@ -3,7 +3,9 @@ package br.com.tonspersonalizados.usuarios_ms.entity;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 
 @Entity
@@ -26,6 +28,8 @@ public class Usuario {
     @Column(nullable = false)
     private String telefone;
 
+    private LocalDate dataNascimento;
+
     @CreationTimestamp
     @Column(nullable = false)
     private LocalDateTime dataDeCadastro;
@@ -40,8 +44,8 @@ public class Usuario {
     @JoinColumn(name = "fk_login")
     private Login login;
 
-    @ManyToOne // muitos usuarios é tipo usuario(uma role)
-    private  TipoUsuario tipoUsuario;
+    @ManyToMany // um usuário pode ter muitas roles
+    private List<Acesso> acessos;
 
     @OneToOne (cascade = CascadeType.ALL)
     @JoinColumn(name = "fk_endereco")
@@ -62,14 +66,6 @@ public class Usuario {
 
     public void setCpf(String cpf) {
         this.cpf = cpf;
-    }
-
-    public TipoUsuario getTipoUsuario() {
-        return tipoUsuario;
-    }
-
-    public void setTipoUsuario(TipoUsuario tipoUsuario) {
-        this.tipoUsuario = tipoUsuario;
     }
 
     public String getTelefone() {
@@ -103,6 +99,22 @@ public class Usuario {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public LocalDate getDataNascimento() {
+        return dataNascimento;
+    }
+
+    public void setDataNascimento(LocalDate dataNascimento) {
+        this.dataNascimento = dataNascimento;
+    }
+
+    public List<Acesso> getAcessos() {
+        return acessos;
+    }
+
+    public void setAcessos(List<Acesso> acesso) {
+        this.acessos = acesso;
     }
 
     public Endereco getEndereco() {

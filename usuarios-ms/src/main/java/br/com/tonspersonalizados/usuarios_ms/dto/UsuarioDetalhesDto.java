@@ -16,20 +16,7 @@ public class UsuarioDetalhesDto implements UserDetails {
     public UsuarioDetalhesDto(Usuario usuario) {
         this.nome = usuario.getNome();
         this.email = usuario.getLogin().getEmail();
-        this.email = usuario.getLogin().getSenhaHash();
-    }
-
-
-    public String getSenha() {
-        return senha;
-    }
-
-    public String getNome() {
-        return nome;
-    }
-
-    public String getEmail() {
-        return email;
+        this.senha = usuario.getLogin().getSenhaHash();
     }
 
     @Override
@@ -39,12 +26,12 @@ public class UsuarioDetalhesDto implements UserDetails {
 
     @Override
     public @Nullable String getPassword() {
-        return "";
+        return senha;
     }
 
     @Override
     public String getUsername() {
-        return "";
+        return email;
     }
 
     @Override

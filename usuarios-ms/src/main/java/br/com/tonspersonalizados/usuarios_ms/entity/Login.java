@@ -18,9 +18,6 @@ public class Login {
 
     private String senhaHash;
     private LocalDateTime ultimoLogin;
-    private LocalDateTime logout;
-    private String tokenRecuperarSenha;
-    private Date expiracaoToken;
     private Integer tentativasLogin;
 
     //relacionamento:
@@ -52,14 +49,6 @@ public class Login {
         this.tentativasLogin = tentativasLogin;
     }
 
-    public LocalDateTime getLogout() {
-        return logout;
-    }
-
-    public void setLogout(LocalDateTime logout) {
-        this.logout = logout;
-    }
-
     public Long getId() {
         return id;
     }
@@ -68,28 +57,12 @@ public class Login {
         this.id = id;
     }
 
-    public Date getExpiracaoToken() {
-        return expiracaoToken;
-    }
-
-    public void setExpiracaoToken(Date expiracaoToken) {
-        this.expiracaoToken = expiracaoToken;
-    }
-
     public String getSenhaHash() {
         return senhaHash;
     }
 
     public void setSenhaHash(String senhaHash) {
         this.senhaHash = senhaHash;
-    }
-
-    public String getTokenRecuperarSenha() {
-        return tokenRecuperarSenha;
-    }
-
-    public void setTokenRecuperarSenha(String tokenRecuperarSenha) {
-        this.tokenRecuperarSenha = tokenRecuperarSenha;
     }
 
     public Usuario getUsuario() {
