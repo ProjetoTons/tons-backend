@@ -1,6 +1,7 @@
 package br.com.tonspersonalizados.usuarios_ms.entity;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -29,6 +30,7 @@ public class Empresa {
     private String cnpj;
 
     @Column(nullable = false)
+    @CreationTimestamp
     private LocalDateTime dataDoCadastro;
 
 
