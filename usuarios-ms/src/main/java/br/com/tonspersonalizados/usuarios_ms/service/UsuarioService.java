@@ -2,17 +2,13 @@ package br.com.tonspersonalizados.usuarios_ms.service;
 
 
 import br.com.tonspersonalizados.usuarios_ms.config.GerenciadorTokenJwt;
-import br.com.tonspersonalizados.usuarios_ms.dto.FuncionarioRequestDto;
-import br.com.tonspersonalizados.usuarios_ms.dto.LoginRequestDto;
-import br.com.tonspersonalizados.usuarios_ms.dto.UsuarioRequestDto;
-import br.com.tonspersonalizados.usuarios_ms.dto.UsuarioTokenDto;
-import br.com.tonspersonalizados.usuarios_ms.entity.Acesso;
-import br.com.tonspersonalizados.usuarios_ms.entity.Empresa;
-import br.com.tonspersonalizados.usuarios_ms.entity.Login;
+import br.com.tonspersonalizados.usuarios_ms.dto.*;
+import br.com.tonspersonalizados.usuarios_ms.entity.*;
 import br.com.tonspersonalizados.usuarios_ms.exception.EmailJaExisteException;
+import br.com.tonspersonalizados.usuarios_ms.exception.EnderecoNaoEncontradoException;
 import br.com.tonspersonalizados.usuarios_ms.exception.LoginInvalidoException;
 import br.com.tonspersonalizados.usuarios_ms.exception.UsuarioNaoEncontradoException;
-import br.com.tonspersonalizados.usuarios_ms.entity.Usuario;
+import br.com.tonspersonalizados.usuarios_ms.repository.EnderecoRepository;
 import br.com.tonspersonalizados.usuarios_ms.repository.UsuarioRepository;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -27,11 +23,11 @@ import java.util.List;
 @Service
 public class UsuarioService {
 
-
+    private final UsuarioRepository usuarioRepository;
+    private final EnderecoRepository enderecoRepository;
     private final AcessoService acessoService;
     private final EmpresaService empresaService;
     private final PasswordEncoder passwordEncoder;
-    private final UsuarioRepository usuarioRepository;
     private final GerenciadorTokenJwt gerenciadorTokenJwt;
     private final AuthenticationManager authenticationManager;
 
@@ -41,16 +37,17 @@ public class UsuarioService {
             UsuarioRepository usuarioRepository,
             PasswordEncoder passwordEncoder,
             GerenciadorTokenJwt gerenciadorTokenJwt,
-            AuthenticationManager authenticationManager) {
+            AuthenticationManager authenticationManager, EnderecoRepository enderecoRepository) {
         this.acessoService = acessoService;
         this.usuarioRepository = usuarioRepository;
         this.passwordEncoder = passwordEncoder;
         this.empresaService = empresaService;
         this.gerenciadorTokenJwt = gerenciadorTokenJwt;
         this.authenticationManager = authenticationManager;
+        this.enderecoRepository = enderecoRepository;
+
     }
 
-    // CRUD
     public void cadastrar(UsuarioRequestDto dto) {
 
         Usuario usuario = new Usuario();
@@ -64,7 +61,7 @@ public class UsuarioService {
         login.setUsuario(usuario);
         usuario.setLogin(login);
 
-        // cadastro de endereço é feito posteriormente
+        // cadastro de endereço é feito posteriormente(endpoints abaixo)
 
         if (dto.getCnpj() != null) {
 
@@ -79,7 +76,7 @@ public class UsuarioService {
         usuarioRepository.save(usuario);
     }
 
-    public void cadastrarFuncionario(FuncionarioRequestDto dto){
+    public void cadastrarFuncionario(FuncionarioRequestDto dto) {
         Usuario funcionario = new Usuario();
         funcionario.setNome(dto.getNome());
         funcionario.setTelefone(dto.getTelefone());
@@ -106,15 +103,14 @@ public class UsuarioService {
         final Authentication authentication = this.authenticationManager.authenticate(credentials);
 
 
-        Usuario usuario = usuarioRepository.findByLoginEmail(loginDto.getEmail());
+        Usuario usuario = usuarioRepository.findByLoginEmail(loginDto.getEmail())
+                .orElseThrow(() -> new LoginInvalidoException("Login inválido"));
 
-        if (usuario == null) {
-            throw new LoginInvalidoException("Login inválido");
-        }
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         final String token = gerenciadorTokenJwt.generateToken(authentication);
+
 
         UsuarioTokenDto usuarioTokenDto = new UsuarioTokenDto();
 
@@ -123,22 +119,22 @@ public class UsuarioService {
         usuarioTokenDto.setNome(usuario.getNome());
         usuarioTokenDto.setToken(token);
 
+        usuario.getLogin().setUltimoLogin(LocalDateTime.now());
+
+        usuarioRepository.save(usuario);
+
         return usuarioTokenDto;
     }
 
 
-    public Usuario buscarPorNome(String nome) { //verificar depois
-        Usuario nomeExiste = usuarioRepository.findByNome(nome);
+    public Usuario buscarPorNome(String nome) {
 
-        if (nomeExiste == null) {
-            throw new UsuarioNaoEncontradoException("Usuário não encontrado");
-        }
-
-        return nomeExiste;
+       return usuarioRepository.findByNome(nome)
+                .orElseThrow(() -> new UsuarioNaoEncontradoException("Usuário não encontrado"));
     }
 
     public Usuario buscarPorEmail(String email) {
-        return usuarioRepository.findByLoginEmail(email);
+        return usuarioRepository.findByLoginEmail(email).orElseThrow(() -> new UsuarioNaoEncontradoException("Usuário não encontrado"));
     }
 
     public void atualizar(Long id, UsuarioRequestDto usuarioDto) {
@@ -148,12 +144,9 @@ public class UsuarioService {
             throw new UsuarioNaoEncontradoException("Usuário não encontrado");
         }
 
-        //atualizando informações de usuario
         usuarioExistente.setNome(usuarioDto.getNome());
-        // usuarioExistente.setCpf(usuarioDto.getCpf());
         usuarioExistente.setTelefone(usuarioDto.getTelefone());
 
-        //atualizando informações de login:
         usuarioExistente.getLogin().setEmail(usuarioDto.getEmail());
         usuarioExistente.getLogin().setSenhaHash(usuarioDto.getSenha());
 
@@ -161,19 +154,11 @@ public class UsuarioService {
     }
 
 
-    public void atualizar(Usuario usuario) {
-
-        usuarioRepository.save(usuario);
-    }
-
 
     public void deletar(Long id) {
         // Soft-delete
-        Usuario usuario = usuarioRepository.findById(id).orElse(null);
-
-        if (usuario == null) {
-            throw new UsuarioNaoEncontradoException("Usuário não encontrado");
-        }
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new UsuarioNaoEncontradoException("Usuário não encontrado"));
 
         usuario.setDataDeDeletado(LocalDateTime.now());
 
@@ -181,4 +166,50 @@ public class UsuarioService {
     }
 
 
+    public Endereco cadastrarEnderecoUsuario(EnderecoRequestDto enderecoDto, Long idUsuario) {
+
+
+        Usuario usuario = usuarioRepository.findById(idUsuario)
+                .orElseThrow(() -> new UsuarioNaoEncontradoException("Usuário não encontrado"));
+
+        Endereco endereco = new Endereco();
+        endereco.setUsuario(usuario);
+        endereco.setLogradouro(enderecoDto.getLogadouro());
+        endereco.setNumero(enderecoDto.getNumero());
+        endereco.setCep(enderecoDto.getCep());
+        endereco.setComplemento(endereco.getComplemento());
+
+
+        return enderecoRepository.save(endereco);
+
+    }
+
+    public Endereco buscarEndereco(Long idUsuario) {
+
+        return enderecoRepository.findByUsuarioId(idUsuario)
+                .orElse(null);
+
+    }
+
+    public Endereco atualizarEndereco(EnderecoRequestDto enderecoDto, Long id) {
+
+        Endereco enderecoExistente = enderecoRepository.findByUsuarioId(id)
+                .orElseThrow(() -> new EnderecoNaoEncontradoException("Endereço não encontrado"));
+
+        enderecoExistente.setLogradouro(enderecoDto.getLogadouro());
+        enderecoExistente.setNumero(enderecoDto.getNumero());
+        enderecoExistente.setCep(enderecoDto.getCep());
+        enderecoExistente.setComplemento(enderecoDto.getComplemento());
+
+        return enderecoRepository.save(enderecoExistente);
+
+    }
+
+    public void deletarEndereco(Long id) {
+        Endereco enderecoExistente = enderecoRepository.findByUsuarioId(id)
+                .orElseThrow(() -> new EnderecoNaoEncontradoException("Endereço não encontrado"));
+
+        enderecoRepository.delete(enderecoExistente);
+
+    }
 }

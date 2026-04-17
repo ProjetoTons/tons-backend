@@ -4,11 +4,13 @@ import br.com.tonspersonalizados.usuarios_ms.entity.Usuario;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
 
-     Usuario findByLoginEmail(String loginEmail);
-     Usuario findByNome(String nome);
+    Optional<Usuario> findByLoginEmail(String loginEmail);
 
-     //Usuario findByLoginEmailAndLoginSenhaHash(String email, String senha);
+    Optional<Usuario> findByNome(String nome);
+
 }

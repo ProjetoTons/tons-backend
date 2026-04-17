@@ -28,11 +28,8 @@ public class AutenticacaoService implements UserDetailsService {
             UsernameNotFoundException {
 
 
-        Usuario usuario = usuarioRepository.findByLoginEmail(username);
-
-        if (usuario == null){
-            throw new UsernameNotFoundException(String.format("Usuário: %s  não encontrado",  username));
-        }
+        Usuario usuario = usuarioRepository.findByLoginEmail(username)
+                .orElseThrow(() -> new UsernameNotFoundException(String.format("Usuário: %s  não encontrado",  username)));
 
         return  new UsuarioDetalhesDto(usuario);
     }

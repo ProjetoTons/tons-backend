@@ -35,14 +35,12 @@ public class UsuarioController {
         return ResponseEntity.status(201).body("Usuário cadastrado com sucesso!");
     }
 
-    @PostMapping("/login") //usando o post por mais seguro já que ele possui uma critografia própria, melhor para transitar com a senha do usuário
-    public ResponseEntity<UsuarioTokenDto> login(@RequestBody @Valid LoginRequestDto loginDto){
+    @PostMapping("/login")
+    //usando o post por ser mais seguro já que ele possui uma critografia própria, melhor para transitar com a senha do usuário
+    public ResponseEntity<UsuarioTokenDto> login(@RequestBody @Valid LoginRequestDto loginDto) {
 
         UsuarioTokenDto loginValidado = usuarioService.login(loginDto);
 
-        // loginValidado.().setUltimoLogin(LocalDateTime.now());
-
-        // usuarioService.atualizar(loginValidado);
 
         return ResponseEntity.ok(loginValidado);
     }
@@ -79,4 +77,38 @@ public class UsuarioController {
 
         return ResponseEntity.ok("Usuário deletado com sucesso!");
     }
+
+    //adicionar endpoints para recupereção de senha para isso preciso verificar a api de email
+
+
+    @PostMapping("/{id}/endereco")
+    public ResponseEntity<Endereco> cadastrarEndereco(@RequestBody @Valid EnderecoRequestDto enderecoDto, @PathVariable Long id) {
+
+
+        return ResponseEntity.status(201).body(usuarioService.cadastrarEnderecoUsuario(enderecoDto, id));
+
+    }
+
+    @GetMapping("/{id}/endereco")
+    public ResponseEntity<Endereco> buscarEndereco(@PathVariable Long id) {
+
+        return ResponseEntity.status(200).body(usuarioService.buscarEndereco(id));
+
+    }
+
+    @PutMapping("/{id}/endereco")
+    public ResponseEntity<Endereco> atualizarEndereco(@PathVariable @Valid EnderecoRequestDto enderecoDto, Long id) {
+
+        return ResponseEntity.status(200).body(usuarioService.atualizarEndereco(enderecoDto, id));
+    }
+
+
+    @DeleteMapping("/{id}/endereco")
+    public ResponseEntity<Void> deletarEndereco(@PathVariable Long id){
+
+        usuarioService.deletarEndereco(id);
+
+       return   ResponseEntity.status(204).build();
+    }
+
 }
