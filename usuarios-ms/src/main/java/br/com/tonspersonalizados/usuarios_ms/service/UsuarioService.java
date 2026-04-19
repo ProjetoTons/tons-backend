@@ -129,12 +129,12 @@ public class UsuarioService {
 
     public Usuario buscarPorNome(String nome) {
 
-       return usuarioRepository.findByNome(nome)
+        return usuarioRepository.findByNome(nome)
                 .orElseThrow(() -> new UsuarioNaoEncontradoException("Usuário não encontrado"));
     }
 
     public Usuario buscarPorEmail(String email) {
-        return usuarioRepository.findByLoginEmail(email).orElseThrow(() -> new UsuarioNaoEncontradoException("Usuário não encontrado"));
+        return usuarioRepository.findByLoginEmail(email).orElse(null);
     }
 
     public void atualizar(Long id, UsuarioRequestDto usuarioDto) {
@@ -152,7 +152,6 @@ public class UsuarioService {
 
         usuarioRepository.save(usuarioExistente);
     }
-
 
 
     public void deletar(Long id) {
@@ -179,9 +178,11 @@ public class UsuarioService {
         endereco.setCep(enderecoDto.getCep());
         endereco.setComplemento(endereco.getComplemento());
 
+        usuario.setEndereco(endereco);
 
-        return enderecoRepository.save(endereco);
+        usuarioRepository.save(usuario);
 
+        return endereco;
     }
 
     public Endereco buscarEndereco(Long idUsuario) {
@@ -206,10 +207,17 @@ public class UsuarioService {
     }
 
     public void deletarEndereco(Long id) {
-        Endereco enderecoExistente = enderecoRepository.findByUsuarioId(id)
-                .orElseThrow(() -> new EnderecoNaoEncontradoException("Endereço não encontrado"));
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(UsuarioNaoEncontradoException::new);
 
-        enderecoRepository.delete(enderecoExistente);
+        if (usuario.getEndereco() != null) {
 
+            // Desvinculando endereço do usuário para que o JPA possa deletar esse endereço
+            usuario.getEndereco().setUsuario(null);
+            usuario.setEndereco(null);
+        }
+
+
+        usuarioRepository.save(usuario);
     }
 }

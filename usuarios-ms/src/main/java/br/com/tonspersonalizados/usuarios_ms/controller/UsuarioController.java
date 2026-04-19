@@ -53,7 +53,9 @@ public class UsuarioController {
         return ResponseEntity.status(201).body("Funcionário cadastrado com sucesso!");
     }
 
+
     @GetMapping("/{nome}")
+    @SecurityRequirement(name = "Bearer")
     public ResponseEntity<Usuario> buscarPorNome(@PathVariable String nome) {
         Usuario usuario = usuarioService.buscarPorNome(nome);
 
@@ -78,10 +80,8 @@ public class UsuarioController {
         return ResponseEntity.ok("Usuário deletado com sucesso!");
     }
 
-    //adicionar endpoints para recupereção de senha para isso preciso verificar a api de email
-
-
     @PostMapping("/{id}/endereco")
+    @SecurityRequirement(name = "Bearer")
     public ResponseEntity<Endereco> cadastrarEndereco(@RequestBody @Valid EnderecoRequestDto enderecoDto, @PathVariable Long id) {
 
 
@@ -90,6 +90,7 @@ public class UsuarioController {
     }
 
     @GetMapping("/{id}/endereco")
+    @SecurityRequirement(name = "Bearer")
     public ResponseEntity<Endereco> buscarEndereco(@PathVariable Long id) {
 
         return ResponseEntity.status(200).body(usuarioService.buscarEndereco(id));
@@ -97,13 +98,15 @@ public class UsuarioController {
     }
 
     @PutMapping("/{id}/endereco")
-    public ResponseEntity<Endereco> atualizarEndereco(@PathVariable @Valid EnderecoRequestDto enderecoDto, Long id) {
+    @SecurityRequirement(name = "Bearer")
+    public ResponseEntity<Endereco> atualizarEndereco(@RequestBody @Valid EnderecoRequestDto enderecoDto,@PathVariable  Long id) {
 
         return ResponseEntity.status(200).body(usuarioService.atualizarEndereco(enderecoDto, id));
     }
 
 
     @DeleteMapping("/{id}/endereco")
+    @SecurityRequirement(name = "Bearer")
     public ResponseEntity<Void> deletarEndereco(@PathVariable Long id){
 
         usuarioService.deletarEndereco(id);

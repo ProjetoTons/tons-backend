@@ -1,5 +1,7 @@
 package br.com.tonspersonalizados.usuarios_ms.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 @Entity
@@ -17,13 +19,14 @@ public class Endereco {
     @Column(nullable = false)
     private String numero;
 
-    @Column(nullable = false)
+
     private String complemento;
 
 
 //relacionamentos:
 
-    @OneToOne
+    @OneToOne(mappedBy = "endereco")
+    @JsonIgnore
     private Usuario usuario;
 
     @OneToOne

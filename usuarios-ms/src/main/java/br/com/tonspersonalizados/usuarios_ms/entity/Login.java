@@ -10,7 +10,6 @@ import java.util.Date;
 public class Login {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false, unique = true)
@@ -22,6 +21,8 @@ public class Login {
 
     //relacionamento:
     @OneToOne
+    @MapsId  //indica que a fk também será a chave primária
+    @JoinColumn(name = "id_usuario")
     private Usuario usuario;
 
 

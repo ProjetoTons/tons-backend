@@ -1,5 +1,6 @@
 package br.com.tonspersonalizados.usuarios_ms.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -19,10 +20,7 @@ public class Usuario {
     private String nome;
 
 
-    //private String email;
-    //private String senha;
-
-    @Column(nullable = false, unique = true)
+    @Column(unique = true)
     private String cpf;
 
     @Column(nullable = false)
@@ -38,17 +36,16 @@ public class Usuario {
     private LocalDateTime dataDeDeletado;
 
 
-    //relacionamentos:
 
-    @OneToOne(cascade = CascadeType.ALL) // ações relacionadas ao usuário serão aplicadas no login tbm.
-    @JoinColumn(name = "fk_login")
+    @OneToOne(mappedBy = "usuario",  cascade = CascadeType.ALL)
     private Login login;
 
     @ManyToMany // um usuário pode ter muitas roles
     private List<Acesso> acessos;
 
-    @OneToOne (cascade = CascadeType.ALL)
+    @OneToOne (cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "fk_endereco")
+    @JsonBackReference
     private Endereco endereco;
 
     @ManyToOne
