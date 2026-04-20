@@ -48,24 +48,24 @@ public class UsuarioService {
 
     }
 
-    public void cadastrar(UsuarioRequestDto dto) {
+    public void cadastrar(UsuarioRequestDto usuarioDto) {
 
         Usuario usuario = new Usuario();
-        usuario.setNome(dto.getNome());
-        usuario.setCpf(dto.getCpf());
-        usuario.setTelefone(dto.getTelefone());
+        usuario.setNome(usuarioDto.getNome());
+        usuario.setCpf(usuarioDto.getCpf());
+        usuario.setTelefone(usuarioDto.getTelefone());
 
         Login login = new Login();
-        login.setEmail(dto.getEmail());
-        login.setSenhaHash(passwordEncoder.encode(dto.getSenha()));
+        login.setEmail(usuarioDto.getEmail());
+        login.setSenhaHash(passwordEncoder.encode(usuarioDto.getSenha()));
         login.setUsuario(usuario);
         usuario.setLogin(login);
 
         // cadastro de endereço é feito posteriormente(endpoints abaixo)
 
-        if (dto.getCnpj() != null) {
+        if (usuarioDto.getCnpj() != null) {
 
-            Empresa empresa = empresaService.buscarPorCnpj(dto.getCnpj());
+            Empresa empresa = empresaService.buscarPorCnpj(usuarioDto.getCnpj());
             usuario.setEmpresa(empresa);
         }
 
@@ -76,19 +76,19 @@ public class UsuarioService {
         usuarioRepository.save(usuario);
     }
 
-    public void cadastrarFuncionario(FuncionarioRequestDto dto) {
+    public void cadastrarFuncionario(FuncionarioRequestDto funcionarioDto) {
         Usuario funcionario = new Usuario();
-        funcionario.setNome(dto.getNome());
-        funcionario.setTelefone(dto.getTelefone());
+        funcionario.setNome(funcionarioDto.getNome());
+        funcionario.setTelefone(funcionarioDto.getTelefone());
 
         Login login = new Login();
-        login.setEmail(dto.getEmail());
-        login.setSenhaHash(passwordEncoder.encode(dto.getSenha()));
+        login.setEmail(funcionarioDto.getEmail());
+        login.setSenhaHash(passwordEncoder.encode(funcionarioDto.getSenha()));
         login.setUsuario(funcionario);
         funcionario.setLogin(login);
 
         // Adicionar acessos
-        List<Acesso> acessos = acessoService.listarAcessosById(dto.getAcessos());
+        List<Acesso> acessos = acessoService.listarAcessosById(funcionarioDto.getAcessos());
         funcionario.setAcessos(acessos);
 
         usuarioRepository.save(funcionario);

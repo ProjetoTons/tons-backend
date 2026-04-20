@@ -3,6 +3,7 @@ package br.com.tonspersonalizados.usuarios_ms.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
+import org.hibernate.boot.model.source.spi.DiscriminatorSource;
 
 @Entity
 public class Endereco {
@@ -23,13 +24,13 @@ public class Endereco {
     private String complemento;
 
 
-//relacionamentos:
-
     @OneToOne(mappedBy = "endereco")
     @JsonIgnore
     private Usuario usuario;
 
     @OneToOne
+    @JsonIgnore
+    @JoinColumn(name = "empresa_id")
     private Empresa empresa;
 
 

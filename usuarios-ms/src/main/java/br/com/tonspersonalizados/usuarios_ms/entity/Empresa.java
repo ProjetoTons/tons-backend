@@ -1,5 +1,6 @@
 package br.com.tonspersonalizados.usuarios_ms.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -38,7 +39,8 @@ public class Empresa {
     @OneToMany
     private List<Usuario> usuario;
 
-    @OneToOne
+    @OneToOne (cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "empresa")
+    @JsonBackReference
     private Endereco endereco;
 
 
