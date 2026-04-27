@@ -10,13 +10,13 @@ Backend do sistema de comunicação unificada da **Tons Personalizados**, uma gr
 
 - [Sobre o Projeto](#sobre-o-projeto)
 - [Arquitetura](#arquitetura)
-- [Microserviços](#microserviços)
+- [Módulos do Domínio](#módulos-do-domínio)
 - [Stack Tecnológica](#stack-tecnológica)
 - [Estrutura do Repositório](#estrutura-do-repositório)
 - [Pré-requisitos](#pré-requisitos)
 - [Como Executar](#como-executar)
 - [Variáveis de Ambiente](#variáveis-de-ambiente)
-- [Endpoints por Serviço](#endpoints-por-serviço)
+- [Endpoints](#endpoints)
 - [Equipe](#equipe)
 
 ---
@@ -27,29 +27,29 @@ A **Tons Personalizados** é uma gráfica especializada em sublimação e person
 
 - **Vitrine digital** de produtos com categorias e favoritos
 - **Gestão de pedidos** com Kanban, status em tempo real e histórico
-- **Notificações automáticas** via WhatsApp (Evolution API)
+- **Notificações automáticas** via WhatsApp (Evolution API) e e-mail
 - **Painéis por nível de acesso** (dono, funcionário, cliente)
 - **Dashboard de insights** com métricas de produção e vendas
 - **Formulário de feedback** pós-entrega
 
 ### Requisitos Funcionais
 
-| # | Requisito | Microserviço |
-|---|-----------|-------------|
-| 1 | Portfólio / Vitrine de Produtos | `produtos-ms` |
-| 2 | Integração WhatsApp | `notificação-ms` |
-| 3 | Painel de gerenciamento por área/nível | `usuarios-ms` |
-| 4 | Painel de status do pedido (cliente) | `pedidos-ms` |
-| 5 | Dashboard de insights | `pedidos-ms` |
-| 6 | Formulário de feedback | `notificação-ms` |
-| 7 | Histórico de pedidos | `pedidos-ms` |
-| 8 | Favoritos | `produtos-ms` |
+| #   | Requisito                            | Módulo        |
+| --- | ------------------------------------ | ------------- |
+| 1   | Portfólio / Vitrine de Produtos      | `produtos`    |
+| 2   | Integração WhatsApp                  | `notificacao` |
+| 3   | Painel de gerenciamento por nível    | `usuarios`    |
+| 4   | Painel de status do pedido (cliente) | `pedidos`     |
+| 5   | Dashboard de insights                | `pedidos`     |
+| 6   | Formulário de feedback               | `notificacao` |
+| 7   | Histórico de pedidos                 | `pedidos`     |
+| 8   | Favoritos                            | `produtos`    |
 
 ---
 
 ## Arquitetura
 
-O backend segue uma arquitetura de **microserviços**, onde cada serviço é uma aplicação Spring Boot independente com seu próprio contexto de domínio.
+O backend é uma **aplicação monolítica Spring Boot** organizada em **arquitetura por camadas** (Package-by-Layer). Todos os módulos de domínio compartilham o mesmo contexto Spring, o mesmo DataSource e a mesma porta.
 
 ```
                          ┌──────────┐
@@ -57,105 +57,77 @@ O backend segue uma arquitetura de **microserviços**, onde cada serviço é uma
                          │ (React)  │
                          └────┬─────┘
                               │
-                         ┌────▼─────┐
-                         │   API    │
-                         │ Gateway  │
-                         └────┬─────┘
+                              │ HTTP/REST
                               │
-            ┌─────────────────┼─────────────────┐
-            │                 │                  │
-   ┌────────▼──────┐  ┌──────▼───────┐  ┌──────▼────────┐
-   │  usuarios-ms  │  │ produtos-ms  │  │  pedidos-ms   │
-   │   :8081       │  │   :8082      │  │   :8083       │
-   └────────┬──────┘  └──────┬───────┘  └──────┬────────┘
-            │                │                  │
-            └────────────────┼──────────────────┘
-                             │
-                      ┌──────▼───────┐     ┌────────────────┐
-                      │    MySQL     │     │ notificação-ms │
-                      │   (Banco)   │     │     :8084       │
-                      └──────────────┘     └───────┬────────┘
-                                                   │
-                                           ┌───────▼────────┐
-                                           │ Evolution API  │
-                                           │  (WhatsApp)    │
-                                           └────────────────┘
+                       ┌──────▼───────┐
+                       │ Tons Backend │
+                       │  (monolito)  │
+                       │   :8080      │
+                       └──────┬───────┘
+                              │
+              ┌───────────────┼─────────────────┐
+              │               │                 │
+       ┌──────▼─────┐  ┌──────▼──────┐  ┌──────▼────────┐
+       │   MySQL    │  │   SMTP      │  │ Evolution API │
+       │  (única    │  │  (Gmail)    │  │  (WhatsApp)   │
+       │   DB)      │  │             │  │               │
+       └────────────┘  └─────────────┘  └───────────────┘
 ```
 
-### Comunicação entre serviços
-
-- **Síncrona:** HTTP/REST interno entre microserviços quando necessário
-- **Roteamento:** API Gateway — roteia por prefixo de URL para cada serviço
+> **Histórico:** o projeto começou como 4 microsserviços (`usuarios-ms`, `pedidos-ms`, `produtos-ms`, `notificação-ms`) e foi consolidado em um monolito modular para simplificar deploy e operação. Ver [_bmad-output/planning-artifacts/06-arquitetura/plano-migracao-microservicos-para-monolito.md](../_bmad-output/planning-artifacts/06-arquitetura/plano-migracao-microservicos-para-monolito.md).
 
 ---
 
-## Microserviços
+## Módulos do Domínio
 
-### 1. `usuarios-ms` — Porta 8081
+Os módulos não correspondem a artefatos Maven separados — são agrupamentos lógicos dentro do monolito.
 
-Gerencia autenticação, autorização e dados de usuários.
+### `usuarios`
 
-| Domínio | Responsabilidade |
-|---------|-----------------|
-| `auth` | Login, registro, JWT, refresh token |
-| `cliente` | CRUD de clientes, perfil, endereço |
-| `funcionario` | CRUD de funcionários, cargos, níveis de acesso |
+Autenticação, autorização e dados de usuários.
 
-**Roles:** `DONO`, `FUNCIONARIO`, `CLIENTE`
+| Domínio       | Responsabilidade                              |
+| ------------- | --------------------------------------------- |
+| `auth`        | Login, JWT, controle de acesso                |
+| `cliente`     | CRUD de clientes, perfil, endereço            |
+| `funcionario` | CRUD de funcionários, cargos, níveis          |
+| `empresa`     | Cadastro de empresas e endereços vinculados   |
 
-### 2. `produtos-ms` — Porta 8082
+**Roles:** `DONO`, `FUNCIONARIO`, `CLIENTE`.
 
-Gerencia o catálogo de produtos, categorias e favoritos.
+### `produtos`
 
-| Domínio | Responsabilidade |
-|---------|-----------------|
-| `catalogo` | CRUD de produtos, imagens, preços, vitrine pública |
-| `categoria` | Categorias e subcategorias (canecas, camisetas, quadros, etc.) |
-| `favorito` | Lista de favoritos por cliente |
-| `upload` | Upload e armazenamento de imagens |
+Catálogo, categorias e favoritos.
 
-### 3. `pedidos-ms` — Porta 8083
+### `pedidos`
 
-Gerencia todo o ciclo de vida dos pedidos.
+Ciclo de vida dos pedidos, Kanban, dashboard, histórico.
 
-| Domínio | Responsabilidade |
-|---------|-----------------|
-| `order` | CRUD de pedidos, mudança de status |
-| `kanban` | Visualização Kanban para gestão interna |
-| `dashboard` | Métricas, gráficos, insights de produção e vendas |
-| `historico` | Histórico de pedidos por cliente e por período |
-| `calendario` | Calendário de entregas e produção |
-| `ordemservico` | Ordem de serviço digital (impressão para produção) |
+**Status:** `RECEBIDO` → `EM_PRODUÇÃO` → `PRONTO` → `ENTREGUE`.
 
-**Status do pedido:** `RECEBIDO` → `EM_PRODUÇÃO` → `PRONTO` → `ENTREGUE`
+### `notificacao`
 
-### 4. `notificação-ms` — Porta 8084
-
-Gerencia notificações e comunicação com o cliente.
-
-| Domínio | Responsabilidade |
-|---------|-----------------|
-| `whatsapp` | Integração com Evolution API, envio de mensagens |
-| `template` | Templates de mensagens (confirmação, status, promoção) |
-| `fila` | Fila de mensagens para envio assíncrono |
-| `feedback` | Formulário de satisfação pós-entrega |
+Envio de e-mails (SMTP) e integração com WhatsApp via Evolution API. Templates e formulário de feedback.
 
 ---
 
 ## Stack Tecnológica
 
-| Componente | Tecnologia | Versão |
-|------------|-----------|--------|
-| Linguagem | Java | 21 (LTS) |
-| Framework | Spring Boot | 4.0.3 |
-| ORM | Spring Data JPA + Hibernate | — |
-| Banco de Dados | MySQL | 8+ |
-| Sessão | Spring Session JDBC | — |
-| Utilitários | Lombok | — |
-| Build | Maven | — |
-| API Gateway | Spring Cloud Gateway | — |
-| WhatsApp | Evolution API | — |
-| Containerização | Docker + Docker Compose | — |
+| Componente     | Tecnologia                  | Versão     |
+| -------------- | --------------------------- | ---------- |
+| Linguagem      | Java                        | 21 (LTS)   |
+| Framework      | Spring Boot                 | 4.0.3      |
+| Web            | Spring Web MVC              | —          |
+| Segurança      | Spring Security + JJWT      | 0.11.5     |
+| ORM            | Spring Data JPA + Hibernate | —          |
+| Banco          | MySQL                       | 8+         |
+| Sessão         | Spring Session JDBC         | —          |
+| E-mail         | Spring Boot Starter Mail    | —          |
+| Documentação   | springdoc-openapi-ui        | 2.8.8      |
+| Observabilidade| Spring Boot Actuator        | —          |
+| Utilitários    | Lombok                      | —          |
+| Build          | Maven Wrapper               | 3.9.x      |
+| WhatsApp       | Evolution API               | —          |
 
 ---
 
@@ -163,163 +135,162 @@ Gerencia notificações e comunicação com o cliente.
 
 ```
 tons-backend/
-├── api-gateway/                    # API Gateway (Spring Cloud Gateway)
-│
-├── usuarios-ms/                    # Microserviço de Usuários (:8081)
-│   └── src/main/java/br/com/tonspersonalizados/usuarios_ms/
-│       ├── config/                 # Configurações (Security, CORS, etc.)
-│       ├── auth/                   # Autenticação e autorização
-│       │   ├── controller/
-│       │   ├── service/
-│       │   └── dto/
-│       ├── cliente/                # Gestão de clientes
-│       │   ├── controller/
-│       │   ├── service/
-│       │   ├── repository/
-│       │   ├── model/
-│       │   └── dto/
-│       └── funcionario/            # Gestão de funcionários
-│           ├── controller/
-│           ├── service/
-│           ├── repository/
-│           ├── model/
-│           └── dto/
-│
-├── produtos-ms/                    # Microserviço de Produtos (:8082)
-│   └── src/main/java/br/com/tonspersonalizados/produtos_ms/
-│       ├── catalogo/               # Catálogo e vitrine
-│       ├── categoria/              # Categorias de produtos
-│       ├── favorito/               # Favoritos do cliente
-│       └── upload/                 # Upload de imagens
-│
-├── pedidos-ms/                     # Microserviço de Pedidos (:8083)
-│   └── src/main/java/br/com/tonspersonalizados/pedidos_ms/
-│       ├── order/                  # CRUD de pedidos
-│       ├── kanban/                 # Painel Kanban
-│       ├── dashboard/              # Métricas e insights
-│       ├── historico/              # Histórico de pedidos
-│       ├── calendario/             # Calendário de entregas
-│       └── ordemservico/           # Ordem de serviço digital
-│
-├── notificação-ms/                 # Microserviço de Notificações (:8084)
-│   └── src/main/java/br/com/tonspersonalizados/notificacao_ms/
-│       ├── whatsapp/               # Integração Evolution API
-│       ├── template/               # Templates de mensagem
-│       ├── fila/                   # Fila de envio assíncrono
-│       └── feedback/               # Feedback pós-entrega
-│
-├── docker-compose.yml              # Orquestração dos serviços
+├── pom.xml                          # POM único do monolito
+├── mvnw, mvnw.cmd, .mvn/            # Maven Wrapper
+├── azure-pipelines.yml              # CI (build + sync)
+├── docs/                            # Guias técnicos
+│   └── guia-javamail-springboot.md
+├── src/
+│   ├── main/
+│   │   ├── java/br/com/tonspersonalizados/
+│   │   │   ├── TonsApplication.java # Entrypoint Spring Boot
+│   │   │   ├── config/              # Security, JWT, Swagger, CORS
+│   │   │   ├── controller/          # Endpoints REST (todos os módulos)
+│   │   │   ├── service/             # Regras de negócio
+│   │   │   ├── repository/          # Spring Data JPA
+│   │   │   ├── entity/              # @Entity JPA
+│   │   │   ├── dto/                 # Request/Response DTOs
+│   │   │   └── exception/           # Exceções de domínio
+│   │   └── resources/
+│   │       └── application.properties
+│   └── test/
+│       └── java/br/com/tonspersonalizados/
 └── README.md
 ```
-
-> **Nota:** Cada domínio segue o padrão `controller/ → service/ → repository/ → model/ → dto/`, sendo criados conforme a implementação avançar.
 
 ---
 
 ## Pré-requisitos
 
 - **Java 21** (LTS)
-- **Maven 3.9+**
-- **MySQL 8+**
-- **Docker** e **Docker Compose** (opcional, para ambiente containerizado)
+- **MySQL 8+** com banco `tonsDb` criado
+- **Maven 3.9+** (opcional — o wrapper `./mvnw` já vai instalar quando houver internet)
 
 ---
 
 ## Como Executar
 
-### Executar um serviço individualmente
+### 1. Subir o MySQL
 
-```bash
-cd usuarios-ms
-./mvnw spring-boot:run
+Crie o banco usado pela aplicação:
+
+```sql
+CREATE DATABASE tonsDb;
 ```
 
-### Executar todos com Docker Compose
+### 2. Configurar credenciais
+
+Edite [src/main/resources/application.properties](src/main/resources/application.properties) (ou exporte variáveis de ambiente equivalentes) ajustando:
+
+- `spring.datasource.url`
+- `spring.datasource.username`
+- `spring.datasource.password`
+- `jwt.secret` (mínimo 32 caracteres)
+- `spring.mail.username` / `spring.mail.password` (se for usar e-mail)
+
+> ⚠️ **Não commit credenciais em produção.** Mover para variáveis de ambiente é recomendado.
+
+### 3. Build e execução
 
 ```bash
-docker-compose up --build
+./mvnw clean compile          # compila
+./mvnw test                   # roda testes
+./mvnw spring-boot:run        # sobe a aplicação em :8080
 ```
 
-### Build de todos os serviços
+Ou empacotar e executar o JAR:
 
 ```bash
-# Em cada diretório de serviço:
 ./mvnw clean package -DskipTests
+java -jar target/tons-backend-0.0.1-SNAPSHOT.jar
 ```
+
+### 4. Documentação OpenAPI / Swagger UI
+
+Após subir, acesse:
+
+- Swagger UI: `http://localhost:8080/swagger-ui.html`
+- OpenAPI JSON: `http://localhost:8080/v3/api-docs`
 
 ---
 
 ## Variáveis de Ambiente
 
-Cada serviço possui seu `application.properties` em `src/main/resources/`. Configurações típicas:
+Configurações principais em [src/main/resources/application.properties](src/main/resources/application.properties):
 
-| Variável | Descrição | Exemplo |
-|----------|-----------|---------|
-| `spring.datasource.url` | URL do banco MySQL | `jdbc:mysql://localhost:3306/tons_usuarios` |
-| `spring.datasource.username` | Usuário do banco | `root` |
-| `spring.datasource.password` | Senha do banco | `tons123` |
-| `server.port` | Porta do serviço | `8081` |
-
-### Bancos por serviço
-
-| Serviço | Banco | Porta |
-|---------|-------|-------|
-| `usuarios-ms` | `tons_usuarios` | 8081 |
-| `produtos-ms` | `tons_produtos` | 8082 |
-| `pedidos-ms` | `tons_pedidos` | 8083 |
-| `notificação-ms` | `tons_notificacoes` | 8084 |
+| Chave                          | Descrição                              | Padrão                              |
+| ------------------------------ | -------------------------------------- | ----------------------------------- |
+| `spring.datasource.url`        | URL JDBC do MySQL                      | `jdbc:mysql://localhost:3306/tonsDb`|
+| `spring.datasource.username`   | Usuário do banco                       | `root`                              |
+| `spring.datasource.password`   | Senha do banco                         | —                                   |
+| `spring.jpa.hibernate.ddl-auto`| Estratégia DDL                         | `update`                            |
+| `jwt.validity`                 | Expiração do token (ms)                | `3600000` (1h)                      |
+| `jwt.secret`                   | Chave de assinatura JWT                | —                                   |
+| `spring.mail.host`             | Host SMTP                              | `smtp.gmail.com`                    |
+| `spring.mail.port`             | Porta SMTP                             | `587`                               |
+| `spring.mail.username`         | Usuário SMTP                           | —                                   |
+| `spring.mail.password`         | Senha de aplicativo SMTP               | —                                   |
 
 ---
 
-## Endpoints por Serviço
+## Endpoints
 
-> Endpoints planejados — serão implementados durante as sprints.
+URLs preservadas dos microsserviços originais — agora servidas pelo monolito em `:8080`.
 
-### usuarios-ms (`/api/users`)
-| Método | Rota | Descrição |
-|--------|------|-----------|
-| POST | `/api/users/auth/login` | Login |
-| POST | `/api/users/auth/register` | Registro |
-| GET | `/api/users/clientes` | Listar clientes |
-| GET | `/api/users/clientes/{id}` | Buscar cliente |
-| GET | `/api/users/funcionarios` | Listar funcionários |
+### Usuários (`/usuarios`)
 
-### produtos-ms (`/api/products`)
-| Método | Rota | Descrição |
-|--------|------|-----------|
-| GET | `/api/products/catalogo` | Listar vitrine |
-| GET | `/api/products/catalogo/{id}` | Detalhe do produto |
-| GET | `/api/products/categorias` | Listar categorias |
-| POST | `/api/products/favoritos` | Adicionar favorito |
-| GET | `/api/products/favoritos` | Listar favoritos |
+| Método | Rota                          | Descrição                  |
+| ------ | ----------------------------- | -------------------------- |
+| POST   | `/usuarios`                   | Cadastrar usuário          |
+| POST   | `/usuarios/login`             | Login (retorna JWT)        |
+| POST   | `/usuarios/funcionario`       | Cadastrar funcionário      |
+| GET    | `/usuarios/{nome}`            | Buscar por nome            |
+| PUT    | `/usuarios/{id}`              | Atualizar usuário          |
+| DELETE | `/usuarios/{id}`              | Remover usuário            |
+| POST   | `/usuarios/{id}/endereco`     | Cadastrar endereço         |
+| GET    | `/usuarios/{id}/endereco`     | Buscar endereço            |
+| PUT    | `/usuarios/{id}/endereco`     | Atualizar endereço         |
+| DELETE | `/usuarios/{id}/endereco`     | Remover endereço           |
 
-### pedidos-ms (`/api/orders`)
-| Método | Rota | Descrição |
-|--------|------|-----------|
-| POST | `/api/orders` | Criar pedido |
-| GET | `/api/orders/{id}` | Detalhe do pedido |
-| PATCH | `/api/orders/{id}/status` | Atualizar status |
-| GET | `/api/orders/kanban` | Visualização Kanban |
-| GET | `/api/orders/dashboard` | Métricas |
-| GET | `/api/orders/historico` | Histórico |
+### Empresas (`/empresas`)
 
-### notificação-ms (`/api/notifications`)
-| Método | Rota | Descrição |
-|--------|------|-----------|
-| POST | `/api/notifications/send` | Enviar notificação |
-| GET | `/api/notifications/templates` | Listar templates |
-| POST | `/api/notifications/feedback` | Enviar feedback |
+| Método | Rota                         | Descrição               |
+| ------ | ---------------------------- | ----------------------- |
+| POST   | `/empresas`                  | Cadastrar empresa       |
+| GET    | `/empresas`                  | Listar empresas         |
+| POST   | `/empresas/{id}/endereco`    | Cadastrar endereço      |
+| GET    | `/empresas/{id}/endereco`    | Buscar endereço         |
+| PUT    | `/empresas/{id}/endereco`    | Atualizar endereço      |
+| DELETE | `/empresas/{id}/endereco`    | Remover endereço        |
+
+### Notificações (`/notificacao`)
+
+| Método | Rota                          | Descrição           |
+| ------ | ----------------------------- | ------------------- |
+| POST   | `/notificacao/enviar-email`   | Enviar e-mail       |
+
+> Endpoints de produtos e pedidos serão implementados nas próximas sprints.
+
+---
+
+## CI/CD
+
+Pipeline em [azure-pipelines.yml](azure-pipelines.yml):
+
+1. Instala JDK 21
+2. Roda `./mvnw clean verify`
+3. Sincroniza repositório com Azure DevOps
 
 ---
 
 ## Equipe
 
-| Nome | Papel |
-|------|-------|
-| Dennis Wilson Serrano Medrano | Tech Lead |
-| Davi | Desenvolvedor |
-| Gustavo | Desenvolvedor |
-| Rafael | Desenvolvedor |
+| Nome                            | Papel           |
+| ------------------------------- | --------------- |
+| Dennis Wilson Serrano Medrano   | Tech Lead       |
+| Davi                            | Desenvolvedor   |
+| Gustavo                         | Desenvolvedor   |
+| Rafael                          | Desenvolvedor   |
 
 ---
 
