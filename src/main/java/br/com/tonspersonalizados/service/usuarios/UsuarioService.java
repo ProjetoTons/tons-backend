@@ -51,6 +51,7 @@ public class UsuarioService {
     public void cadastrar(UsuarioRequestDto usuarioDto) {
 
         Usuario usuario = new Usuario();
+        usuario.setFuncionario(false);
         usuario.setNome(usuarioDto.getNome());
         usuario.setCpf(usuarioDto.getCpf());
         usuario.setTelefone(usuarioDto.getTelefone());
@@ -78,8 +79,10 @@ public class UsuarioService {
 
     public void cadastrarFuncionario(FuncionarioRequestDto funcionarioDto) {
         Usuario funcionario = new Usuario();
+        funcionario.setFuncionario(true);
         funcionario.setNome(funcionarioDto.getNome());
         funcionario.setTelefone(funcionarioDto.getTelefone());
+        funcionario.setDataNascimento(funcionarioDto.getDataNascimento());
 
         Login login = new Login();
         login.setEmail(funcionarioDto.getEmail());
@@ -127,10 +130,8 @@ public class UsuarioService {
     }
 
 
-    public Usuario buscarPorNome(String nome) {
-
-        return usuarioRepository.findByNome(nome)
-                .orElseThrow(() -> new UsuarioNaoEncontradoException("Usuário não encontrado"));
+    public List<FuncionarioResponseDto> listarFuncionarios() {
+        return usuarioRepository.findAllByIsFuncionario(true);
     }
 
     public Usuario buscarPorEmail(String email) {
@@ -138,11 +139,8 @@ public class UsuarioService {
     }
 
     public void atualizar(Long id, UsuarioRequestDto usuarioDto) {
-        Usuario usuarioExistente = usuarioRepository.findById(id).orElse(null);
-
-        if (usuarioExistente == null) {
-            throw new UsuarioNaoEncontradoException("Usuário não encontrado");
-        }
+        Usuario usuarioExistente = usuarioRepository.findById(id)
+                .orElseThrow(() -> new UsuarioNaoEncontradoException("Usuário não encontrado"));
 
         usuarioExistente.setNome(usuarioDto.getNome());
         usuarioExistente.setTelefone(usuarioDto.getTelefone());
@@ -153,6 +151,20 @@ public class UsuarioService {
         usuarioRepository.save(usuarioExistente);
     }
 
+    public void atualizarFuncionario(Long id, FuncionarioRequestDto funcionarioDto) {
+        Usuario funcionarioExistente = usuarioRepository.findById(id)
+                .orElseThrow(() -> new UsuarioNaoEncontradoException("Funcionário não encontrado"));
+
+        funcionarioExistente.setNome(funcionarioDto.getNome());
+        funcionarioExistente.setTelefone(funcionarioDto.getTelefone());
+        funcionarioExistente.setDataNascimento(funcionarioDto.getDataNascimento());
+
+        List<Acesso> acessos = acessoService.listarAcessosById(funcionarioDto.getAcessos());
+
+        funcionarioExistente.setAcessos(acessos);
+
+        usuarioRepository.save(funcionarioExistente);
+    }
 
     public void deletar(Long id) {
         // Soft-delete
