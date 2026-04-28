@@ -13,6 +13,6 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
 
     Optional<Usuario> findByLoginEmail(String loginEmail);
 
-    List<FuncionarioResponseDto> findAllByIsFuncionario(Boolean isFuncionario);
+    List<Usuario> findAllByIsFuncionarioIsTrueAndDataDeDeletadoIsNull();
 
 }

@@ -76,7 +76,7 @@ public class UsuarioController {
     }
 
 
-    @Operation(summary = "Buscar usuário por nome", description = "Recupera as informações de um usuário buscando por seu nome de usuário. Requer autenticação.")
+    @Operation(summary = "Buscar funcionários", description = "Recupera as informações de todos os funcionários. Requer autenticação.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Funcionários encontrados com sucesso"),
             @ApiResponse(responseCode = "403", description = "Acesso não autorizado")
@@ -110,6 +110,7 @@ public class UsuarioController {
             @ApiResponse(responseCode = "403", description = "Acesso não autorizado")
     })
     @PutMapping("funcionario/{id}")
+    @SecurityRequirement(name = "Bearer")
     public ResponseEntity<String> atualizarFuncionario(@PathVariable Long id, @RequestBody @Valid FuncionarioRequestDto funcionario) {
         usuarioService.atualizarFuncionario(id, funcionario);
 

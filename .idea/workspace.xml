@@ -5,12 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="58737723-9b5d-4081-b16c-19932057d09f" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/java/br/com/tonspersonalizados/dto/usuarios/FuncionarioResponseDto.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/br/com/tonspersonalizados/controller/usuarios/UsuarioController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/br/com/tonspersonalizados/controller/usuarios/UsuarioController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/br/com/tonspersonalizados/entity/usuarios/Acesso.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/br/com/tonspersonalizados/entity/usuarios/Acesso.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/br/com/tonspersonalizados/entity/usuarios/Usuario.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/br/com/tonspersonalizados/entity/usuarios/Usuario.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/br/com/tonspersonalizados/dto/usuarios/FuncionarioResponseDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/br/com/tonspersonalizados/dto/usuarios/FuncionarioResponseDto.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/br/com/tonspersonalizados/repository/usuarios/UsuarioRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/br/com/tonspersonalizados/repository/usuarios/UsuarioRepository.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/br/com/tonspersonalizados/service/usuarios/UsuarioService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/br/com/tonspersonalizados/service/usuarios/UsuarioService.java" afterDir="false" />
     </list>
@@ -38,6 +35,11 @@
     </option>
   </component>
   <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="main" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="GitHubPullRequestSearchHistory">{
@@ -46,12 +48,12 @@
     &quot;assignee&quot;: &quot;Dennis-Medrano&quot;
   }
 }</component>
-  <component name="GithubPullRequestsUISettings">{
-  &quot;selectedUrlAndAccountId&quot;: {
-    &quot;url&quot;: &quot;https://github.com/ProjetoTons/tons-backend.git&quot;,
-    &quot;accountId&quot;: &quot;9eef197d-661f-4589-8dcb-6f3cc62c0396&quot;
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/ProjetoTons/tons-backend.git",
+    "accountId": "9de5e8b2-789f-4796-9def-f4454f825969"
   }
-}</component>
+}]]></component>
   <component name="MavenImportPreferences">
     <option name="generalSettings">
       <MavenGeneralSettings>
@@ -78,6 +80,7 @@
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
     "Spring Boot.TonsApplication.executor": "Run",
     "codeWithMe.voiceChat.enabledByDefault": "false",
+    "dart.analysis.tool.window.visible": "false",
     "git-widget-placeholder": "endpoints-funcionario",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "C:/Users/bssantos8/OneDrive - Stefanini/Área de Trabalho/backend/PROJETO PI/tons-backend",
@@ -113,7 +116,16 @@
     </configuration>
     <list>
       <item itemvalue="Application.Unnamed" />
+      <item itemvalue="Spring Boot.TonsApplication" />
     </list>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-jdk-9823dce3aa75-bf35d07a577b-intellij.indexing.shared.core-IU-252.28539.33" />
+        <option value="bundled-js-predefined-d6986cc7102b-a71380e98a7c-JavaScript-IU-252.28539.33" />
+      </set>
+    </attachedChunks>
   </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
@@ -122,11 +134,35 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1772577203557</updated>
+      <workItem from="1777334121171" duration="2417000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="origin/endpoints-funcionario" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
   <component name="github-copilot-workspace">
     <instructionFileLocations>

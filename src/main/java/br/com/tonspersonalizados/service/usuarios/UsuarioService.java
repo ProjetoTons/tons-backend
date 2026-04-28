@@ -131,7 +131,19 @@ public class UsuarioService {
 
 
     public List<FuncionarioResponseDto> listarFuncionarios() {
-        return usuarioRepository.findAllByIsFuncionario(true);
+
+        return usuarioRepository.findAllByIsFuncionarioIsTrueAndDataDeDeletadoIsNull()
+                .stream()
+                .map((funcionario) -> {
+                    FuncionarioResponseDto dto = new FuncionarioResponseDto();
+                    dto.setId(funcionario.getId());
+                    dto.setNome(funcionario.getNome());
+                    dto.setTelefone(funcionario.getTelefone());
+                    dto.setDataNascimento(funcionario.getDataNascimento());
+                    dto.setAcessos(funcionario.getAcessos());
+
+                    return dto;
+                }).toList();
     }
 
     public Usuario buscarPorEmail(String email) {
