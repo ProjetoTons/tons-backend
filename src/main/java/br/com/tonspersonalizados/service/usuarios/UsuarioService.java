@@ -1,15 +1,9 @@
 package br.com.tonspersonalizados.service.usuarios;
 
 
-import br.com.tonspersonalizados.config.GerenciadorTokenJwt;
-import br.com.tonspersonalizados.dto.usuarios.*;
-import br.com.tonspersonalizados.entity.usuarios.*;
-import br.com.tonspersonalizados.exception.usuarios.EmailJaExisteException;
-import br.com.tonspersonalizados.exception.usuarios.EnderecoNaoEncontradoException;
-import br.com.tonspersonalizados.exception.usuarios.LoginInvalidoException;
-import br.com.tonspersonalizados.exception.usuarios.UsuarioNaoEncontradoException;
-import br.com.tonspersonalizados.repository.usuarios.EnderecoRepository;
-import br.com.tonspersonalizados.repository.usuarios.UsuarioRepository;
+import java.time.LocalDateTime;
+import java.util.List;
+
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -17,8 +11,24 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
-import java.util.List;
+import br.com.tonspersonalizados.config.GerenciadorTokenJwt;
+import br.com.tonspersonalizados.dto.usuarios.EnderecoRequestDto;
+import br.com.tonspersonalizados.dto.usuarios.FuncionarioRequestDto;
+import br.com.tonspersonalizados.dto.usuarios.LoginRequestDto;
+import br.com.tonspersonalizados.dto.usuarios.UsuarioRequestDto;
+import br.com.tonspersonalizados.dto.usuarios.UsuarioTokenDto;
+import br.com.tonspersonalizados.entity.usuarios.Acesso;
+import br.com.tonspersonalizados.entity.usuarios.Empresa;
+import br.com.tonspersonalizados.entity.usuarios.Endereco;
+import br.com.tonspersonalizados.entity.usuarios.Login;
+import br.com.tonspersonalizados.entity.usuarios.Usuario;
+import br.com.tonspersonalizados.exception.usuarios.EmailJaExisteException;
+import br.com.tonspersonalizados.exception.usuarios.EnderecoNaoEncontradoException;
+import br.com.tonspersonalizados.exception.usuarios.LoginInvalidoException;
+import br.com.tonspersonalizados.exception.usuarios.UsuarioNaoEncontradoException;
+import br.com.tonspersonalizados.repository.usuarios.EnderecoRepository;
+import br.com.tonspersonalizados.repository.usuarios.UsuarioRepository;
+import br.com.tonspersonalizados.service.notificacoes.WhatsAppService;
 
 @Service
 public class UsuarioService {
@@ -30,6 +40,7 @@ public class UsuarioService {
     private final PasswordEncoder passwordEncoder;
     private final GerenciadorTokenJwt gerenciadorTokenJwt;
     private final AuthenticationManager authenticationManager;
+    private final WhatsAppService whatsAppService;
 
 
     public UsuarioService(
@@ -37,7 +48,8 @@ public class UsuarioService {
             UsuarioRepository usuarioRepository,
             PasswordEncoder passwordEncoder,
             GerenciadorTokenJwt gerenciadorTokenJwt,
-            AuthenticationManager authenticationManager, EnderecoRepository enderecoRepository) {
+            AuthenticationManager authenticationManager, EnderecoRepository enderecoRepository,
+            WhatsAppService whatsAppService) {
         this.acessoService = acessoService;
         this.usuarioRepository = usuarioRepository;
         this.passwordEncoder = passwordEncoder;
@@ -45,6 +57,7 @@ public class UsuarioService {
         this.gerenciadorTokenJwt = gerenciadorTokenJwt;
         this.authenticationManager = authenticationManager;
         this.enderecoRepository = enderecoRepository;
+        this.whatsAppService = whatsAppService;
 
     }
 
@@ -74,6 +87,12 @@ public class UsuarioService {
         }
 
         usuarioRepository.save(usuario);
+
+        try {
+            whatsAppService.enviarTemplate("55" + usuario.getTelefone(), "hello_world");
+        } catch (Exception e) {
+            // Não impede o cadastro se o WhatsApp falhar
+        }
     }
 
     public void cadastrarFuncionario(FuncionarioRequestDto funcionarioDto) {

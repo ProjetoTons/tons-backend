@@ -1,9 +1,14 @@
 package br.com.tonspersonalizados.controller.notificacoes;
 
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import br.com.tonspersonalizados.dto.notificacoes.NotificacaoDto;
 import br.com.tonspersonalizados.service.notificacoes.NotificacaoService;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/notificacao")
@@ -26,6 +31,4 @@ public class NotificacaoController {
                     .body("Erro ao enviar e-mail: " + e.getMessage());
         }
     }
-
-
 }
