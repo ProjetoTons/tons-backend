@@ -3,11 +3,13 @@ package br.com.tonspersonalizados.config;
 import br.com.tonspersonalizados.service.usuarios.AutenticacaoService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -48,13 +50,15 @@ public class SecurityConfiguracao {
             "/v3/api-docs/**",
             "/actuator/*",
             "/usuarios",
-            "/usuarios/login",
-            "/h2-console/**",
+            "/login",
+            "/login/reset-senha",
+            "/login/esqueci-senha",
             "/error/**"
     };
 
 
-    public SecurityConfiguracao(AutenticacaoEntryPoint autenticacaoJwtEntryPoint, AutenticacaoService autenticacaoService) {
+    public SecurityConfiguracao(AutenticacaoEntryPoint autenticacaoJwtEntryPoint,
+                                @Lazy AutenticacaoService autenticacaoService) {
         this.autenticacaoJwtEntryPoint = autenticacaoJwtEntryPoint;
         this.autenticacaoService = autenticacaoService;
     }
@@ -62,6 +66,7 @@ public class SecurityConfiguracao {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
+                .authenticationProvider(new AutenticacaoProvider(passwordEncoder(), autenticacaoService))
                 .headers(headers -> headers
                         .frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
                 .cors(Customizer.withDefaults())
@@ -82,11 +87,8 @@ public class SecurityConfiguracao {
     }
 
     @Bean
-    public AuthenticationManager authManager(HttpSecurity http) throws Exception {
-        AuthenticationManagerBuilder authenticationManagerBuilder =
-                http.getSharedObject(AuthenticationManagerBuilder.class);
-        authenticationManagerBuilder.authenticationProvider(new AutenticacaoProvider(passwordEncoder(), autenticacaoService));
-        return authenticationManagerBuilder.build();
+    public AuthenticationManager authManager(AuthenticationConfiguration configuration) throws Exception {
+        return configuration.getAuthenticationManager();
     }
 
     @Bean

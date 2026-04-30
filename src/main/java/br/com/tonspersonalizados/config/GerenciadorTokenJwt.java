@@ -19,8 +19,18 @@ public class GerenciadorTokenJwt {
     @Value("${jwt.secret}")
     private String secret;
 
+    @Value("${jwt.resetSecret}")
+    private String resetSecret;
+
+    @Value("${jwt.resetValidity}")
+    private Long resetTokenValidity;
+
     @Value("${jwt.validity}")
     private long jwtTokenValidity;
+
+    // -------------------------
+    // ‘Token’ de autenticação
+    // -------------------------
 
     public String getUsernameFromToken(String token) {
         return getClaimForToken(token, Claims::getSubject);
@@ -31,8 +41,6 @@ public class GerenciadorTokenJwt {
     }
 
     public String generateToken(final Authentication authentication) {
-
-        // Para verificacoes de permissoes
         final String authorities = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(","));
@@ -45,21 +53,59 @@ public class GerenciadorTokenJwt {
                 .compact();
     }
 
-    public <T> T getClaimForToken(String token, Function<Claims, T> claimsResolver) {
-        Claims claims = getAllClaimsFromToken(token);
-        return claimsResolver.apply(claims);
-    }
-
-
-
     public boolean validateToken(String token, UserDetails userDetails) {
         String username = getUsernameFromToken(token);
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
 
+    // -------------------------
+    // Token de reset de senha
+    // -------------------------
+
+    public String generateResetToken(String userId, String email, String currentPasswordHash) {
+        return Jwts.builder()
+                .setSubject(userId)
+                .claim("email", email)
+                .claim("pwdHash", currentPasswordHash)
+                .signWith(parseResetSecret())
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + resetTokenValidity * 1_000))
+                .compact();
+    }
+
+    public boolean validateResetToken(String token, String currentPasswordHash) {
+        try {
+            Claims claims = getAllClaimsFromResetToken(token);
+            String tokenPwdHash = claims.get("pwdHash", String.class);
+            return !isResetTokenExpired(token) && tokenPwdHash.equals(currentPasswordHash);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public String getUserIdFromResetToken(String token) {
+        return getClaimForResetToken(token, Claims::getSubject);
+    }
+
+    public String getEmailFromResetToken(String token) {
+        return getClaimForResetToken(token, claims -> claims.get("email", String.class));
+    }
+
+    public <T> T getClaimForToken(String token, Function<Claims, T> claimsResolver) {
+        return claimsResolver.apply(getAllClaimsFromToken(token));
+    }
+
+    public <T> T getClaimForResetToken(String token, Function<Claims, T> claimsResolver) {
+        return claimsResolver.apply(getAllClaimsFromResetToken(token));
+    }
+
     private boolean isTokenExpired(String token) {
-        Date expirationDate = getExpirationDateFromToken(token);
-        return expirationDate.before(new Date(System.currentTimeMillis()));
+        return getExpirationDateFromToken(token).before(new Date(System.currentTimeMillis()));
+    }
+
+    private boolean isResetTokenExpired(String token) {
+        return getClaimForResetToken(token, Claims::getExpiration)
+                .before(new Date(System.currentTimeMillis()));
     }
 
     private Claims getAllClaimsFromToken(String token) {
@@ -70,7 +116,19 @@ public class GerenciadorTokenJwt {
                 .getBody();
     }
 
+    private Claims getAllClaimsFromResetToken(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(parseResetSecret())
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+    }
+
     private SecretKey parseSecret() {
         return Keys.hmacShaKeyFor(this.secret.getBytes(StandardCharsets.UTF_8));
+    }
+
+    private SecretKey parseResetSecret() {
+        return Keys.hmacShaKeyFor(this.resetSecret.getBytes(StandardCharsets.UTF_8));
     }
 }

@@ -6,6 +6,7 @@ import br.com.tonspersonalizados.entity.usuarios.Empresa;
 import br.com.tonspersonalizados.entity.usuarios.Endereco;
 import br.com.tonspersonalizados.entity.usuarios.Login;
 import br.com.tonspersonalizados.entity.usuarios.Usuario;
+import br.com.tonspersonalizados.service.usuarios.AutenticacaoService;
 import br.com.tonspersonalizados.service.usuarios.EmpresaService;
 import br.com.tonspersonalizados.service.usuarios.UsuarioService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -43,22 +44,6 @@ public class UsuarioController {
         usuarioService.cadastrar(dto);
 
         return ResponseEntity.status(201).body("Usuário cadastrado com sucesso!");
-    }
-
-    @Operation(summary = "Autenticação (Login)", description = "Realiza a autenticação de um usuário ou funcionário e retorna um token JWT.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Login realizado com sucesso"),
-            @ApiResponse(responseCode = "401", description = "Credenciais inválidas"),
-            @ApiResponse(responseCode = "400", description = "Dados da requisição inválidos")
-    })
-    @PostMapping("/login")
-    //usando o post por ser mais seguro já que ele possui uma critografia própria, melhor para transitar com a senha do usuário
-    public ResponseEntity<UsuarioTokenDto> login(@RequestBody @Valid LoginRequestDto loginDto) {
-
-        UsuarioTokenDto loginValidado = usuarioService.login(loginDto);
-
-
-        return ResponseEntity.ok(loginValidado);
     }
 
     @Operation(summary = "Cadastrar um funcionário", description = "Realiza o cadastro de um novo funcionário. Requer autenticação e permissões específicas.")

@@ -5,11 +5,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="58737723-9b5d-4081-b16c-19932057d09f" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/src/main/java/br/com/tonspersonalizados/controller/usuarios/LoginController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/br/com/tonspersonalizados/dto/usuarios/ResetSenhaRequestDto.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/br/com/tonspersonalizados/config/GerenciadorTokenJwt.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/br/com/tonspersonalizados/config/GerenciadorTokenJwt.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/br/com/tonspersonalizados/config/SecurityConfiguracao.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/br/com/tonspersonalizados/config/SecurityConfiguracao.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/br/com/tonspersonalizados/controller/usuarios/UsuarioController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/br/com/tonspersonalizados/controller/usuarios/UsuarioController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/br/com/tonspersonalizados/dto/usuarios/FuncionarioResponseDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/br/com/tonspersonalizados/dto/usuarios/FuncionarioResponseDto.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/br/com/tonspersonalizados/repository/usuarios/UsuarioRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/br/com/tonspersonalizados/repository/usuarios/UsuarioRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/br/com/tonspersonalizados/dto/usuarios/UsuarioRequestDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/br/com/tonspersonalizados/dto/usuarios/UsuarioRequestDto.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/br/com/tonspersonalizados/service/usuarios/AutenticacaoService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/br/com/tonspersonalizados/service/usuarios/AutenticacaoService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/br/com/tonspersonalizados/service/usuarios/UsuarioService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/br/com/tonspersonalizados/service/usuarios/UsuarioService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.properties" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -48,12 +53,12 @@
     &quot;assignee&quot;: &quot;Dennis-Medrano&quot;
   }
 }</component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/ProjetoTons/tons-backend.git",
-    "accountId": "9de5e8b2-789f-4796-9def-f4454f825969"
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/ProjetoTons/tons-backend.git&quot;,
+    &quot;accountId&quot;: &quot;9de5e8b2-789f-4796-9def-f4454f825969&quot;
   }
-}]]></component>
+}</component>
   <component name="MavenImportPreferences">
     <option name="generalSettings">
       <MavenGeneralSettings>
@@ -74,14 +79,18 @@
     "Application.TonsApplication.executor": "Run",
     "Application.Unnamed.executor": "Run",
     "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "Notification.DisplayName-DoNotAsk-DatabaseConfigFileWatcher.found": "New/updated database configurations found",
+    "Notification.DoNotAsk-DatabaseConfigFileWatcher.found": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
     "RunOnceActivity.git.unshallow": "true",
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
     "Spring Boot.TonsApplication.executor": "Run",
     "codeWithMe.voiceChat.enabledByDefault": "false",
+    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
     "dart.analysis.tool.window.visible": "false",
     "git-widget-placeholder": "endpoints-funcionario",
+    "junie.onboarding.icon.badge.shown": "true",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "C:/Users/bssantos8/OneDrive - Stefanini/Área de Trabalho/backend/PROJETO PI/tons-backend",
     "node.js.detected.package.eslint": "true",
@@ -89,7 +98,9 @@
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "preferences.editor"
+    "settings.editor.selected.configurable": "preferences.editor",
+    "to.speed.mode.migration.done": "true",
+    "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
   <component name="RunManager" selected="Application.Unnamed">
@@ -134,7 +145,8 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1772577203557</updated>
-      <workItem from="1777334121171" duration="2417000" />
+      <workItem from="1777334121171" duration="2768000" />
+      <workItem from="1777559911251" duration="6378000" />
     </task>
     <servers />
   </component>
