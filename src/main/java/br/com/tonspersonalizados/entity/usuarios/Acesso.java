@@ -1,5 +1,6 @@
 package br.com.tonspersonalizados.entity.usuarios;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.util.List;
@@ -20,6 +21,7 @@ public class Acesso {
 
     //relacionamentos:
     @ManyToMany  // muitos acessos podem ser atribuidos a muitos usuários.
+    @JsonIgnore
     private List<Usuario> usuarios;
 
 

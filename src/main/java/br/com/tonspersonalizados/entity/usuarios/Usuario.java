@@ -26,6 +26,9 @@ public class Usuario {
     @Column(nullable = false)
     private String telefone;
 
+    @Column(nullable = false)
+    private Boolean isFuncionario; // Colocar essa coluna na modelagem
+
     private LocalDate dataNascimento;
 
     @CreationTimestamp
@@ -113,6 +116,10 @@ public class Usuario {
     public void setAcessos(List<Acesso> acesso) {
         this.acessos = acesso;
     }
+
+    public Boolean getFuncionario() { return isFuncionario; }
+
+    public void setFuncionario(Boolean funcionario) { isFuncionario = funcionario; }
 
     public Endereco getEndereco() {
         return endereco;

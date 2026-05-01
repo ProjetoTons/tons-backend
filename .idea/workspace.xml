@@ -5,86 +5,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="58737723-9b5d-4081-b16c-19932057d09f" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/tons-backend.iml" beforeDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/br/com/tonspersonalizados/controller/usuarios/LoginController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/br/com/tonspersonalizados/dto/usuarios/ResetSenhaRequestDto.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/azure-pipelines.yml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/notificação-ms/.gitattributes" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/notificação-ms/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/notificação-ms/.mvn/wrapper/maven-wrapper.properties" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/notificação-ms/docs/guia-javamail-springboot.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/notificação-ms/mvnw" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/notificação-ms/mvnw.cmd" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/notificação-ms/pom.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/notificação-ms/src/main/java/br/com/tonspersonalizados/notificacao_ms/TonsNotificacaoMsApplication.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/notificação-ms/src/main/java/br/com/tonspersonalizados/notificacao_ms/controller/NotificacaoController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/notificação-ms/src/main/java/br/com/tonspersonalizados/notificacao_ms/dto/NotificacaoDto.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/notificação-ms/src/main/java/br/com/tonspersonalizados/notificacao_ms/service/NotificacaoService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/notificação-ms/src/main/resources/application.properties" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/notificação-ms/src/test/java/br/com/tonspersonalizados/notificacao_ms/TonsNotificacaoMsApplicationTests.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pedidos-ms/.gitattributes" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pedidos-ms/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pedidos-ms/.mvn/wrapper/maven-wrapper.properties" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pedidos-ms/mvnw" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pedidos-ms/mvnw.cmd" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pedidos-ms/pom.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pedidos-ms/src/main/java/br/com/tonspersonalizados/pedidos_ms/TonsPedidosMsApplication.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pedidos-ms/src/main/resources/application.properties" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pedidos-ms/src/test/java/br/com/tonspersonalizados/pedidos_ms/TonsPedidosMsApplicationTests.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/produtos-ms/.gitattributes" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/produtos-ms/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/produtos-ms/.mvn/wrapper/maven-wrapper.properties" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/produtos-ms/mvnw" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/produtos-ms/mvnw.cmd" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/produtos-ms/pom.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/produtos-ms/src/main/java/br/com/tonspersonalizados/produtos_ms/TonsProdutosMsApplication.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/produtos-ms/src/main/resources/application.properties" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/produtos-ms/src/test/java/br/com/tonspersonalizados/produtos_ms/TonsProdutosMsApplicationTests.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/usuarios-ms/.gitattributes" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/usuarios-ms/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/usuarios-ms/.mvn/wrapper/maven-wrapper.properties" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/usuarios-ms/mvnw" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/usuarios-ms/mvnw.cmd" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/usuarios-ms/pom.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/usuarios-ms/src/main/java/br/com/tonspersonalizados/usuarios_ms/TonsUsuariosMsApplication.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/usuarios-ms/src/main/java/br/com/tonspersonalizados/usuarios_ms/config/AutenticacaoEntryPoint.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/usuarios-ms/src/main/java/br/com/tonspersonalizados/usuarios_ms/config/AutenticacaoFilter.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/usuarios-ms/src/main/java/br/com/tonspersonalizados/usuarios_ms/config/AutenticacaoProvider.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/usuarios-ms/src/main/java/br/com/tonspersonalizados/usuarios_ms/config/GerenciadorTokenJwt.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/usuarios-ms/src/main/java/br/com/tonspersonalizados/usuarios_ms/config/SecurityConfiguracao.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/usuarios-ms/src/main/java/br/com/tonspersonalizados/usuarios_ms/config/swagger/OpenApiConfig.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/usuarios-ms/src/main/java/br/com/tonspersonalizados/usuarios_ms/controller/EmpresaController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/usuarios-ms/src/main/java/br/com/tonspersonalizados/usuarios_ms/controller/UsuarioController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/usuarios-ms/src/main/java/br/com/tonspersonalizados/usuarios_ms/dto/EmpresaRequestDto.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/usuarios-ms/src/main/java/br/com/tonspersonalizados/usuarios_ms/dto/EnderecoRequestDto.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/usuarios-ms/src/main/java/br/com/tonspersonalizados/usuarios_ms/dto/FuncionarioRequestDto.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/usuarios-ms/src/main/java/br/com/tonspersonalizados/usuarios_ms/dto/LoginRequestDto.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/usuarios-ms/src/main/java/br/com/tonspersonalizados/usuarios_ms/dto/UsuarioDetalhesDto.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/usuarios-ms/src/main/java/br/com/tonspersonalizados/usuarios_ms/dto/UsuarioRequestDto.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/usuarios-ms/src/main/java/br/com/tonspersonalizados/usuarios_ms/dto/UsuarioResponseDto.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/usuarios-ms/src/main/java/br/com/tonspersonalizados/usuarios_ms/dto/UsuarioTokenDto.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/usuarios-ms/src/main/java/br/com/tonspersonalizados/usuarios_ms/entity/Acesso.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/usuarios-ms/src/main/java/br/com/tonspersonalizados/usuarios_ms/entity/Empresa.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/usuarios-ms/src/main/java/br/com/tonspersonalizados/usuarios_ms/entity/Endereco.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/usuarios-ms/src/main/java/br/com/tonspersonalizados/usuarios_ms/entity/Login.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/usuarios-ms/src/main/java/br/com/tonspersonalizados/usuarios_ms/entity/Usuario.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/usuarios-ms/src/main/java/br/com/tonspersonalizados/usuarios_ms/exception/EmailJaExisteException.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/usuarios-ms/src/main/java/br/com/tonspersonalizados/usuarios_ms/exception/EmpresaNaoEncontradoException.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/usuarios-ms/src/main/java/br/com/tonspersonalizados/usuarios_ms/exception/EnderecoNaoEncontradoException.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/usuarios-ms/src/main/java/br/com/tonspersonalizados/usuarios_ms/exception/LoginInvalidoException.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/usuarios-ms/src/main/java/br/com/tonspersonalizados/usuarios_ms/exception/UsuarioNaoEncontradoException.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/usuarios-ms/src/main/java/br/com/tonspersonalizados/usuarios_ms/repository/AcessoRepository.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/usuarios-ms/src/main/java/br/com/tonspersonalizados/usuarios_ms/repository/EmpresaRepository.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/usuarios-ms/src/main/java/br/com/tonspersonalizados/usuarios_ms/repository/EnderecoRepository.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/usuarios-ms/src/main/java/br/com/tonspersonalizados/usuarios_ms/repository/UsuarioRepository.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/usuarios-ms/src/main/java/br/com/tonspersonalizados/usuarios_ms/service/AcessoService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/usuarios-ms/src/main/java/br/com/tonspersonalizados/usuarios_ms/service/AutenticacaoService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/usuarios-ms/src/main/java/br/com/tonspersonalizados/usuarios_ms/service/EmpresaService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/usuarios-ms/src/main/java/br/com/tonspersonalizados/usuarios_ms/service/UsuarioService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/usuarios-ms/src/main/resources/application.properties" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/usuarios-ms/src/test/java/br/com/tonspersonalizados/usuarios_ms/TonsUsuariosMsApplicationTests.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/br/com/tonspersonalizados/config/GerenciadorTokenJwt.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/br/com/tonspersonalizados/config/GerenciadorTokenJwt.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/br/com/tonspersonalizados/config/SecurityConfiguracao.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/br/com/tonspersonalizados/config/SecurityConfiguracao.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/br/com/tonspersonalizados/controller/usuarios/UsuarioController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/br/com/tonspersonalizados/controller/usuarios/UsuarioController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/br/com/tonspersonalizados/dto/usuarios/UsuarioRequestDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/br/com/tonspersonalizados/dto/usuarios/UsuarioRequestDto.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/br/com/tonspersonalizados/service/usuarios/AutenticacaoService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/br/com/tonspersonalizados/service/usuarios/AutenticacaoService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/br/com/tonspersonalizados/service/usuarios/UsuarioService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/br/com/tonspersonalizados/service/usuarios/UsuarioService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.properties" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -102,21 +32,33 @@
       <entry key="agent-panel" value="Claude Opus 4.6" />
     </selectedModels>
   </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
   <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="main" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
-  "lastFilter": {
-    "state": "OPEN",
-    "assignee": "Dennis-Medrano"
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;Dennis-Medrano&quot;
   }
-}]]></component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/ProjetoTons/tons-backend.git",
-    "accountId": "9eef197d-661f-4589-8dcb-6f3cc62c0396"
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/ProjetoTons/tons-backend.git&quot;,
+    &quot;accountId&quot;: &quot;9de5e8b2-789f-4796-9def-f4454f825969&quot;
   }
-}]]></component>
+}</component>
   <component name="MavenImportPreferences">
     <option name="generalSettings">
       <MavenGeneralSettings>
@@ -134,25 +76,41 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "Application.TonsApplication.executor": "Run",
+    "Application.Unnamed.executor": "Run",
     "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "Notification.DisplayName-DoNotAsk-DatabaseConfigFileWatcher.found": "New/updated database configurations found",
+    "Notification.DoNotAsk-DatabaseConfigFileWatcher.found": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
     "RunOnceActivity.git.unshallow": "true",
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
     "Spring Boot.TonsApplication.executor": "Run",
     "codeWithMe.voiceChat.enabledByDefault": "false",
-    "git-widget-placeholder": "#5 on refatoracao-usuario-ms",
+    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
+    "dart.analysis.tool.window.visible": "false",
+    "git-widget-placeholder": "endpoints-funcionario",
+    "junie.onboarding.icon.badge.shown": "true",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/denni/OneDrive/Documentos/Faculdade/PI-Benificiario/tons-backend",
+    "last_opened_file_path": "C:/Users/bssantos8/OneDrive - Stefanini/Área de Trabalho/backend/PROJETO PI/tons-backend",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "preferences.lookFeel"
+    "settings.editor.selected.configurable": "preferences.editor",
+    "to.speed.mode.migration.done": "true",
+    "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
-  <component name="RunManager">
+  <component name="RunManager" selected="Application.Unnamed">
+    <configuration name="Unnamed" type="Application" factoryName="Application" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="br.com.tonspersonalizados.TonsApplication" />
+      <module name="tons-backend" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="TonsApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" temporary="true" nameIsGenerated="true">
       <option name="FRAME_DEACTIVATION_UPDATE_POLICY" value="UnknownPolicyInFreeMode" />
       <module name="tons-backend" />
@@ -167,11 +125,18 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <recent_temporary>
-      <list>
-        <item itemvalue="Spring Boot.TonsApplication" />
-      </list>
-    </recent_temporary>
+    <list>
+      <item itemvalue="Application.Unnamed" />
+      <item itemvalue="Spring Boot.TonsApplication" />
+    </list>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-jdk-9823dce3aa75-bf35d07a577b-intellij.indexing.shared.core-IU-252.28539.33" />
+        <option value="bundled-js-predefined-d6986cc7102b-a71380e98a7c-JavaScript-IU-252.28539.33" />
+      </set>
+    </attachedChunks>
   </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
@@ -180,11 +145,36 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1772577203557</updated>
+      <workItem from="1777334121171" duration="2768000" />
+      <workItem from="1777559911251" duration="6378000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="origin/endpoints-funcionario" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
   <component name="github-copilot-workspace">
     <instructionFileLocations>

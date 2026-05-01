@@ -23,7 +23,7 @@ public class UsuarioRequestDto {
     @Size(min = 11, max = 11)
     private String telefone;
 
-    @NotNull
+    @NotBlank
     private String senha;
 
     @CNPJ
