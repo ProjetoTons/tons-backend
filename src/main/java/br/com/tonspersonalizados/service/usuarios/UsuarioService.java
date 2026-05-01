@@ -11,6 +11,7 @@ import br.com.tonspersonalizados.dto.usuarios.EnderecoRequestDto;
 import br.com.tonspersonalizados.dto.usuarios.FuncionarioRequestDto;
 import br.com.tonspersonalizados.dto.usuarios.FuncionarioResponseDto;
 import br.com.tonspersonalizados.dto.usuarios.UsuarioRequestDto;
+import br.com.tonspersonalizados.dto.usuarios.UsuarioResponseDto;
 import br.com.tonspersonalizados.entity.usuarios.Acesso;
 import br.com.tonspersonalizados.entity.usuarios.Empresa;
 import br.com.tonspersonalizados.entity.usuarios.Endereco;
@@ -114,6 +115,20 @@ public class UsuarioService {
         return usuarioRepository
                 .findById(id)
                 .orElseThrow(() -> new UsuarioNaoEncontradoException("Usuário não encontrado"));
+    }
+
+    public UsuarioResponseDto buscarPorCpf(String cpf) {
+        Usuario usuario = usuarioRepository
+                .findByCpfAndIsFuncionarioIsFalseAndDataDeDeletadoIsNull(cpf)
+                .orElseThrow(() -> new UsuarioNaoEncontradoException("Usuário não encontrado"));
+
+        UsuarioResponseDto dto = new UsuarioResponseDto();
+        dto.setNome(usuario.getNome());
+        dto.setTelefone(usuario.getTelefone());
+        if (usuario.getLogin() != null) {
+            dto.setEmail(usuario.getLogin().getEmail());
+        }
+        return dto;
     }
 
     public List<FuncionarioResponseDto> listarFuncionarios() {
