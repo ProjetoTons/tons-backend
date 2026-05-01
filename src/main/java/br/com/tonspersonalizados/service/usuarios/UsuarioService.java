@@ -4,20 +4,13 @@ package br.com.tonspersonalizados.service.usuarios;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import br.com.tonspersonalizados.config.GerenciadorTokenJwt;
 import br.com.tonspersonalizados.dto.usuarios.EnderecoRequestDto;
 import br.com.tonspersonalizados.dto.usuarios.FuncionarioRequestDto;
 import br.com.tonspersonalizados.dto.usuarios.FuncionarioResponseDto;
-import br.com.tonspersonalizados.dto.usuarios.LoginRequestDto;
 import br.com.tonspersonalizados.dto.usuarios.UsuarioRequestDto;
-import br.com.tonspersonalizados.dto.usuarios.UsuarioTokenDto;
 import br.com.tonspersonalizados.entity.usuarios.Acesso;
 import br.com.tonspersonalizados.entity.usuarios.Empresa;
 import br.com.tonspersonalizados.entity.usuarios.Endereco;
@@ -25,7 +18,6 @@ import br.com.tonspersonalizados.entity.usuarios.Login;
 import br.com.tonspersonalizados.entity.usuarios.Usuario;
 import br.com.tonspersonalizados.exception.usuarios.EmailJaExisteException;
 import br.com.tonspersonalizados.exception.usuarios.EnderecoNaoEncontradoException;
-import br.com.tonspersonalizados.exception.usuarios.LoginInvalidoException;
 import br.com.tonspersonalizados.exception.usuarios.UsuarioNaoEncontradoException;
 import br.com.tonspersonalizados.repository.usuarios.EnderecoRepository;
 import br.com.tonspersonalizados.repository.usuarios.UsuarioRepository;
