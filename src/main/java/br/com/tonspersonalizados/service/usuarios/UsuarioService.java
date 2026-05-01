@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import br.com.tonspersonalizados.config.GerenciadorTokenJwt;
 import br.com.tonspersonalizados.dto.usuarios.EnderecoRequestDto;
 import br.com.tonspersonalizados.dto.usuarios.FuncionarioRequestDto;
+import br.com.tonspersonalizados.dto.usuarios.FuncionarioResponseDto;
 import br.com.tonspersonalizados.dto.usuarios.LoginRequestDto;
 import br.com.tonspersonalizados.dto.usuarios.UsuarioRequestDto;
 import br.com.tonspersonalizados.dto.usuarios.UsuarioTokenDto;
@@ -38,8 +39,6 @@ public class UsuarioService {
     private final AcessoService acessoService;
     private final EmpresaService empresaService;
     private final PasswordEncoder passwordEncoder;
-    private final GerenciadorTokenJwt gerenciadorTokenJwt;
-    private final AuthenticationManager authenticationManager;
     private final WhatsAppService whatsAppService;
 
 
@@ -47,15 +46,12 @@ public class UsuarioService {
             AcessoService acessoService, EmpresaService empresaService,
             UsuarioRepository usuarioRepository,
             PasswordEncoder passwordEncoder,
-            GerenciadorTokenJwt gerenciadorTokenJwt,
-            AuthenticationManager authenticationManager, EnderecoRepository enderecoRepository,
+            EnderecoRepository enderecoRepository,
             WhatsAppService whatsAppService) {
         this.acessoService = acessoService;
         this.usuarioRepository = usuarioRepository;
         this.passwordEncoder = passwordEncoder;
         this.empresaService = empresaService;
-        this.gerenciadorTokenJwt = gerenciadorTokenJwt;
-        this.authenticationManager = authenticationManager;
         this.enderecoRepository = enderecoRepository;
         this.whatsAppService = whatsAppService;
 
@@ -64,6 +60,7 @@ public class UsuarioService {
     public void cadastrar(UsuarioRequestDto usuarioDto) {
 
         Usuario usuario = new Usuario();
+        usuario.setFuncionario(false);
         usuario.setNome(usuarioDto.getNome());
         usuario.setCpf(usuarioDto.getCpf());
         usuario.setTelefone(usuarioDto.getTelefone());
@@ -97,8 +94,10 @@ public class UsuarioService {
 
     public void cadastrarFuncionario(FuncionarioRequestDto funcionarioDto) {
         Usuario funcionario = new Usuario();
+        funcionario.setFuncionario(true);
         funcionario.setNome(funcionarioDto.getNome());
         funcionario.setTelefone(funcionarioDto.getTelefone());
+        funcionario.setDataNascimento(funcionarioDto.getDataNascimento());
 
         Login login = new Login();
         login.setEmail(funcionarioDto.getEmail());
@@ -113,55 +112,37 @@ public class UsuarioService {
         usuarioRepository.save(funcionario);
     }
 
-    public UsuarioTokenDto login(LoginRequestDto loginDto) {
-
-
-        final UsernamePasswordAuthenticationToken credentials = new UsernamePasswordAuthenticationToken(
-                loginDto.getEmail(), loginDto.getSenha());
-
-        final Authentication authentication = this.authenticationManager.authenticate(credentials);
-
-
-        Usuario usuario = usuarioRepository.findByLoginEmail(loginDto.getEmail())
-                .orElseThrow(() -> new LoginInvalidoException("Login inválido"));
-
-
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-
-        final String token = gerenciadorTokenJwt.generateToken(authentication);
-
-
-        UsuarioTokenDto usuarioTokenDto = new UsuarioTokenDto();
-
-        usuarioTokenDto.setId(usuario.getId());
-        usuarioTokenDto.setEmail(usuario.getLogin().getEmail());
-        usuarioTokenDto.setNome(usuario.getNome());
-        usuarioTokenDto.setToken(token);
-
-        usuario.getLogin().setUltimoLogin(LocalDateTime.now());
-
-        usuarioRepository.save(usuario);
-
-        return usuarioTokenDto;
+    public Usuario buscarPorEmail(String email){
+        return usuarioRepository
+                .findByLoginEmail(email)
+                .orElse(null);
     }
 
-
-    public Usuario buscarPorNome(String nome) {
-
-        return usuarioRepository.findByNome(nome)
+    public Usuario buscarPorId(Long id){
+        return usuarioRepository
+                .findById(id)
                 .orElseThrow(() -> new UsuarioNaoEncontradoException("Usuário não encontrado"));
     }
 
-    public Usuario buscarPorEmail(String email) {
-        return usuarioRepository.findByLoginEmail(email).orElse(null);
+    public List<FuncionarioResponseDto> listarFuncionarios() {
+
+        return usuarioRepository.findAllByIsFuncionarioIsTrueAndDataDeDeletadoIsNull()
+                .stream()
+                .map((funcionario) -> {
+                    FuncionarioResponseDto dto = new FuncionarioResponseDto();
+                    dto.setId(funcionario.getId());
+                    dto.setNome(funcionario.getNome());
+                    dto.setTelefone(funcionario.getTelefone());
+                    dto.setDataNascimento(funcionario.getDataNascimento());
+                    dto.setAcessos(funcionario.getAcessos());
+
+                    return dto;
+                }).toList();
     }
 
     public void atualizar(Long id, UsuarioRequestDto usuarioDto) {
-        Usuario usuarioExistente = usuarioRepository.findById(id).orElse(null);
-
-        if (usuarioExistente == null) {
-            throw new UsuarioNaoEncontradoException("Usuário não encontrado");
-        }
+        Usuario usuarioExistente = usuarioRepository.findById(id)
+                .orElseThrow(() -> new UsuarioNaoEncontradoException("Usuário não encontrado"));
 
         usuarioExistente.setNome(usuarioDto.getNome());
         usuarioExistente.setTelefone(usuarioDto.getTelefone());
@@ -172,6 +153,24 @@ public class UsuarioService {
         usuarioRepository.save(usuarioExistente);
     }
 
+    public void atualizar(Usuario usuario){
+        usuarioRepository.save(usuario);
+    }
+
+    public void atualizarFuncionario(Long id, FuncionarioRequestDto funcionarioDto) {
+        Usuario funcionarioExistente = usuarioRepository.findById(id)
+                .orElseThrow(() -> new UsuarioNaoEncontradoException("Funcionário não encontrado"));
+
+        funcionarioExistente.setNome(funcionarioDto.getNome());
+        funcionarioExistente.setTelefone(funcionarioDto.getTelefone());
+        funcionarioExistente.setDataNascimento(funcionarioDto.getDataNascimento());
+
+        List<Acesso> acessos = acessoService.listarAcessosById(funcionarioDto.getAcessos());
+
+        funcionarioExistente.setAcessos(acessos);
+
+        usuarioRepository.save(funcionarioExistente);
+    }
 
     public void deletar(Long id) {
         // Soft-delete
