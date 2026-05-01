@@ -46,6 +46,18 @@ public class UsuarioController {
         return ResponseEntity.status(201).body("Usuário cadastrado com sucesso!");
     }
 
+    @Operation(summary = "Buscar usuário por CPF", description = "Recupera os dados de um usuário comum (não funcionário) pelo CPF. Requer autenticação.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Usuário encontrado"),
+            @ApiResponse(responseCode = "404", description = "Usuário não encontrado"),
+            @ApiResponse(responseCode = "403", description = "Acesso não autorizado")
+    })
+    @GetMapping("/cpf/{cpf}")
+    @SecurityRequirement(name = "Bearer")
+    public ResponseEntity<UsuarioResponseDto> buscarPorCpf(@PathVariable String cpf) {
+        return ResponseEntity.ok(usuarioService.buscarPorCpf(cpf));
+    }
+
     @Operation(summary = "Cadastrar um funcionário", description = "Realiza o cadastro de um novo funcionário. Requer autenticação e permissões específicas.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Funcionário cadastrado com sucesso"),
