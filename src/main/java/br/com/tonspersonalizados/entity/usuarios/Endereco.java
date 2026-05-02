@@ -1,11 +1,10 @@
 package br.com.tonspersonalizados.entity.usuarios;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
-import org.hibernate.boot.model.source.spi.DiscriminatorSource;
 
 @Entity
+@Table(name = "endereco")
 public class Endereco {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id

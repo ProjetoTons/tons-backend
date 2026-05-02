@@ -20,7 +20,7 @@ public class Acesso {
 
 
     //relacionamentos:
-    @ManyToMany  // muitos acessos podem ser atribuidos a muitos usuários.
+    @ManyToMany(mappedBy = "acessos")  // muitos acessos podem ser atribuidos a muitos usuários.
     @JsonIgnore
     private List<Usuario> usuarios;
 

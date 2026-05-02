@@ -35,15 +35,17 @@ public class Usuario {
     @Column(nullable = false)
     private LocalDateTime dataDeCadastro;
 
-
     private LocalDateTime dataDeDeletado;
-
-
 
     @OneToOne(mappedBy = "usuario",  cascade = CascadeType.ALL)
     private Login login;
 
-    @ManyToMany // um usuário pode ter muitas roles
+    @ManyToMany // muitos usuários pode ter muitas roles
+    @JoinTable(
+            name = "tipo_usuario",
+            joinColumns = @JoinColumn(name = "fk_usuario"),
+            inverseJoinColumns = @JoinColumn(name = "fk_acesso")
+    )
     private List<Acesso> acessos;
 
     @OneToOne (cascade = CascadeType.ALL, orphanRemoval = true)

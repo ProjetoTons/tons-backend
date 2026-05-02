@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
+@Table(name = "empresa")
 public class Empresa {
 
 
@@ -36,7 +37,7 @@ public class Empresa {
 
 
     //relacionamentos
-    @OneToMany
+    @OneToMany(mappedBy = "empresa")
     private List<Usuario> usuario;
 
     @OneToOne (cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "empresa")

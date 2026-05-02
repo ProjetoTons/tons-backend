@@ -4,7 +4,6 @@ import br.com.tonspersonalizados.dto.usuarios.EmpresaRequestDto;
 import br.com.tonspersonalizados.dto.usuarios.EnderecoRequestDto;
 import br.com.tonspersonalizados.entity.usuarios.Empresa;
 import br.com.tonspersonalizados.entity.usuarios.Endereco;
-import br.com.tonspersonalizados.entity.usuarios.Usuario;
 import br.com.tonspersonalizados.exception.usuarios.EmpresaNaoEncontradoException;
 import br.com.tonspersonalizados.exception.usuarios.EnderecoNaoEncontradoException;
 import br.com.tonspersonalizados.exception.usuarios.UsuarioNaoEncontradoException;
@@ -20,13 +19,11 @@ public class EmpresaService {
 
 
     private final EmpresaRepository empresaRepository;
-    private final UsuarioRepository usuarioRepository;
     private final EnderecoRepository enderecoRepository;
 
 
-    public EmpresaService(EmpresaRepository empresaRepository, UsuarioRepository usuarioRepository, EnderecoRepository enderecoRepository) {
+    public EmpresaService(EmpresaRepository empresaRepository, EnderecoRepository enderecoRepository) {
         this.empresaRepository = empresaRepository;
-        this.usuarioRepository = usuarioRepository;
         this.enderecoRepository = enderecoRepository;
     }
 
@@ -54,7 +51,6 @@ public class EmpresaService {
         empresa.setNomeFantasia(empresaDto.getNomeFantasia());
         empresa.setRazaoSocial(empresaDto.getRazaoSocial());
 
-
         return empresaRepository.save(empresa);
     }
 
@@ -62,7 +58,7 @@ public class EmpresaService {
     public Endereco cadastrarEnderecoEmpresa(EnderecoRequestDto enderecoDto, Long idEmpresa) {
 
 
-      Empresa empresa = empresaRepository.findById(idEmpresa)
+        Empresa empresa = empresaRepository.findById(idEmpresa)
                 .orElseThrow(() -> new UsuarioNaoEncontradoException("Empresa não encontrado"));
 
         Endereco endereco = new Endereco();
@@ -78,7 +74,6 @@ public class EmpresaService {
 
         return endereco;
     }
-
 
 
     public Endereco buscarEndereco(Long idEmpresa) {

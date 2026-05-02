@@ -4,6 +4,8 @@ package br.com.tonspersonalizados.service.usuarios;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +25,7 @@ import br.com.tonspersonalizados.exception.usuarios.UsuarioNaoEncontradoExceptio
 import br.com.tonspersonalizados.repository.usuarios.EnderecoRepository;
 import br.com.tonspersonalizados.repository.usuarios.UsuarioRepository;
 import br.com.tonspersonalizados.service.notificacoes.WhatsAppService;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class UsuarioService {
@@ -76,7 +79,13 @@ public class UsuarioService {
             throw new EmailJaExisteException("Email já cadastrado!");
         }
 
-        usuarioRepository.save(usuario);
+        try {
+            usuarioRepository.save(usuario);
+        }
+        catch (DataIntegrityViolationException e){
+            // Insert violou a chave unique para CPF
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Dados inválidos.");
+        }
 
         try {
             whatsAppService.enviarTemplate("55" + usuario.getTelefone(), "confirmacao_cadastro", usuario.getNome());
@@ -105,13 +114,13 @@ public class UsuarioService {
         usuarioRepository.save(funcionario);
     }
 
-    public Usuario buscarPorEmail(String email){
+    public Usuario buscarPorEmail(String email) {
         return usuarioRepository
                 .findByLoginEmail(email)
                 .orElse(null);
     }
 
-    public Usuario buscarPorId(Long id){
+    public Usuario buscarPorId(Long id) {
         return usuarioRepository
                 .findById(id)
                 .orElseThrow(() -> new UsuarioNaoEncontradoException("Usuário não encontrado"));
@@ -160,7 +169,7 @@ public class UsuarioService {
         usuarioRepository.save(usuarioExistente);
     }
 
-    public void atualizar(Usuario usuario){
+    public void atualizar(Usuario usuario) {
         usuarioRepository.save(usuario);
     }
 
