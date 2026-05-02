@@ -1,13 +1,12 @@
 package br.com.tonspersonalizados.dto.usuarios;
 
-import com.fasterxml.jackson.dataformat.yaml.util.StringQuotingChecker;
-
 public class UsuarioTokenDto {
 
     private Long id;
     private String nome;
     private String email;
     private String telefone;
+    private String cnpj;
     private String token;
 
     public String getEmail() {
@@ -48,5 +47,13 @@ public class UsuarioTokenDto {
 
     public void setToken(String token) {
         this.token = token;
+    }
+
+    public String getCnpj() {
+        return cnpj;
+    }
+
+    public void setCnpj(String cnpj) {
+        this.cnpj = cnpj;
     }
 }

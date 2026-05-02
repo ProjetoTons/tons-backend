@@ -79,7 +79,7 @@ public class UsuarioService {
         usuarioRepository.save(usuario);
 
         try {
-            whatsAppService.enviarTemplate("55" + usuario.getTelefone(), "hello_world");
+            whatsAppService.enviarTemplate("55" + usuario.getTelefone(), "confirmacao_cadastro", usuario.getNome());
         } catch (Exception e) {
             // Não impede o cadastro se o WhatsApp falhar
         }

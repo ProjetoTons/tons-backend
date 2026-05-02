@@ -1,15 +1,7 @@
 package br.com.tonspersonalizados.service.usuarios;
 
-import br.com.tonspersonalizados.config.GerenciadorTokenJwt;
-import br.com.tonspersonalizados.dto.notificacoes.NotificacaoDto;
-import br.com.tonspersonalizados.dto.usuarios.LoginRequestDto;
-import br.com.tonspersonalizados.dto.usuarios.UsuarioDetalhesDto;
-import br.com.tonspersonalizados.dto.usuarios.UsuarioTokenDto;
-import br.com.tonspersonalizados.entity.usuarios.Usuario;
-import br.com.tonspersonalizados.exception.usuarios.LoginInvalidoException;
-import br.com.tonspersonalizados.exception.usuarios.UsuarioNaoEncontradoException;
-import br.com.tonspersonalizados.repository.usuarios.UsuarioRepository;
-import br.com.tonspersonalizados.service.notificacoes.NotificacaoService;
+import java.time.LocalDateTime;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
@@ -24,8 +16,15 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.time.LocalDateTime;
-import java.util.Optional;
+import br.com.tonspersonalizados.config.GerenciadorTokenJwt;
+import br.com.tonspersonalizados.dto.notificacoes.NotificacaoDto;
+import br.com.tonspersonalizados.dto.usuarios.LoginRequestDto;
+import br.com.tonspersonalizados.dto.usuarios.UsuarioDetalhesDto;
+import br.com.tonspersonalizados.dto.usuarios.UsuarioTokenDto;
+import br.com.tonspersonalizados.entity.usuarios.Usuario;
+import br.com.tonspersonalizados.exception.usuarios.LoginInvalidoException;
+import br.com.tonspersonalizados.exception.usuarios.UsuarioNaoEncontradoException;
+import br.com.tonspersonalizados.service.notificacoes.NotificacaoService;
 
 @Service
 public class AutenticacaoService implements UserDetailsService {
@@ -87,6 +86,7 @@ public class AutenticacaoService implements UserDetailsService {
         usuarioTokenDto.setId(usuario.getId());
         usuarioTokenDto.setEmail(usuario.getLogin().getEmail());
         usuarioTokenDto.setNome(usuario.getNome());
+        usuarioTokenDto.setCnpj(usuario.getEmpresa() != null ? usuario.getEmpresa().getCnpj() : null);
         usuarioTokenDto.setToken(token);
 
         usuario.getLogin().setUltimoLogin(LocalDateTime.now());
