@@ -29,9 +29,40 @@ public class WhatsAppService {
                   "messaging_product": "whatsapp",
                   "to": "%s",
                   "type": "template",
-                  "template": { "name": "%s", "language": { "code": "pt_BR" } }
+                  "template": { "name": "%s", "language": { "code": "en_US" } }
                 }
                 """.formatted(limparTelefone(telefone), template);
+
+        return enviar(body);
+    }
+
+    public String enviarTemplate(String telefone, String template, String... parametros) {
+        if (parametros == null || parametros.length == 0) {
+            return enviarTemplate(telefone, template);
+        }
+
+        StringBuilder parametersJson = new StringBuilder();
+        for (int i = 0; i < parametros.length; i++) {
+            if (i > 0) parametersJson.append(",");
+            parametersJson.append("{\"type\":\"text\",\"text\":\"")
+                          .append(escapar(parametros[i]))
+                          .append("\"}");
+        }
+
+        String body = """
+                {
+                  "messaging_product": "whatsapp",
+                  "to": "%s",
+                  "type": "template",
+                  "template": {
+                    "name": "%s",
+                    "language": { "code": "pt_BR" },
+                    "components": [
+                      { "type": "body", "parameters": [%s] }
+                    ]
+                  }
+                }
+                """.formatted(limparTelefone(telefone), template, parametersJson);
 
         return enviar(body);
     }
@@ -60,5 +91,10 @@ public class WhatsAppService {
 
     private String limparTelefone(String telefone) {
         return telefone.replaceAll("[^0-9]", "");
+    }
+
+    private String escapar(String valor) {
+        if (valor == null) return "";
+        return valor.replace("\\", "\\\\").replace("\"", "\\\"");
     }
 }

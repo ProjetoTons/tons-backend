@@ -1,10 +1,11 @@
 package br.com.tonspersonalizados.service.usuarios;
 
-import br.com.tonspersonalizados.entity.usuarios.Acesso;
-import br.com.tonspersonalizados.repository.usuarios.AcessoRepository;
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import br.com.tonspersonalizados.entity.usuarios.Acesso;
+import br.com.tonspersonalizados.repository.usuarios.AcessoRepository;
 
 @Service
 public class AcessoService {
@@ -16,5 +17,9 @@ public class AcessoService {
 
     public List<Acesso> listarAcessosById(List<Long> ids){
         return acessoRepository.findAllByIdIn(ids);
+    }
+
+    public List<Acesso> listarTodos() {
+        return acessoRepository.findAll();
     }
 }
