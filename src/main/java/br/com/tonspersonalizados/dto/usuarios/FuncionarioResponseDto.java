@@ -1,9 +1,10 @@
 package br.com.tonspersonalizados.dto.usuarios;
 
-import br.com.tonspersonalizados.entity.usuarios.Acesso;
-
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
+
+import br.com.tonspersonalizados.entity.usuarios.Acesso;
 
 public class FuncionarioResponseDto {
     /*
@@ -16,9 +17,12 @@ public class FuncionarioResponseDto {
 
     private Long id;
     private String nome;
+    private String email;
     private String telefone;
     private LocalDate dataNascimento;
     private List<Acesso> acessos;
+    private Boolean ativo;
+    private LocalDateTime dataCriacao;
 
     public Long getId() {
         return id;
@@ -34,6 +38,14 @@ public class FuncionarioResponseDto {
 
     public void setNome(String nome) {
         this.nome = nome;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getTelefone() {
@@ -58,5 +70,21 @@ public class FuncionarioResponseDto {
 
     public void setAcessos(List<Acesso> acessos) {
         this.acessos = acessos;
+    }
+
+    public Boolean getAtivo() {
+        return ativo;
+    }
+
+    public void setAtivo(Boolean ativo) {
+        this.ativo = ativo;
+    }
+
+    public LocalDateTime getDataCriacao() {
+        return dataCriacao;
+    }
+
+    public void setDataCriacao(LocalDateTime dataCriacao) {
+        this.dataCriacao = dataCriacao;
     }
 }
