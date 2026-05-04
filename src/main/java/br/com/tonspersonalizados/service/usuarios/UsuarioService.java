@@ -139,9 +139,14 @@ public class UsuarioService {
                     FuncionarioResponseDto dto = new FuncionarioResponseDto();
                     dto.setId(funcionario.getId());
                     dto.setNome(funcionario.getNome());
+                    if (funcionario.getLogin() != null) {
+                        dto.setEmail(funcionario.getLogin().getEmail());
+                    }
                     dto.setTelefone(funcionario.getTelefone());
                     dto.setDataNascimento(funcionario.getDataNascimento());
                     dto.setAcessos(funcionario.getAcessos());
+                    dto.setAtivo(funcionario.getDataDeDeletado() == null);
+                    dto.setDataCriacao(funcionario.getDataDeCadastro());
 
                     return dto;
                 }).toList();
