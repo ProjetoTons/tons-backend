@@ -4,6 +4,7 @@ package br.com.tonspersonalizados.service.usuarios;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -37,6 +38,9 @@ public class UsuarioService {
     private final PasswordEncoder passwordEncoder;
     private final WhatsAppService whatsAppService;
 
+    @Value("${tons.cnpj}")
+    private String cnpjTons;
+
 
     public UsuarioService(
             AcessoService acessoService, EmpresaService empresaService,
@@ -69,9 +73,9 @@ public class UsuarioService {
 
         // cadastro de endereço é feito posteriormente(endpoints abaixo)
 
-        if (usuarioDto.getCnpj() != null) {
+        if (usuarioDto.getEmpresaId() != null) {
 
-            Empresa empresa = empresaService.buscarPorCnpj(usuarioDto.getCnpj());
+            Empresa empresa = empresaService.buscarPorId(usuarioDto.getEmpresaId());
             usuario.setEmpresa(empresa);
         }
 
@@ -106,6 +110,10 @@ public class UsuarioService {
         login.setSenhaHash(passwordEncoder.encode(funcionarioDto.getSenha()));
         login.setUsuario(funcionario);
         funcionario.setLogin(login);
+
+        //assim sempre o funcionario estará vinculado a tons.
+        Empresa empresa = empresaService.buscarPorCnpj(cnpjTons);
+        funcionario.setEmpresa(empresa);
 
         // Adicionar acessos
         List<Acesso> acessos = acessoService.listarAcessosById(funcionarioDto.getAcessos());
