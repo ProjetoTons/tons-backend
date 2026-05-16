@@ -29,6 +29,7 @@ import br.com.tonspersonalizados.service.notificacoes.NotificacaoService;
 @Service
 public class AutenticacaoService implements UserDetailsService {
 
+    //por a rota do frontend onde a pessoa vai digitar a nova senha
     @Value("${jwt.resetSenhaUrl}")
     private String resetUrl;
 
