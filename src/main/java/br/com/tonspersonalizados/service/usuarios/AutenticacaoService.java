@@ -79,7 +79,7 @@ public class AutenticacaoService implements UserDetailsService {
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        final String token = gerenciadorTokenJwt.generateToken(authentication);
+        final String token = gerenciadorTokenJwt.generateToken(authentication, usuario.getId());
 
         UsuarioTokenDto usuarioTokenDto = new UsuarioTokenDto();
 

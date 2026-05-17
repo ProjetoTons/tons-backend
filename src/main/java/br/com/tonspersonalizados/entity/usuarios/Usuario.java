@@ -1,5 +1,6 @@
 package br.com.tonspersonalizados.entity.usuarios;
 
+import br.com.tonspersonalizados.entity.produtos.Produto;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -26,6 +27,8 @@ public class Usuario {
     @Column(nullable = false)
     private String telefone;
 
+    private String fotoUrl;
+
     @Column(nullable = false)
     private Boolean isFuncionario; // Colocar essa coluna na modelagem
 
@@ -37,7 +40,7 @@ public class Usuario {
 
     private LocalDateTime dataDeDeletado;
 
-    @OneToOne(mappedBy = "usuario",  cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "usuario", cascade = CascadeType.ALL)
     private Login login;
 
     @ManyToMany // muitos usuários pode ter muitas roles
@@ -48,7 +51,7 @@ public class Usuario {
     )
     private List<Acesso> acessos;
 
-    @OneToOne (cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "fk_endereco")
     @JsonBackReference
     private Endereco endereco;
@@ -57,9 +60,21 @@ public class Usuario {
     private Empresa empresa;
 
 
+    @ManyToMany
+    @JoinTable(
+            name = "produto_favorito", //produtos salvos
+            joinColumns = @JoinColumn(name = "fk_usuario"),
+            inverseJoinColumns = @JoinColumn(name = "fk_produto")
+    )
+    private List<Produto> produtos;
 
-
-
+    @ManyToMany
+    @JoinTable(
+            name = "produto_interesse",
+            joinColumns = @JoinColumn(name = "fk_usuario"),
+            inverseJoinColumns = @JoinColumn(name = "fk_produto")
+    )
+    private List<Produto> produtosDoCarrinho;
 
 
     public String getCpf() {
@@ -119,9 +134,13 @@ public class Usuario {
         this.acessos = acesso;
     }
 
-    public Boolean getFuncionario() { return isFuncionario; }
+    public Boolean getFuncionario() {
+        return isFuncionario;
+    }
 
-    public void setFuncionario(Boolean funcionario) { isFuncionario = funcionario; }
+    public void setFuncionario(Boolean funcionario) {
+        isFuncionario = funcionario;
+    }
 
     public Endereco getEndereco() {
         return endereco;
@@ -154,5 +173,37 @@ public class Usuario {
 
     public void setDataDeDeletado(LocalDateTime dataDeDeletado) {
         this.dataDeDeletado = dataDeDeletado;
+    }
+
+    public List<Produto> getProdutosFavoritos() {
+        return produtos;
+    }
+
+    public void setProdutos(List<Produto> produtos) {
+        this.produtos = produtos;
+    }
+
+    public List<Produto> getProdutos() {
+        return produtos;
+    }
+
+    public List<Produto> getProdutosInterressados() {
+        return produtosDoCarrinho;
+    }
+
+    public void setProdutosDoCarrinho(List<Produto> produtosDoCarrinho) {
+        this.produtosDoCarrinho = produtosDoCarrinho;
+    }
+
+    public String getFotoUrl() {
+        return fotoUrl;
+    }
+
+    public void setFotoUrl(String fotoUrl) {
+        this.fotoUrl = fotoUrl;
+    }
+
+    public List<Produto> getProdutosDoCarrinho() {
+        return produtosDoCarrinho;
     }
 }

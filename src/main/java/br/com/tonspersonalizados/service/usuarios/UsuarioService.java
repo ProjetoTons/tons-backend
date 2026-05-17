@@ -4,16 +4,13 @@ package br.com.tonspersonalizados.service.usuarios;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import br.com.tonspersonalizados.dto.usuarios.*;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import br.com.tonspersonalizados.dto.usuarios.EnderecoRequestDto;
-import br.com.tonspersonalizados.dto.usuarios.FuncionarioRequestDto;
-import br.com.tonspersonalizados.dto.usuarios.FuncionarioResponseDto;
-import br.com.tonspersonalizados.dto.usuarios.UsuarioRequestDto;
-import br.com.tonspersonalizados.dto.usuarios.UsuarioResponseDto;
 import br.com.tonspersonalizados.entity.usuarios.Acesso;
 import br.com.tonspersonalizados.entity.usuarios.Empresa;
 import br.com.tonspersonalizados.entity.usuarios.Endereco;
@@ -37,6 +34,9 @@ public class UsuarioService {
     private final PasswordEncoder passwordEncoder;
     private final WhatsAppService whatsAppService;
 
+    @Value("${tons.cnpj}")
+    private String cnpjTons;
+
 
     public UsuarioService(
             AcessoService acessoService, EmpresaService empresaService,
@@ -56,7 +56,7 @@ public class UsuarioService {
     public void cadastrar(UsuarioRequestDto usuarioDto) {
 
         Usuario usuario = new Usuario();
-        usuario.setFuncionario(false);
+        usuario.setFuncionario(Boolean.valueOf(false));
         usuario.setNome(usuarioDto.getNome());
         usuario.setCpf(usuarioDto.getCpf());
         usuario.setTelefone(usuarioDto.getTelefone());
@@ -69,9 +69,9 @@ public class UsuarioService {
 
         // cadastro de endereço é feito posteriormente(endpoints abaixo)
 
-        if (usuarioDto.getCnpj() != null) {
+        if (usuarioDto.getEmpresaId() != null) {
 
-            Empresa empresa = empresaService.buscarPorCnpj(usuarioDto.getCnpj());
+            Empresa empresa = empresaService.buscarPorId(usuarioDto.getEmpresaId());
             usuario.setEmpresa(empresa);
         }
 
@@ -96,7 +96,7 @@ public class UsuarioService {
 
     public void cadastrarFuncionario(FuncionarioRequestDto funcionarioDto) {
         Usuario funcionario = new Usuario();
-        funcionario.setFuncionario(true);
+        funcionario.setFuncionario(Boolean.valueOf(true));
         funcionario.setNome(funcionarioDto.getNome());
         funcionario.setTelefone(funcionarioDto.getTelefone());
         funcionario.setDataNascimento(funcionarioDto.getDataNascimento());
@@ -106,6 +106,10 @@ public class UsuarioService {
         login.setSenhaHash(passwordEncoder.encode(funcionarioDto.getSenha()));
         login.setUsuario(funcionario);
         funcionario.setLogin(login);
+
+        //assim sempre o funcionario estará vinculado a tons.
+        Empresa empresa = empresaService.buscarPorCnpj(cnpjTons);
+        funcionario.setEmpresa(empresa);
 
         // Adicionar acessos
         List<Acesso> acessos = acessoService.listarAcessosById(funcionarioDto.getAcessos());
@@ -154,14 +158,14 @@ public class UsuarioService {
                     dto.setTelefone(funcionario.getTelefone());
                     dto.setDataNascimento(funcionario.getDataNascimento());
                     dto.setAcessos(funcionario.getAcessos());
-                    dto.setAtivo(funcionario.getDataDeDeletado() == null);
+                    dto.setAtivo(Boolean.valueOf(funcionario.getDataDeDeletado() == null));
                     dto.setDataCriacao(funcionario.getDataDeCadastro());
 
                     return dto;
                 }).toList();
     }
 
-    public void atualizar(Long id, UsuarioRequestDto usuarioDto) {
+    public void atualizar(Long id, UsuarioAtualizarRequestDto usuarioDto) {
         Usuario usuarioExistente = usuarioRepository.findById(id)
                 .orElseThrow(() -> new UsuarioNaoEncontradoException("Usuário não encontrado"));
 
@@ -169,7 +173,6 @@ public class UsuarioService {
         usuarioExistente.setTelefone(usuarioDto.getTelefone());
 
         usuarioExistente.getLogin().setEmail(usuarioDto.getEmail());
-        usuarioExistente.getLogin().setSenhaHash(usuarioDto.getSenha());
 
         usuarioRepository.save(usuarioExistente);
     }
@@ -178,13 +181,12 @@ public class UsuarioService {
         usuarioRepository.save(usuario);
     }
 
-    public void atualizarFuncionario(Long id, FuncionarioRequestDto funcionarioDto) {
+    public void atualizarFuncionario(Long id, FuncionarioAtualizarRequestDto funcionarioDto) {
         Usuario funcionarioExistente = usuarioRepository.findById(id)
                 .orElseThrow(() -> new UsuarioNaoEncontradoException("Funcionário não encontrado"));
 
         funcionarioExistente.setNome(funcionarioDto.getNome());
         funcionarioExistente.setTelefone(funcionarioDto.getTelefone());
-        funcionarioExistente.setDataNascimento(funcionarioDto.getDataNascimento());
 
         List<Acesso> acessos = acessoService.listarAcessosById(funcionarioDto.getAcessos());
 
