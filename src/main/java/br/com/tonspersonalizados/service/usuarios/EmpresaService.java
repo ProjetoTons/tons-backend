@@ -4,12 +4,14 @@ import br.com.tonspersonalizados.dto.usuarios.EmpresaRequestDto;
 import br.com.tonspersonalizados.dto.usuarios.EnderecoRequestDto;
 import br.com.tonspersonalizados.entity.usuarios.Empresa;
 import br.com.tonspersonalizados.entity.usuarios.Endereco;
+import br.com.tonspersonalizados.exception.usuarios.CnpjInvalidoException;
 import br.com.tonspersonalizados.exception.usuarios.EmpresaNaoEncontradoException;
 import br.com.tonspersonalizados.exception.usuarios.EnderecoNaoEncontradoException;
 import br.com.tonspersonalizados.exception.usuarios.UsuarioNaoEncontradoException;
 import br.com.tonspersonalizados.repository.usuarios.EmpresaRepository;
 import br.com.tonspersonalizados.repository.usuarios.EnderecoRepository;
 import br.com.tonspersonalizados.repository.usuarios.UsuarioRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,6 +22,9 @@ public class EmpresaService {
 
     private final EmpresaRepository empresaRepository;
     private final EnderecoRepository enderecoRepository;
+
+    @Value("${tons.cnpj}")
+    private String cnpjTons;
 
 
     public EmpresaService(EmpresaRepository empresaRepository, EnderecoRepository enderecoRepository) {
@@ -38,6 +43,13 @@ public class EmpresaService {
 
     }
 
+
+    public Empresa buscarPorId(Long id){
+        return empresaRepository.findById(id).orElseThrow(() ->
+                new EmpresaNaoEncontradoException("Empresa não encontrada."));
+    }
+
+
     public List<Empresa> listarTodos() {
         return empresaRepository.findAll();
     }
@@ -50,6 +62,12 @@ public class EmpresaService {
         empresa.setTelefone(empresaDto.getTelefone());
         empresa.setNomeFantasia(empresaDto.getNomeFantasia());
         empresa.setRazaoSocial(empresaDto.getRazaoSocial());
+
+        //para garantir que empresas não sejam cadastradas com o cnpj da tons.
+        if(empresa.getCnpj().equalsIgnoreCase(cnpjTons)){
+            throw new CnpjInvalidoException("CNPJ inválido.");
+        }
+
 
         return empresaRepository.save(empresa);
     }
