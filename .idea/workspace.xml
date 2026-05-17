@@ -5,9 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="58737723-9b5d-4081-b16c-19932057d09f" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/src/main/java/br/com/tonspersonalizados/exception/usuarios/CnpjInvalidoException.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/br/com/tonspersonalizados/config/SecurityConfiguracao.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/br/com/tonspersonalizados/config/SecurityConfiguracao.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/br/com/tonspersonalizados/controller/notificacoes/NotificacaoController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/br/com/tonspersonalizados/controller/notificacoes/NotificacaoController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/br/com/tonspersonalizados/controller/usuarios/EmpresaController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/br/com/tonspersonalizados/controller/usuarios/EmpresaController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/br/com/tonspersonalizados/dto/usuarios/UsuarioRequestDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/br/com/tonspersonalizados/dto/usuarios/UsuarioRequestDto.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/br/com/tonspersonalizados/service/usuarios/EmpresaService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/br/com/tonspersonalizados/service/usuarios/EmpresaService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/br/com/tonspersonalizados/service/usuarios/UsuarioService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/br/com/tonspersonalizados/service/usuarios/UsuarioService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.properties" afterDir="false" />
     </list>
@@ -26,6 +28,13 @@
       <entry key="chat-panel" value="Claude Opus 4.6" />
       <entry key="agent-panel" value="Claude Opus 4.6" />
     </selectedModels>
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Exception" />
+      </list>
+    </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -60,13 +69,17 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RequestMappingsPanelOrder0": "0",
+    "RequestMappingsPanelOrder1": "1",
+    "RequestMappingsPanelWidth0": "75",
+    "RequestMappingsPanelWidth1": "75",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
     "RunOnceActivity.git.unshallow": "true",
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
     "Spring Boot.TonsApplication.executor": "Run",
     "codeWithMe.voiceChat.enabledByDefault": "false",
-    "git-widget-placeholder": "refactor/mudanca-de-arquitetura-microservice-para-monolito",
+    "git-widget-placeholder": "ajustes-sprint2",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "C:/Users/denni/OneDrive/Documentos/Faculdade/PI-Benificiario/tons-backend",
     "node.js.detected.package.eslint": "true",
@@ -110,6 +123,17 @@
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
   <component name="github-copilot-workspace">
     <instructionFileLocations>

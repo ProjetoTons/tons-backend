@@ -43,10 +43,9 @@ public class EmpresaController {
     })
     @PostMapping
     @SecurityRequirement(name = "Bearer")
-    public ResponseEntity<String> cadastrarEmpresa(@RequestBody @Valid EmpresaRequestDto dto) {
+    public ResponseEntity<Empresa> cadastrarEmpresa(@RequestBody @Valid EmpresaRequestDto dto) {
 
-        empresaService.cadastrarEmpresa(dto);
-        return ResponseEntity.status(201).body("Empresa cadastrada com sucesso.");
+        return ResponseEntity.status(201).body(empresaService.cadastrarEmpresa(dto));
     }
 
     @Operation(summary = "Listar todas as empresas", description = "Retorna uma lista com todas as empresas cadastradas.")
