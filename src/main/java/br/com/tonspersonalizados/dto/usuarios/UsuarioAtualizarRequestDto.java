@@ -2,6 +2,7 @@ package br.com.tonspersonalizados.dto.usuarios;
 
 import jakarta.persistence.Column;
 import jakarta.validation.constraints.*;
+import org.hibernate.validator.constraints.br.CNPJ;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -21,6 +22,9 @@ public class UsuarioAtualizarRequestDto {
     @Size(min = 11, max = 11)
     private String telefone;
 
+    private Long idEmpresa;
+
+    private EnderecoRequestDto endereco;
 
     public String getEmail() {
         return email;
@@ -45,4 +49,10 @@ public class UsuarioAtualizarRequestDto {
     public void setTelefone(String telefone) {
         this.telefone = telefone;
     }
+
+    public Long getIdEmpresa() { return idEmpresa; }
+
+    public void setIdEmpresa(Long idEmpresa) { this.idEmpresa = idEmpresa; }
+
+    public EnderecoRequestDto getEndereco() { return endereco; }
 }

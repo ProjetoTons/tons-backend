@@ -1,8 +1,7 @@
 package br.com.tonspersonalizados.dto.usuarios;
 
 import jakarta.validation.constraints.*;
-import org.hibernate.validator.constraints.br.CNPJ;
-import org.hibernate.validator.constraints.br.CPF;
+import org.hibernate.validator.constraints.URL;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -23,6 +22,12 @@ public class FuncionarioRequestDto {
 
     @NotNull
     private String senha;
+
+    @URL
+    private String fotoUrl;
+
+    @NotEmpty
+    private String fotoPublicId;
 
     @NotNull
     private LocalDate dataNascimento;
@@ -55,4 +60,8 @@ public class FuncionarioRequestDto {
     public String getTelefone() {
         return telefone;
     }
+
+    public String getFotoUrl() { return fotoUrl; }
+
+    public String getFotoPublicId() { return fotoPublicId; }
 }

@@ -1,9 +1,10 @@
 package br.com.tonspersonalizados.entity.produtos;
 
-import com.sun.source.doctree.EscapeTree;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.util.List;
+
 @Entity
 public class CategoriaProduto {
 
@@ -18,7 +19,8 @@ public class CategoriaProduto {
 
 
     @OneToMany(mappedBy = "categoriaProduto")
-   private List<Produto> produtos;
+    @JsonIgnore
+    private List<Produto> produtos;
 
 
     public String getDescricao() {

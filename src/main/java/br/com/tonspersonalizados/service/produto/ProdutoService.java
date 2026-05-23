@@ -13,13 +13,15 @@ import java.util.List;
 public class ProdutoService {
 
     private final ProdutoRepository produtoRepository;
-    private final ProdutoService produtoService;
     private final UsuarioService usuarioService;
 
-    public ProdutoService(ProdutoRepository produtoRepository, ProdutoService produtoService, UsuarioService usuarioService) {
+    public ProdutoService(ProdutoRepository produtoRepository, UsuarioService usuarioService) {
         this.produtoRepository = produtoRepository;
-        this.produtoService = produtoService;
         this.usuarioService = usuarioService;
+    }
+
+    public List<Produto> obterTodos(){
+        return produtoRepository.findAll();
     }
 
     public List<Produto> obterProdutosPorCategoria(Long id) {
@@ -32,6 +34,13 @@ public class ProdutoService {
 
     }
 
+    public List<Produto> listarFavoritos(Long idUsuario){
+
+        Usuario usuario = usuarioService.buscarPorId(idUsuario);
+
+        return  usuario.getProdutosFavoritos();
+
+    }
 
     public void favoritarProduto(Long idProduto, Long idUsuario) {
 
@@ -45,8 +54,7 @@ public class ProdutoService {
 
     }
 
-
-    public void removerProduto(Long idProduto, Long idUsuario) {
+    public void removerProdutoFavoritado(Long idProduto, Long idUsuario) {
 
         Produto produto = produtoRepository.findById(idProduto).orElseThrow(() -> new ProdutoNaoEncontradoException("Produto não encontrado"));
 
@@ -58,13 +66,10 @@ public class ProdutoService {
 
     }
 
-
-    public List<Produto> listarFavoritos(Long idUsuario){
-
+    public List<Produto> listarInteressados(Long idUsuario){
         Usuario usuario = usuarioService.buscarPorId(idUsuario);
 
-        return  usuario.getProdutosFavoritos();
-
+        return usuario.getProdutosInterressados();
     }
 
     //seria o carrinho de compras
@@ -80,5 +85,14 @@ public class ProdutoService {
 
     }
 
+    public void removerProdutoInteressado(Long idProduto, Long idUsuario) {
 
+        Produto produto = produtoRepository.findById(idProduto).orElseThrow(() -> new ProdutoNaoEncontradoException("Produto não encontrado"));
+
+        Usuario usuario = usuarioService.buscarPorId(idUsuario);
+
+        usuario.getProdutosInterressados().remove(produto);
+        usuarioService.atualizar(usuario);
+
+    }
 }
