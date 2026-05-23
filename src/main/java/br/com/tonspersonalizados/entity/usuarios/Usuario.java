@@ -76,7 +76,8 @@ public class Usuario {
     @JoinTable(
             name = "produto_interesse",
             joinColumns = @JoinColumn(name = "fk_usuario"),
-            inverseJoinColumns = @JoinColumn(name = "fk_produto")
+            inverseJoinColumns = @JoinColumn(name = "fk_produto"),
+            uniqueConstraints = @UniqueConstraint(columnNames = {"fk_usuario", "fk_produto"})
     )
     private List<Produto> produtosDoCarrinho;
 

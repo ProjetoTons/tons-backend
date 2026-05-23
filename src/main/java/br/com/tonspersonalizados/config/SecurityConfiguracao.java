@@ -52,6 +52,7 @@ public class SecurityConfiguracao {
             "/usuarios/login",
             "/notificacao/**",
             "/produtos",
+            "/categorias",
             "/whatsapp/**",
             "/h2-console/**",
             "/login",
