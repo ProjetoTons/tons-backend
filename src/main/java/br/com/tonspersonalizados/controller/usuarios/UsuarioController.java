@@ -93,7 +93,7 @@ public class UsuarioController {
     })
     @PutMapping("/{id}")
     @SecurityRequirement(name = "Bearer")
-    public ResponseEntity<String> atualizar(@PathVariable Long id, @RequestBody @Valid UsuarioRequestDto usuario) {
+    public ResponseEntity<String> atualizar(@PathVariable Long id, @RequestBody @Valid UsuarioAtualizarRequestDto usuario) {
         usuarioService.atualizar(id, usuario);
 
         return ResponseEntity.ok("Usuário atualizado com sucesso!");
@@ -108,7 +108,7 @@ public class UsuarioController {
     })
     @PutMapping("funcionario/{id}")
     @SecurityRequirement(name = "Bearer")
-    public ResponseEntity<String> atualizarFuncionario(@PathVariable Long id, @RequestBody @Valid FuncionarioRequestDto funcionario) {
+    public ResponseEntity<String> atualizarFuncionario(@PathVariable Long id, @RequestBody @Valid FuncionarioAtualizarRequestDto funcionario) {
         usuarioService.atualizarFuncionario(id, funcionario);
 
         return ResponseEntity.ok("Funcionário atualizado com sucesso.");

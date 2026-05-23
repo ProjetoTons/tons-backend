@@ -51,6 +51,8 @@ public class SecurityConfiguracao {
             "/usuarios",
             "/usuarios/login",
             "/notificacao/**",
+            "/produtos",
+            "/categorias",
             "/whatsapp/**",
             "/h2-console/**",
             "/login",
@@ -76,6 +78,7 @@ public class SecurityConfiguracao {
                 .csrf(CsrfConfigurer<HttpSecurity>::disable)
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(HttpMethod.POST, "/empresas").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/produtos/{id}").permitAll()
                         .requestMatchers(URLS_PERMITIDAS).permitAll()
                         .anyRequest()
                         .authenticated()

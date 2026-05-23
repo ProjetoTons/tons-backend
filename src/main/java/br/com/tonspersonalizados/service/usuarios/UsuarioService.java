@@ -4,17 +4,13 @@ package br.com.tonspersonalizados.service.usuarios;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import br.com.tonspersonalizados.dto.usuarios.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import br.com.tonspersonalizados.dto.usuarios.EnderecoRequestDto;
-import br.com.tonspersonalizados.dto.usuarios.FuncionarioRequestDto;
-import br.com.tonspersonalizados.dto.usuarios.FuncionarioResponseDto;
-import br.com.tonspersonalizados.dto.usuarios.UsuarioRequestDto;
-import br.com.tonspersonalizados.dto.usuarios.UsuarioResponseDto;
 import br.com.tonspersonalizados.entity.usuarios.Acesso;
 import br.com.tonspersonalizados.entity.usuarios.Empresa;
 import br.com.tonspersonalizados.entity.usuarios.Endereco;
@@ -37,6 +33,7 @@ public class UsuarioService {
     private final EmpresaService empresaService;
     private final PasswordEncoder passwordEncoder;
     private final WhatsAppService whatsAppService;
+    private final CloudinaryService cloudinaryService;
 
     @Value("${tons.cnpj}")
     private String cnpjTons;
@@ -47,13 +44,15 @@ public class UsuarioService {
             UsuarioRepository usuarioRepository,
             PasswordEncoder passwordEncoder,
             EnderecoRepository enderecoRepository,
-            WhatsAppService whatsAppService) {
+            WhatsAppService whatsAppService,
+            CloudinaryService cloudinaryService) {
         this.acessoService = acessoService;
         this.usuarioRepository = usuarioRepository;
         this.passwordEncoder = passwordEncoder;
         this.empresaService = empresaService;
         this.enderecoRepository = enderecoRepository;
         this.whatsAppService = whatsAppService;
+        this.cloudinaryService = cloudinaryService;
 
     }
 
@@ -102,6 +101,7 @@ public class UsuarioService {
         Usuario funcionario = new Usuario();
         funcionario.setFuncionario(true);
         funcionario.setNome(funcionarioDto.getNome());
+        funcionario.setFotoUrl(funcionarioDto.getFotoUrl());
         funcionario.setTelefone(funcionarioDto.getTelefone());
         funcionario.setDataNascimento(funcionarioDto.getDataNascimento());
 
@@ -140,11 +140,14 @@ public class UsuarioService {
                 .orElseThrow(() -> new UsuarioNaoEncontradoException("Usuário não encontrado"));
 
         UsuarioResponseDto dto = new UsuarioResponseDto();
+        dto.setCpf(usuario.getCpf());
         dto.setNome(usuario.getNome());
         dto.setTelefone(usuario.getTelefone());
-        if (usuario.getLogin() != null) {
-            dto.setEmail(usuario.getLogin().getEmail());
-        }
+        dto.setDataNascimento(usuario.getDataNascimento());
+        dto.setEmail(usuario.getLogin().getEmail());
+        dto.setEmpresa(usuario.getEmpresa());
+        dto.setEndereco(usuario.getEndereco());
+
         return dto;
     }
 
@@ -169,7 +172,7 @@ public class UsuarioService {
                 }).toList();
     }
 
-    public void atualizar(Long id, UsuarioRequestDto usuarioDto) {
+    public void atualizar(Long id, UsuarioAtualizarRequestDto usuarioDto) {
         Usuario usuarioExistente = usuarioRepository.findById(id)
                 .orElseThrow(() -> new UsuarioNaoEncontradoException("Usuário não encontrado"));
 
@@ -177,7 +180,17 @@ public class UsuarioService {
         usuarioExistente.setTelefone(usuarioDto.getTelefone());
 
         usuarioExistente.getLogin().setEmail(usuarioDto.getEmail());
-        usuarioExistente.getLogin().setSenhaHash(usuarioDto.getSenha());
+
+        if (usuarioDto.getIdEmpresa() != null) {
+
+            Empresa empresa = empresaService.buscarPorId(usuarioDto.getIdEmpresa());
+
+            usuarioExistente.setEmpresa(empresa);
+        }
+        else if (usuarioExistente.getEmpresa() != null) {
+            // Usuário desvinculando da empresa atual
+            usuarioExistente.setEmpresa(null);
+        }
 
         usuarioRepository.save(usuarioExistente);
     }
@@ -186,13 +199,20 @@ public class UsuarioService {
         usuarioRepository.save(usuario);
     }
 
-    public void atualizarFuncionario(Long id, FuncionarioRequestDto funcionarioDto) {
+    public void atualizarFuncionario(Long id, FuncionarioAtualizarRequestDto funcionarioDto) {
         Usuario funcionarioExistente = usuarioRepository.findById(id)
                 .orElseThrow(() -> new UsuarioNaoEncontradoException("Funcionário não encontrado"));
 
         funcionarioExistente.setNome(funcionarioDto.getNome());
+
+        if (!funcionarioDto.getFotoUrl().isBlank() && !funcionarioExistente.getFotoUrl().equals(funcionarioDto.getFotoUrl())){
+            cloudinaryService.deletar(funcionarioExistente.getFotoPublicId());
+
+            funcionarioExistente.setFotoUrl(funcionarioDto.getFotoUrl());
+            funcionarioExistente.setFotoPublicId(funcionarioDto.getFotoPublicId());
+        }
+
         funcionarioExistente.setTelefone(funcionarioDto.getTelefone());
-        funcionarioExistente.setDataNascimento(funcionarioDto.getDataNascimento());
 
         List<Acesso> acessos = acessoService.listarAcessosById(funcionarioDto.getAcessos());
 
@@ -214,7 +234,6 @@ public class UsuarioService {
 
     public Endereco cadastrarEnderecoUsuario(EnderecoRequestDto enderecoDto, Long idUsuario) {
 
-
         Usuario usuario = usuarioRepository.findById(idUsuario)
                 .orElseThrow(() -> new UsuarioNaoEncontradoException("Usuário não encontrado"));
 
@@ -223,13 +242,13 @@ public class UsuarioService {
         endereco.setLogradouro(enderecoDto.getLogadouro());
         endereco.setNumero(enderecoDto.getNumero());
         endereco.setCep(enderecoDto.getCep());
-        endereco.setComplemento(endereco.getComplemento());
+        endereco.setComplemento(enderecoDto.getComplemento());
 
         usuario.setEndereco(endereco);
 
         usuarioRepository.save(usuario);
 
-        return endereco;
+        return usuario.getEndereco();
     }
 
     public Endereco buscarEndereco(Long idUsuario) {

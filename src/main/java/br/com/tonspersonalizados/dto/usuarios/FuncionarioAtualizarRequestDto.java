@@ -3,10 +3,10 @@ package br.com.tonspersonalizados.dto.usuarios;
 import jakarta.validation.constraints.*;
 import org.hibernate.validator.constraints.URL;
 
-import java.time.LocalDate;
 import java.util.List;
 
-public class FuncionarioRequestDto {
+public class FuncionarioAtualizarRequestDto {
+
 
     @NotBlank
     @NotNull
@@ -20,8 +20,8 @@ public class FuncionarioRequestDto {
     @Size(min = 11, max = 11)
     private String telefone;
 
-    @NotNull
-    private String senha;
+    @NotEmpty
+    private List<Long> acessos;
 
     @URL
     private String fotoUrl;
@@ -29,39 +29,46 @@ public class FuncionarioRequestDto {
     @NotEmpty
     private String fotoPublicId;
 
-    @NotNull
-    private LocalDate dataNascimento;
-
-    @NotEmpty
-    private List<Long> acessos;
-
-    //sem cpf para funcionario
 
     public List<Long> getAcessos() {
         return acessos;
     }
 
-    public LocalDate getDataNascimento() {
-        return dataNascimento;
+    public void setAcessos(List<Long> acessos) {
+        this.acessos = acessos;
     }
 
     public String getEmail() {
         return email;
     }
 
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getFotoUrl() {
+        return fotoUrl;
+    }
+
+    public void setFotoUrl(String fotoUrl) {
+        this.fotoUrl = fotoUrl;
+    }
+
+    public String getFotoPublicId() { return fotoPublicId; }
+
     public String getNome() {
         return nome;
     }
 
-    public String getSenha() {
-        return senha;
+    public void setNome(String nome) {
+        this.nome = nome;
     }
 
     public String getTelefone() {
         return telefone;
     }
 
-    public String getFotoUrl() { return fotoUrl; }
-
-    public String getFotoPublicId() { return fotoPublicId; }
+    public void setTelefone(String telefone) {
+        this.telefone = telefone;
+    }
 }
