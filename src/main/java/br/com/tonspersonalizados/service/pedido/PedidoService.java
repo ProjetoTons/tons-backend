@@ -265,22 +265,22 @@ public class PedidoService {
 
         if (itens != null) {
             response.setItens(itens.stream().map(item -> {
-                ItemPedidoResponseDto i = new ItemPedidoResponseDto();
-                i.setIdProduto(item.getProduto().getId());
-                i.setNomeProduto(item.getProduto().getNome());
-                i.setQuantidade(item.getQuantidade());
-                i.setValorUnitario(item.getValorUnitario());
+                ItemPedidoResponseDto itemPedido = new ItemPedidoResponseDto();
+                itemPedido.setIdProduto(item.getProduto().getId());
+                itemPedido.setNomeProduto(item.getProduto().getNome());
+                itemPedido.setQuantidade(item.getQuantidade());
+                itemPedido.setValorUnitario(item.getValorUnitario());
                 if (item.getCaracteristicas() != null) {
-                    CaracteristicasRequestDto cr = new CaracteristicasRequestDto();
-                    cr.setDescricaoArte(item.getCaracteristicas().getDescricaoArte());
-                    cr.setCorEstampa(item.getCaracteristicas().getCorEstampa());
-                    cr.setCorMaterial(item.getCaracteristicas().getCorMaterial());
-                    cr.setComposicao(item.getCaracteristicas().getComposicao());
-                    cr.setTamanho(item.getCaracteristicas().getTamanho());
-                    cr.setFornecedor(item.getCaracteristicas().getFornecedor());
-                    i.setCaracteristicas(cr);
+                    CaracteristicasRequestDto caracteristica = new CaracteristicasRequestDto();
+                    caracteristica.setDescricaoArte(item.getCaracteristicas().getDescricaoArte());
+                    caracteristica.setCorEstampa(item.getCaracteristicas().getCorEstampa());
+                    caracteristica.setCorMaterial(item.getCaracteristicas().getCorMaterial());
+                    caracteristica.setComposicao(item.getCaracteristicas().getComposicao());
+                    caracteristica.setTamanho(item.getCaracteristicas().getTamanho());
+                    caracteristica.setFornecedor(item.getCaracteristicas().getFornecedor());
+                    itemPedido.setCaracteristicas(caracteristica);
                 }
-                return i;
+                return itemPedido;
             }).collect(Collectors.toList()));
         }
 

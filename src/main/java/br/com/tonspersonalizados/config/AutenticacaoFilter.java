@@ -54,6 +54,11 @@ public class AutenticacaoFilter extends OncePerRequestFilter {
                 LOGGER.trace("[FALHA AUTENTICACAO] - stack trace: %s", exception);
 
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            } catch (io.jsonwebtoken.MalformedJwtException exception) {
+
+                LOGGER.info("[FALHA AUTENTICACAO] - Token malformado: {}", exception.getMessage());
+
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             }
         }
 
