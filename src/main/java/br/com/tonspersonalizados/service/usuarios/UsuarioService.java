@@ -134,6 +134,23 @@ public class UsuarioService {
                 .orElseThrow(() -> new UsuarioNaoEncontradoException("Usuário não encontrado"));
     }
 
+    public UsuarioResponseDto buscarPorIdDto(Long id) {
+        Usuario usuario = usuarioRepository
+                .findById(id)
+                .orElseThrow(() -> new UsuarioNaoEncontradoException("Usuário não encontrado"));
+
+        UsuarioResponseDto dto = new UsuarioResponseDto();
+        dto.setCpf(usuario.getCpf());
+        dto.setNome(usuario.getNome());
+        dto.setTelefone(usuario.getTelefone());
+        dto.setDataNascimento(usuario.getDataNascimento());
+        dto.setEmail(usuario.getLogin().getEmail());
+        dto.setEmpresa(usuario.getEmpresa());
+        dto.setEndereco(usuario.getEndereco());
+
+        return dto;
+    }
+
     public UsuarioResponseDto buscarPorCpf(String cpf) {
         Usuario usuario = usuarioRepository
                 .findByCpfAndIsFuncionarioIsFalseAndDataDeDeletadoIsNull(cpf)
@@ -192,6 +209,32 @@ public class UsuarioService {
             usuarioExistente.setEmpresa(null);
         }
 
+        // Atualizar endereço se informado
+        if (usuarioDto.getEndereco() != null) {
+            EnderecoRequestDto endDto = usuarioDto.getEndereco();
+            if (usuarioExistente.getEndereco() != null) {
+                Endereco endExistente = usuarioExistente.getEndereco();
+                endExistente.setLogradouro(endDto.getLogadouro());
+                endExistente.setNumero(endDto.getNumero());
+                endExistente.setCep(endDto.getCep());
+                endExistente.setComplemento(endDto.getComplemento());
+                endExistente.setBairro(endDto.getBairro());
+                endExistente.setCidade(endDto.getCidade());
+                endExistente.setEstado(endDto.getEstado());
+            } else {
+                Endereco novoEndereco = new Endereco();
+                novoEndereco.setUsuario(usuarioExistente);
+                novoEndereco.setLogradouro(endDto.getLogadouro());
+                novoEndereco.setNumero(endDto.getNumero());
+                novoEndereco.setCep(endDto.getCep());
+                novoEndereco.setComplemento(endDto.getComplemento());
+                novoEndereco.setBairro(endDto.getBairro());
+                novoEndereco.setCidade(endDto.getCidade());
+                novoEndereco.setEstado(endDto.getEstado());
+                usuarioExistente.setEndereco(novoEndereco);
+            }
+        }
+
         usuarioRepository.save(usuarioExistente);
     }
 
@@ -243,6 +286,9 @@ public class UsuarioService {
         endereco.setNumero(enderecoDto.getNumero());
         endereco.setCep(enderecoDto.getCep());
         endereco.setComplemento(enderecoDto.getComplemento());
+        endereco.setBairro(enderecoDto.getBairro());
+        endereco.setCidade(enderecoDto.getCidade());
+        endereco.setEstado(enderecoDto.getEstado());
 
         usuario.setEndereco(endereco);
 
@@ -267,6 +313,9 @@ public class UsuarioService {
         enderecoExistente.setNumero(enderecoDto.getNumero());
         enderecoExistente.setCep(enderecoDto.getCep());
         enderecoExistente.setComplemento(enderecoDto.getComplemento());
+        enderecoExistente.setBairro(enderecoDto.getBairro());
+        enderecoExistente.setCidade(enderecoDto.getCidade());
+        enderecoExistente.setEstado(enderecoDto.getEstado());
 
         return enderecoRepository.save(enderecoExistente);
 

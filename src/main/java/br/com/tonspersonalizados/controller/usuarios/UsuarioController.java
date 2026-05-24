@@ -29,9 +29,11 @@ import java.util.List;
 public class UsuarioController {
 
     private final UsuarioService usuarioService;
+    private final AutenticacaoService autenticacaoService;
 
-    public UsuarioController(UsuarioService usuarioService) {
+    public UsuarioController(UsuarioService usuarioService, AutenticacaoService autenticacaoService) {
         this.usuarioService = usuarioService;
+        this.autenticacaoService = autenticacaoService;
     }
 
     @Operation(summary = "Cadastrar um novo usuário", description = "Realiza o cadastro de um novo usuário comum no sistema.")
@@ -56,6 +58,18 @@ public class UsuarioController {
     @SecurityRequirement(name = "Bearer")
     public ResponseEntity<UsuarioResponseDto> buscarPorCpf(@PathVariable String cpf) {
         return ResponseEntity.ok(usuarioService.buscarPorCpf(cpf));
+    }
+
+    @Operation(summary = "Buscar usuário por ID", description = "Recupera os dados completos do usuário logado pelo ID. Requer autenticação.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Usuário encontrado"),
+            @ApiResponse(responseCode = "404", description = "Usuário não encontrado"),
+            @ApiResponse(responseCode = "403", description = "Acesso não autorizado")
+    })
+    @GetMapping("/{id}")
+    @SecurityRequirement(name = "Bearer")
+    public ResponseEntity<UsuarioResponseDto> buscarPorId(@PathVariable Long id) {
+        return ResponseEntity.ok(usuarioService.buscarPorIdDto(id));
     }
 
     @Operation(summary = "Cadastrar um funcionário", description = "Realiza o cadastro de um novo funcionário. Requer autenticação e permissões específicas.")
@@ -97,6 +111,19 @@ public class UsuarioController {
         usuarioService.atualizar(id, usuario);
 
         return ResponseEntity.ok("Usuário atualizado com sucesso!");
+    }
+
+    @Operation(summary = "Alterar senha", description = "Altera a senha do usuário informando a senha atual. Requer autenticação.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Senha alterada com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Senha atual incorreta"),
+            @ApiResponse(responseCode = "404", description = "Usuário não encontrado")
+    })
+    @PatchMapping("/{id}/senha")
+    @SecurityRequirement(name = "Bearer")
+    public ResponseEntity<Void> alterarSenha(@PathVariable Long id, @RequestBody @Valid AlterarSenhaRequestDto dto) {
+        autenticacaoService.alterarSenha(id, dto.getSenhaAtual(), dto.getNovaSenha());
+        return ResponseEntity.noContent().build();
     }
 
     @Operation(summary = "Atualizar funcionário", description = "Atualiza os dados de um funcionário existente. Requer autenticação.")
