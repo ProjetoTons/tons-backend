@@ -17,9 +17,13 @@ public class ProdutoController {
 
     private final ProdutoService produtoService;
 
-
     public ProdutoController(ProdutoService produtoService) {
         this.produtoService = produtoService;
+    }
+
+    @GetMapping
+    public ResponseEntity<List<Produto>> listarProdutos(){
+        return ResponseEntity.status(200).body(produtoService.obterTodos());
     }
 
     @GetMapping("/categorias/{idCategoria}")
@@ -33,19 +37,15 @@ public class ProdutoController {
         return ResponseEntity.status(200).body(produtoService.buscarPorId(id));
     }
 
-
-    @PostMapping("/{idProduto}/favorito")
-    public ResponseEntity<Void> favoritarProduto(@PathVariable Long idProduto) {
+    @GetMapping("/interessados")
+    public ResponseEntity<List<Produto>> listarProdutosInteressados(){
         Long userId = (Long) SecurityContextHolder.getContext().getAuthentication().getDetails();
 
-        produtoService.favoritarProduto(idProduto, userId);
-
-        return ResponseEntity.status(200).build();
+        return ResponseEntity.status(200).body(produtoService.listarInteressados(userId));
     }
 
-
     @PostMapping("/{idProduto}/interesse")
-    public ResponseEntity<Void> salarProdutosDeInteresse(@PathVariable Long idProduto) {
+    public ResponseEntity<Void> salvarProdutoDeInteresse(@PathVariable Long idProduto) {
         Long userId = (Long) SecurityContextHolder.getContext().getAuthentication().getDetails();
 
         produtoService.salvarProdutoDeInteresse(idProduto, userId);
@@ -53,20 +53,37 @@ public class ProdutoController {
 
     }
 
-    @GetMapping("/{idUsuario}/favoritos")
-    public ResponseEntity<List<Produto>> listarProdutosFavoritos(@PathVariable Long idUsuario){
+    @DeleteMapping("/{idProduto}/interesse")
+    public ResponseEntity<Void> deletarProdutoDeInteresse(@PathVariable Long idProduto) {
+        Long userId = (Long) SecurityContextHolder.getContext().getAuthentication().getDetails();
 
-        return ResponseEntity.status(200).body(produtoService.listarFavoritos(idUsuario));
+        produtoService.removerProdutoInteressado(idProduto, userId);
+        return ResponseEntity.status(200).build();
 
     }
 
+    @GetMapping("/favoritos")
+    public ResponseEntity<List<Produto>> listarProdutosFavoritos(){
+        Long userId = (Long) SecurityContextHolder.getContext().getAuthentication().getDetails();
+
+        return ResponseEntity.status(200).body(produtoService.listarFavoritos(userId));
+    }
+
+    @PostMapping("/{idProduto}/favorito")
+    public ResponseEntity<Void> favoritarProduto(@PathVariable Long idProduto) {
+        Long userId = (Long) SecurityContextHolder.getContext().getAuthentication().getDetails();
+
+        produtoService.favoritarProduto(idProduto, userId);
+
+        return ResponseEntity.status(204).build();
+    }
 
     @DeleteMapping("/{idProduto}/favorito")
-    public ResponseEntity<Void> removerProduto(@PathVariable Long idProduto) {
+    public ResponseEntity<Void> removerProdutoFavoritado(@PathVariable Long idProduto) {
 
         Long userId = (Long) SecurityContextHolder.getContext().getAuthentication().getDetails();
 
-        produtoService.removerProduto(idProduto, userId);
+        produtoService.removerProdutoFavoritado(idProduto, userId);
 
         return ResponseEntity.status(204).build();
     }

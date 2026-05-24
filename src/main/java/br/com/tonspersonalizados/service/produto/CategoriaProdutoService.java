@@ -21,6 +21,4 @@ public class CategoriaProdutoService {
         return categoriaReposirory.findAll();
 
     }
-
-
 }

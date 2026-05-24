@@ -1,6 +1,7 @@
 package br.com.tonspersonalizados.entity.produtos;
 
 import br.com.tonspersonalizados.entity.usuarios.Usuario;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.util.List;
@@ -26,10 +27,12 @@ public class Produto {
     private  CategoriaProduto categoriaProduto;
 
     @ManyToMany(mappedBy = "produtos") //nome da propriedade na classe usuario
+    @JsonIgnore
     private List<Usuario> usuarios;
 
     //para a lista de interesses(carrinho de compras) do usuario
     @ManyToMany(mappedBy = "produtosDoCarrinho")
+    @JsonIgnore
     private List<Usuario> usuariosInteressados;
 
 

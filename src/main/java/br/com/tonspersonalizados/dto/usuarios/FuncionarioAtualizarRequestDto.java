@@ -8,7 +8,6 @@ import java.util.List;
 public class FuncionarioAtualizarRequestDto {
 
 
-
     @NotBlank
     @NotNull
     private String nome;
@@ -21,13 +20,14 @@ public class FuncionarioAtualizarRequestDto {
     @Size(min = 11, max = 11)
     private String telefone;
 
-
-
     @NotEmpty
     private List<Long> acessos;
 
     @URL
     private String fotoUrl;
+
+    @NotEmpty
+    private String fotoPublicId;
 
 
     public List<Long> getAcessos() {
@@ -53,6 +53,8 @@ public class FuncionarioAtualizarRequestDto {
     public void setFotoUrl(String fotoUrl) {
         this.fotoUrl = fotoUrl;
     }
+
+    public String getFotoPublicId() { return fotoPublicId; }
 
     public String getNome() {
         return nome;

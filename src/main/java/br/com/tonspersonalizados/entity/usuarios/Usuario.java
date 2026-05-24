@@ -29,6 +29,8 @@ public class Usuario {
 
     private String fotoUrl;
 
+    private String fotoPublicId;
+
     @Column(nullable = false)
     private Boolean isFuncionario; // Colocar essa coluna na modelagem
 
@@ -64,15 +66,18 @@ public class Usuario {
     @JoinTable(
             name = "produto_favorito", //produtos salvos
             joinColumns = @JoinColumn(name = "fk_usuario"),
-            inverseJoinColumns = @JoinColumn(name = "fk_produto")
+            inverseJoinColumns = @JoinColumn(name = "fk_produto"),
+            uniqueConstraints = @UniqueConstraint(columnNames = {"fk_usuario", "fk_produto"})
     )
+
     private List<Produto> produtos;
 
     @ManyToMany
     @JoinTable(
             name = "produto_interesse",
             joinColumns = @JoinColumn(name = "fk_usuario"),
-            inverseJoinColumns = @JoinColumn(name = "fk_produto")
+            inverseJoinColumns = @JoinColumn(name = "fk_produto"),
+            uniqueConstraints = @UniqueConstraint(columnNames = {"fk_usuario", "fk_produto"})
     )
     private List<Produto> produtosDoCarrinho;
 
@@ -203,7 +208,7 @@ public class Usuario {
         this.fotoUrl = fotoUrl;
     }
 
-    public List<Produto> getProdutosDoCarrinho() {
-        return produtosDoCarrinho;
-    }
+    public String getFotoPublicId() { return fotoPublicId; }
+
+    public void setFotoPublicId(String fotoPublicId) {this.fotoPublicId = fotoPublicId; }
 }
