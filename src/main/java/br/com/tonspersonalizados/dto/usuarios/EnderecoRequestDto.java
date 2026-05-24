@@ -18,6 +18,12 @@ public class EnderecoRequestDto {
 
     private String complemento;
 
+    private String bairro;
+
+    private String cidade;
+
+    private String estado;
+
 
     public String getCep() {
         return cep;
@@ -33,5 +39,17 @@ public class EnderecoRequestDto {
 
     public String getNumero() {
         return numero;
+    }
+
+    public String getBairro() {
+        return bairro;
+    }
+
+    public String getCidade() {
+        return cidade;
+    }
+
+    public String getEstado() {
+        return estado;
     }
 }

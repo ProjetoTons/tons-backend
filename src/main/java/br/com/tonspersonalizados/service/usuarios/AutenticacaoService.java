@@ -141,4 +141,15 @@ public class AutenticacaoService implements UserDetailsService {
         usuario.getLogin().setSenhaHash(passwordEncoder.encode(novaSenha));
         usuarioService.atualizar(usuario);
     }
+
+    public void alterarSenha(Long userId, String senhaAtual, String novaSenha) {
+        Usuario usuario = usuarioService.buscarPorId(userId);
+
+        if (!passwordEncoder.matches(senhaAtual, usuario.getLogin().getSenhaHash())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Senha atual incorreta.");
+        }
+
+        usuario.getLogin().setSenhaHash(passwordEncoder.encode(novaSenha));
+        usuarioService.atualizar(usuario);
+    }
 }

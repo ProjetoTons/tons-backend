@@ -1,6 +1,7 @@
 package br.com.tonspersonalizados.entity.usuarios;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -38,6 +39,7 @@ public class Empresa {
 
     //relacionamentos
     @OneToMany(mappedBy = "empresa")
+    @JsonIgnore
     private List<Usuario> usuario;
 
     @OneToOne (cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "empresa")
