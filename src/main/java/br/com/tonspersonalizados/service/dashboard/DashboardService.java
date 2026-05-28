@@ -4,6 +4,7 @@ import br.com.tonspersonalizados.dto.dashboard.*;
 import br.com.tonspersonalizados.entity.pedidos.Pedido;
 import br.com.tonspersonalizados.repository.pedido.HistoricoEtapaPedidoRepository;
 import br.com.tonspersonalizados.repository.pedido.PedidoRepository;
+import br.com.tonspersonalizados.service.usuarios.EmpresaService;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -16,11 +17,14 @@ public class DashboardService {
 
     private final PedidoRepository pedidoRepository;
     private final HistoricoEtapaPedidoRepository historicoRepository;
+    private final EmpresaService empresaService;
 
     public DashboardService(PedidoRepository pedidoRepository,
-                            HistoricoEtapaPedidoRepository historicoRepository) {
+                            HistoricoEtapaPedidoRepository historicoRepository,
+                            EmpresaService empresaService) {
         this.pedidoRepository = pedidoRepository;
         this.historicoRepository = historicoRepository;
+        this.empresaService = empresaService;
     }
 
     public KpisDashboardDto calcularKpis(LocalDate startDate, LocalDate endDate) {
@@ -42,7 +46,8 @@ public class DashboardService {
                         || "Aguardando retirada".equalsIgnoreCase(p.getStatus()))
                 .count();
 
-        return new KpisDashboardDto(totalValor, aguardandoArte, enviadoRetirada, pedidos.size());
+        return new KpisDashboardDto(totalValor, aguardandoArte, enviadoRetirada,
+                empresaService.buscarGrafica().getMetaSemanal(), pedidos.size());
     }
 
     public List<GraficoEtapaDto> graficoEtapas(LocalDate startDate, LocalDate endDate) {

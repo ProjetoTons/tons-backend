@@ -6,13 +6,15 @@ public class KpisDashboardDto {
     private BigDecimal totalValor;
     private int aguardandoArte;
     private int enviadoAguardandoRetirada;
+    private BigDecimal metaSemanal;
     private int totalPedidos;
 
     public KpisDashboardDto(BigDecimal totalValor, int aguardandoArte,
-                            int enviadoAguardandoRetirada, int totalPedidos) {
+                            int enviadoAguardandoRetirada, BigDecimal metaSemanal, int totalPedidos) {
         this.totalValor = totalValor;
         this.aguardandoArte = aguardandoArte;
         this.enviadoAguardandoRetirada = enviadoAguardandoRetirada;
+        this.metaSemanal = metaSemanal;
         this.totalPedidos = totalPedidos;
     }
 
@@ -22,6 +24,8 @@ public class KpisDashboardDto {
     public void setAguardandoArte(int aguardandoArte) { this.aguardandoArte = aguardandoArte; }
     public int getEnviadoAguardandoRetirada() { return enviadoAguardandoRetirada; }
     public void setEnviadoAguardandoRetirada(int enviadoAguardandoRetirada) { this.enviadoAguardandoRetirada = enviadoAguardandoRetirada; }
+    public BigDecimal getMetaSemanal() { return metaSemanal; }
+    public void setMetaSemanal(BigDecimal metaSemanal) { this.metaSemanal = metaSemanal; }
     public int getTotalPedidos() { return totalPedidos; }
     public void setTotalPedidos(int totalPedidos) { this.totalPedidos = totalPedidos; }
 }
