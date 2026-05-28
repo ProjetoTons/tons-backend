@@ -1,8 +1,9 @@
 package br.com.tonspersonalizados.repository.pedido;
 
 import br.com.tonspersonalizados.entity.pedidos.Pedido;
-import org.springframework.data.jpa.repository.JpaRepository;
+import java.time.LocalDateTime;
 import java.util.List;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface PedidoRepository extends JpaRepository<Pedido, Integer> {
 
@@ -11,4 +12,10 @@ public interface PedidoRepository extends JpaRepository<Pedido, Integer> {
 
     // Buscar pedidos de um cliente
     List<Pedido> findByUsuarioClienteIdOrderByDataPedidoDesc(Integer idCliente);
+
+    // Dashboard: pedidos no período
+    List<Pedido> findByDataPedidoBetween(LocalDateTime inicio, LocalDateTime fim);
+
+    // Dashboard: pedidos de uma etapa no período (drill-down)
+    List<Pedido> findByEtapaPedidoAndDataPedidoBetween(String etapaPedido, LocalDateTime inicio, LocalDateTime fim);
 }

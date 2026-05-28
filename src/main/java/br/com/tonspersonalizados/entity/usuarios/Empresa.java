@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -35,6 +36,9 @@ public class Empresa {
     @Column(nullable = false)
     @CreationTimestamp
     private LocalDateTime dataDoCadastro;
+
+    @Column(columnDefinition = "DECIMAL(10,2) DEFAULT 0.00")
+    private BigDecimal metaSemanal = BigDecimal.ZERO;
 
 
     //relacionamentos
@@ -117,5 +121,13 @@ public class Empresa {
 
     public void setUsuario(List<Usuario> usuario) {
         this.usuario = usuario;
+    }
+
+    public BigDecimal getMetaSemanal() {
+        return metaSemanal;
+    }
+
+    public void setMetaSemanal(BigDecimal metaSemanal) {
+        this.metaSemanal = metaSemanal;
     }
 }
