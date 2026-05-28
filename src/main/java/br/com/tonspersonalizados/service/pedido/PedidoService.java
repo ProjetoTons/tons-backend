@@ -139,19 +139,28 @@ public class PedidoService {
 
         // Se a etapa principal mudou → responsável reseta (null)
         boolean etapaMudou = !request.getEtapa().equals(pedido.getEtapaPedido());
-        if (etapaMudou) {
-            pedido.setUsuarioResponsavel(null);
-        }
+
+        Usuario responsavelEtapa = usuarioRepository.findById(request.getIdResponsavelEtapa())
+                .orElseThrow(() -> new UsuarioNaoEncontradoException("Responsável da etapa não encontrado"));
 
         // Atualizar estado atual do pedido
         pedido.setEtapaPedido(request.getEtapa());
         pedido.setStatus(request.getStatus());
+
+        if (etapaMudou) {
+            pedido.setUsuarioResponsavel(null);
+        } else {
+            pedido.setUsuarioResponsavel(responsavelEtapa);
+        }
+
         pedidoRepository.save(pedido);
 
         // Registrar no histórico
         HistoricoEtapaPedido historico = new HistoricoEtapaPedido();
         historico.setPedido(pedido);
         historico.setUsuario(pedido.getUsuario());
+        historico.setResponsavelEtapa(responsavelEtapa);
+
         historico.setEtapa(request.getEtapa());
         historico.setStatusEtapa(request.getStatus());
         historico.setDataEntrada(request.getDataEntrada());
@@ -160,8 +169,10 @@ public class PedidoService {
 
         historicoRepository.save(historico);
 
-        // Publicar evento — Observer notifica cliente via WhatsApp/email
-        eventPublisher.publishEvent(new EtapaAvancadaEvent(pedido, request.getEtapa(), request.getStatus()));
+        // Publicar evento — Observer notifica cliente via WhatsApp/email (somente mudança de etapa)
+        if (etapaMudou) {
+            eventPublisher.publishEvent(new EtapaAvancadaEvent(pedido, request.getEtapa(), request.getStatus()));
+        }
 
         return montarPedidoResponse(pedido, null);
     }

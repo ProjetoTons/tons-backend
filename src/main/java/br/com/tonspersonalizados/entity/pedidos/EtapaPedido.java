@@ -5,6 +5,7 @@ import java.util.List;
 public enum EtapaPedido {
 
     DESIGN("Design", List.of(
+            "Não Iniciado",
             "Aguardando arte",
             "Criando Mockup",
             "Aguardando aprovação",
@@ -12,11 +13,13 @@ public enum EtapaPedido {
     )),
 
     PRODUCAO("Produção", List.of(
+            "Não Iniciado",
             "Conferindo",
             "Personalizando"
     )),
 
     EMBALAGEM("Embalagem", List.of(
+            "Não Iniciado",
             "Quality check",
             "Embalagem",
             "Medição",

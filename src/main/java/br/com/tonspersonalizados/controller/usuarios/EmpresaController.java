@@ -1,10 +1,13 @@
 package br.com.tonspersonalizados.controller.usuarios;
 
 import java.util.List;
+import java.math.BigDecimal;
+import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -127,5 +130,31 @@ public class EmpresaController {
         empresaService.deletarEndereco(id);
 
         return ResponseEntity.status(204).build();
+    }
+
+    @Operation(summary = "Atualizar meta semanal", description = "Atualiza o valor da meta semanal de vendas da gráfica (empresa principal).")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Meta atualizada com sucesso"),
+            @ApiResponse(responseCode = "404", description = "Empresa não encontrada"),
+            @ApiResponse(responseCode = "403", description = "Acesso não autorizado")
+    })
+    @PatchMapping("/meta-semanal")
+    @SecurityRequirement(name = "Bearer")
+    public ResponseEntity<Map<String, BigDecimal>> atualizarMetaSemanal(@RequestBody Map<String, BigDecimal> body) {
+        BigDecimal novoValor = body.get("metaSemanal");
+        Empresa empresa = empresaService.atualizarMetaSemanalGrafica(novoValor);
+        return ResponseEntity.ok(Map.of("metaSemanal", empresa.getMetaSemanal()));
+    }
+
+    @Operation(summary = "Buscar meta semanal", description = "Retorna o valor da meta semanal de vendas da gráfica (empresa principal).")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Meta retornada com sucesso"),
+            @ApiResponse(responseCode = "404", description = "Empresa não encontrada")
+    })
+    @GetMapping("/meta-semanal")
+    @SecurityRequirement(name = "Bearer")
+    public ResponseEntity<Map<String, BigDecimal>> buscarMetaSemanal() {
+        Empresa empresa = empresaService.buscarGrafica();
+        return ResponseEntity.ok(Map.of("metaSemanal", empresa.getMetaSemanal()));
     }
 }

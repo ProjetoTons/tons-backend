@@ -23,6 +23,7 @@ public class FuncionarioResponseDto {
     private List<Acesso> acessos;
     private Boolean ativo;
     private LocalDateTime dataCriacao;
+    private String fotoUrl;
 
     public Long getId() {
         return id;
@@ -86,5 +87,13 @@ public class FuncionarioResponseDto {
 
     public void setDataCriacao(LocalDateTime dataCriacao) {
         this.dataCriacao = dataCriacao;
+    }
+
+    public String getFotoUrl() {
+        return fotoUrl;
+    }
+
+    public void setFotoUrl(String fotoUrl) {
+        this.fotoUrl = fotoUrl;
     }
 }

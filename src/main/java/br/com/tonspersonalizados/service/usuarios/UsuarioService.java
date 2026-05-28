@@ -184,6 +184,7 @@ public class UsuarioService {
                     dto.setAcessos(funcionario.getAcessos());
                     dto.setAtivo(funcionario.getDataDeDeletado() == null);
                     dto.setDataCriacao(funcionario.getDataDeCadastro());
+                    dto.setFotoUrl(funcionario.getFotoUrl());
 
                     return dto;
                 }).toList();

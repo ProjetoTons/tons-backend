@@ -14,6 +14,7 @@ import br.com.tonspersonalizados.repository.usuarios.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -129,6 +130,27 @@ public class EmpresaService {
 
 
         empresaRepository.save(empresa);
+    }
+
+    public Empresa atualizarMetaSemanal(Long id, BigDecimal novoValor) {
+        Empresa empresa = empresaRepository.findById(id)
+                .orElseThrow(() -> new EmpresaNaoEncontradoException("Empresa não encontrada."));
+        empresa.setMetaSemanal(novoValor != null ? novoValor : BigDecimal.ZERO);
+        return empresaRepository.save(empresa);
+    }
+
+    public Empresa buscarGrafica() {
+        Empresa empresa = empresaRepository.findByCnpj(cnpjTons);
+        if (empresa == null) {
+            throw new EmpresaNaoEncontradoException("Empresa gráfica não encontrada.");
+        }
+        return empresa;
+    }
+
+    public Empresa atualizarMetaSemanalGrafica(BigDecimal novoValor) {
+        Empresa empresa = buscarGrafica();
+        empresa.setMetaSemanal(novoValor != null ? novoValor : BigDecimal.ZERO);
+        return empresaRepository.save(empresa);
     }
 
 }
