@@ -7,6 +7,8 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
@@ -34,6 +36,20 @@ public class PedidoController {
         return ResponseEntity.ok(pedidoService.listarTodos());
     }
 
+    @GetMapping("/meus")
+    @Operation(summary = "Listar pedidos em andamento do cliente autenticado")
+    public ResponseEntity<List<PedidoResponseDto>> meusPedidos() {
+        Integer idCliente = getUsuarioAutenticadoId();
+        return ResponseEntity.ok(pedidoService.listarMeusPedidosEmAndamento(idCliente));
+    }
+
+    @GetMapping("/meus/historico")
+    @Operation(summary = "Listar pedidos finalizados do cliente autenticado")
+    public ResponseEntity<List<PedidoResponseDto>> meusPedidosHistorico() {
+        Integer idCliente = getUsuarioAutenticadoId();
+        return ResponseEntity.ok(pedidoService.listarMeusPedidosFinalizados(idCliente));
+    }
+
     @GetMapping("/{id}")
     @Operation(summary = "Buscar pedido por ID com itens")
     public ResponseEntity<PedidoResponseDto> buscarPorId(@PathVariable Integer id) {
@@ -58,5 +74,11 @@ public class PedidoController {
     @Operation(summary = "Histórico de etapas do pedido")
     public ResponseEntity<List<HistoricoEtapaResponseDto>> listarHistorico(@PathVariable Integer id) {
         return ResponseEntity.ok(pedidoService.listarHistorico(id));
+    }
+
+    private Integer getUsuarioAutenticadoId() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Long userId = (Long) auth.getDetails();
+        return userId.intValue();
     }
 }

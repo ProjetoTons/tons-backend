@@ -29,6 +29,10 @@ public enum EtapaPedido {
     LOGISTICA("Logística", List.of(
             "Enviado",
             "Aguardando retirada"
+    )),
+
+    FINALIZADO("Finalizado", List.of(
+            "Concluído"
     ));
 
     private final String label;
