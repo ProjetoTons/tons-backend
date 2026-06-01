@@ -18,4 +18,10 @@ public interface PedidoRepository extends JpaRepository<Pedido, Integer> {
 
     // Dashboard: pedidos de uma etapa no período (drill-down)
     List<Pedido> findByEtapaPedidoAndDataPedidoBetween(String etapaPedido, LocalDateTime inicio, LocalDateTime fim);
+
+    // Meus pedidos (em andamento) — etapa != "Finalizado"
+    List<Pedido> findByUsuarioClienteIdAndEtapaPedidoNotOrderByDataPedidoDesc(Integer idCliente, String etapa);
+
+    // Meus pedidos (histórico) — etapa = "Finalizado"
+    List<Pedido> findByUsuarioClienteIdAndEtapaPedidoOrderByDataFinalizacaoDesc(Integer idCliente, String etapa);
 }

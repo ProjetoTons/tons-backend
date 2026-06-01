@@ -211,6 +211,24 @@ public class PedidoService {
     }
 
 
+    // MEUS PEDIDOS (em andamento — etapa != "Finalizado")
+    public List<PedidoResponseDto> listarMeusPedidosEmAndamento(Integer idCliente) {
+        return pedidoRepository
+                .findByUsuarioClienteIdAndEtapaPedidoNotOrderByDataPedidoDesc(idCliente, EtapaPedido.FINALIZADO.getLabel())
+                .stream()
+                .map(pedido -> montarPedidoResponse(pedido, null))
+                .collect(Collectors.toList());
+    }
+
+    // MEUS PEDIDOS (histórico — etapa = "Finalizado")
+    public List<PedidoResponseDto> listarMeusPedidosFinalizados(Integer idCliente) {
+        return pedidoRepository
+                .findByUsuarioClienteIdAndEtapaPedidoOrderByDataFinalizacaoDesc(idCliente, EtapaPedido.FINALIZADO.getLabel())
+                .stream()
+                .map(pedido -> montarPedidoResponse(pedido, null))
+                .collect(Collectors.toList());
+    }
+
 
     // MÉTODOS AUXILIARES
     private ItemPedido criarItemPedido(Pedido pedido, ItemPedidoRequestDto dto) {
