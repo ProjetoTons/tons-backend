@@ -1,26 +1,42 @@
 package br.com.tonspersonalizados.service.pedido;
 
-import br.com.tonspersonalizados.dto.pedidos.*;
-import br.com.tonspersonalizados.entity.pedidos.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import br.com.tonspersonalizados.dto.pedidos.CaracteristicasRequestDto;
+import br.com.tonspersonalizados.dto.pedidos.ClienteResumoDto;
+import br.com.tonspersonalizados.dto.pedidos.EtapaRequestDto;
+import br.com.tonspersonalizados.dto.pedidos.FuncionarioResumoDto;
+import br.com.tonspersonalizados.dto.pedidos.HistoricoEtapaResponseDto;
+import br.com.tonspersonalizados.dto.pedidos.ItemPedidoRequestDto;
+import br.com.tonspersonalizados.dto.pedidos.ItemPedidoResponseDto;
+import br.com.tonspersonalizados.dto.pedidos.PedidoRequestDto;
+import br.com.tonspersonalizados.dto.pedidos.PedidoResponseDto;
+import br.com.tonspersonalizados.entity.pedidos.CaracteristicasItemPedido;
+import br.com.tonspersonalizados.entity.pedidos.EtapaPedido;
+import br.com.tonspersonalizados.entity.pedidos.HistoricoEtapaPedido;
+import br.com.tonspersonalizados.entity.pedidos.ItemPedido;
+import br.com.tonspersonalizados.entity.pedidos.Pedido;
 import br.com.tonspersonalizados.entity.produtos.Produto;
 import br.com.tonspersonalizados.entity.usuarios.Endereco;
 import br.com.tonspersonalizados.entity.usuarios.Usuario;
 import br.com.tonspersonalizados.event.EtapaAvancadaEvent;
 import br.com.tonspersonalizados.exception.pedido.PedidoNaoEncontradoException;
+import br.com.tonspersonalizados.exception.produto.ProdutoNaoEncontradoException;
 import br.com.tonspersonalizados.exception.usuarios.EnderecoNaoEncontradoException;
 import br.com.tonspersonalizados.exception.usuarios.UsuarioNaoEncontradoException;
-import br.com.tonspersonalizados.exception.produto.ProdutoNaoEncontradoException;
-import br.com.tonspersonalizados.repository.pedido.*;
+import br.com.tonspersonalizados.repository.pedido.CaracteristicasItemPedidoRepository;
+import br.com.tonspersonalizados.repository.pedido.HistoricoEtapaPedidoRepository;
+import br.com.tonspersonalizados.repository.pedido.ItemPedidoRepository;
+import br.com.tonspersonalizados.repository.pedido.PedidoRepository;
 import br.com.tonspersonalizados.repository.produto.ProdutoRepository;
 import br.com.tonspersonalizados.repository.usuarios.EnderecoRepository;
 import br.com.tonspersonalizados.repository.usuarios.UsuarioRepository;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class PedidoService {
@@ -227,6 +243,30 @@ public class PedidoService {
                 .stream()
                 .map(pedido -> montarPedidoResponse(pedido, null))
                 .collect(Collectors.toList());
+    }
+
+
+    // CANCELAR PEDIDO (soft delete)
+    @Transactional
+    public PedidoResponseDto cancelarPedido(Integer idPedido, String motivo) {
+        Pedido pedido = pedidoRepository.findById(idPedido)
+                .orElseThrow(() -> new PedidoNaoEncontradoException("Pedido não encontrado"));
+
+        if ("Cancelado".equals(pedido.getEtapaPedido())) {
+            throw new IllegalStateException("Pedido já está cancelado");
+        }
+
+        // Mudar etapa para "Cancelado"
+        pedido.setEtapaPedido("Cancelado");
+        pedido.setStatus("Cancelado");
+
+        // Concatenar motivo na descrição
+        String descricaoAtual = pedido.getDescricao() != null ? pedido.getDescricao() : "";
+        pedido.setDescricao(descricaoAtual + "\n\n[CANCELADO] " + motivo);
+
+        pedidoRepository.save(pedido);
+
+        return montarPedidoResponse(pedido, null);
     }
 
 
