@@ -215,7 +215,7 @@ public class UsuarioService {
             EnderecoRequestDto endDto = usuarioDto.getEndereco();
             if (usuarioExistente.getEndereco() != null) {
                 Endereco endExistente = usuarioExistente.getEndereco();
-                endExistente.setLogradouro(endDto.getLogadouro());
+                endExistente.setLogradouro(endDto.getLogradouro());
                 endExistente.setNumero(endDto.getNumero());
                 endExistente.setCep(endDto.getCep());
                 endExistente.setComplemento(endDto.getComplemento());
@@ -225,7 +225,7 @@ public class UsuarioService {
             } else {
                 Endereco novoEndereco = new Endereco();
                 novoEndereco.setUsuario(usuarioExistente);
-                novoEndereco.setLogradouro(endDto.getLogadouro());
+                novoEndereco.setLogradouro(endDto.getLogradouro());
                 novoEndereco.setNumero(endDto.getNumero());
                 novoEndereco.setCep(endDto.getCep());
                 novoEndereco.setComplemento(endDto.getComplemento());
@@ -283,7 +283,7 @@ public class UsuarioService {
 
         Endereco endereco = new Endereco();
         endereco.setUsuario(usuario);
-        endereco.setLogradouro(enderecoDto.getLogadouro());
+        endereco.setLogradouro(enderecoDto.getLogradouro());
         endereco.setNumero(enderecoDto.getNumero());
         endereco.setCep(enderecoDto.getCep());
         endereco.setComplemento(enderecoDto.getComplemento());
@@ -310,7 +310,7 @@ public class UsuarioService {
         Endereco enderecoExistente = enderecoRepository.findByUsuarioId(id)
                 .orElseThrow(() -> new EnderecoNaoEncontradoException("Endereço não encontrado"));
 
-        enderecoExistente.setLogradouro(enderecoDto.getLogadouro());
+        enderecoExistente.setLogradouro(enderecoDto.getLogradouro());
         enderecoExistente.setNumero(enderecoDto.getNumero());
         enderecoExistente.setCep(enderecoDto.getCep());
         enderecoExistente.setComplemento(enderecoDto.getComplemento());

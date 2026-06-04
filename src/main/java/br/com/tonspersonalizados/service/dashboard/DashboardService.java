@@ -1,16 +1,24 @@
 package br.com.tonspersonalizados.service.dashboard;
 
-import br.com.tonspersonalizados.dto.dashboard.*;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Service;
+
+import br.com.tonspersonalizados.dto.dashboard.GraficoEtapaDto;
+import br.com.tonspersonalizados.dto.dashboard.KpisDashboardDto;
+import br.com.tonspersonalizados.dto.dashboard.PerformanceFuncionarioDto;
+import br.com.tonspersonalizados.dto.dashboard.SubEtapaDto;
 import br.com.tonspersonalizados.entity.pedidos.Pedido;
 import br.com.tonspersonalizados.repository.pedido.HistoricoEtapaPedidoRepository;
 import br.com.tonspersonalizados.repository.pedido.PedidoRepository;
 import br.com.tonspersonalizados.service.usuarios.EmpresaService;
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.*;
-import java.util.stream.Collectors;
-import org.springframework.stereotype.Service;
 
 @Service
 public class DashboardService {
@@ -41,12 +49,15 @@ public class DashboardService {
                 .filter(p -> "Aguardando arte".equalsIgnoreCase(p.getStatus()))
                 .count();
 
-        int enviadoRetirada = (int) pedidos.stream()
-                .filter(p -> "Enviado".equalsIgnoreCase(p.getStatus())
-                        || "Aguardando retirada".equalsIgnoreCase(p.getStatus()))
+        int aguardandoRetirada = (int) pedidos.stream()
+                .filter(p -> "Aguardando retirada".equalsIgnoreCase(p.getStatus()))
                 .count();
 
-        return new KpisDashboardDto(totalValor, aguardandoArte, enviadoRetirada,
+        int enviada = (int) pedidos.stream()
+                .filter(p -> "Enviado".equalsIgnoreCase(p.getStatus()))
+                .count();
+
+        return new KpisDashboardDto(totalValor, aguardandoArte, aguardandoRetirada, enviada,
                 empresaService.buscarGrafica().getMetaSemanal(), pedidos.size());
     }
 

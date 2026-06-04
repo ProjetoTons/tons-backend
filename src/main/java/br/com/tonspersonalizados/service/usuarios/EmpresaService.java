@@ -82,7 +82,7 @@ public class EmpresaService {
 
         Endereco endereco = new Endereco();
         endereco.setEmpresa(empresa);
-        endereco.setLogradouro(enderecoDto.getLogadouro());
+        endereco.setLogradouro(enderecoDto.getLogradouro());
         endereco.setNumero(enderecoDto.getNumero());
         endereco.setCep(enderecoDto.getCep());
         endereco.setComplemento(endereco.getComplemento());
@@ -108,7 +108,7 @@ public class EmpresaService {
         Endereco enderecoExistente = enderecoRepository.findByEmpresaId(id)
                 .orElseThrow(() -> new EnderecoNaoEncontradoException("Endereço não encontrado"));
 
-        enderecoExistente.setLogradouro(enderecoDto.getLogadouro());
+        enderecoExistente.setLogradouro(enderecoDto.getLogradouro());
         enderecoExistente.setNumero(enderecoDto.getNumero());
         enderecoExistente.setCep(enderecoDto.getCep());
         enderecoExistente.setComplemento(enderecoDto.getComplemento());

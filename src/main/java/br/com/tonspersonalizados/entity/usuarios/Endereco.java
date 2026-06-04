@@ -59,8 +59,8 @@ public class Endereco {
         return logradouro;
     }
 
-    public void setLogradouro(String logadouro) {
-        this.logradouro = logadouro;
+    public void setLogradouro(String logradouro) {
+        this.logradouro = logradouro;
     }
 
     public Long getId() {
