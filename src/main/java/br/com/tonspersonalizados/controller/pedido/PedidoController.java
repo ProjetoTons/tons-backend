@@ -90,6 +90,13 @@ public class PedidoController {
         return ResponseEntity.ok(pedidoService.listarHistorico(id));
     }
 
+    @PutMapping("/{id}")
+    @Operation(summary = "Atualizar pedido completo com itens")
+    public ResponseEntity<PedidoResponseDto> atualizarPedido(
+            @PathVariable Integer id, @Valid @RequestBody PedidoRequestDto request) {
+        return ResponseEntity.ok(pedidoService.atualizarPedido(id, request));
+    }
+
     @PutMapping("/{id}/cancelar")
     @Operation(summary = "Cancelar pedido")
     public ResponseEntity<PedidoResponseDto> cancelarPedido(

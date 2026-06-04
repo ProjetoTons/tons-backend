@@ -37,6 +37,8 @@ public class PedidoRequestDto {
     @NotNull(message = "Data do pedido é obrigatória")
     private LocalDateTime dataPedido;
 
+    private LocalDateTime dataInicio;
+
     private LocalDateTime dataFinalizacao;
 
     @Size(max = 45)
@@ -114,6 +116,14 @@ public class PedidoRequestDto {
 
     public void setDataPedido(LocalDateTime dataPedido) {
         this.dataPedido = dataPedido;
+    }
+
+    public LocalDateTime getDataInicio() {
+        return dataInicio;
+    }
+
+    public void setDataInicio(LocalDateTime dataInicio) {
+        this.dataInicio = dataInicio;
     }
 
     public LocalDateTime getDataFinalizacao() {

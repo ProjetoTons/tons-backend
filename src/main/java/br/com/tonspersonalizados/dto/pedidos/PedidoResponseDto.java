@@ -1,9 +1,10 @@
 package br.com.tonspersonalizados.dto.pedidos;
 
-import br.com.tonspersonalizados.entity.usuarios.Endereco;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+
+import br.com.tonspersonalizados.entity.usuarios.Endereco;
 
 public class PedidoResponseDto {
     private Integer idPedido;
@@ -14,6 +15,7 @@ public class PedidoResponseDto {
     private String status;
     private BigDecimal valorTotal;
     private LocalDateTime dataPedido;
+    private LocalDateTime dataInicio;
     private LocalDateTime dataFinalizacao;
     private String tipoEnvio;
     private String numNotaFiscal;
@@ -89,6 +91,14 @@ public class PedidoResponseDto {
 
     public void setDataPedido(LocalDateTime dataPedido) {
         this.dataPedido = dataPedido;
+    }
+
+    public LocalDateTime getDataInicio() {
+        return dataInicio;
+    }
+
+    public void setDataInicio(LocalDateTime dataInicio) {
+        this.dataInicio = dataInicio;
     }
 
     public LocalDateTime getDataFinalizacao() {

@@ -96,6 +96,7 @@ public class PedidoService {
         pedido.setStatus(request.getStatus());
         pedido.setValorTotal(request.getValorTotal());
         pedido.setDataPedido(request.getDataPedido());
+        pedido.setDataInicio(request.getDataInicio());
         pedido.setDataFinalizacao(request.getDataFinalizacao());
         pedido.setTipoEnvio(request.getTipoEnvio());
         pedido.setEndereco(endereco);
@@ -246,6 +247,62 @@ public class PedidoService {
     }
 
 
+    // ATUALIZAR PEDIDO COMPLETO
+    @Transactional
+    public PedidoResponseDto atualizarPedido(Integer idPedido, PedidoRequestDto request) {
+        Pedido pedido = pedidoRepository.findById(idPedido)
+                .orElseThrow(() -> new PedidoNaoEncontradoException("Pedido não encontrado"));
+
+        // Validar pessoas
+        Usuario cliente = usuarioRepository.findById(request.getIdUsuarioCliente())
+                .orElseThrow(() -> new UsuarioNaoEncontradoException("Cliente não encontrado"));
+
+        Usuario responsavel = null;
+        if (request.getIdUsuarioResponsavel() != null) {
+            responsavel = usuarioRepository.findById(request.getIdUsuarioResponsavel())
+                    .orElseThrow(() -> new UsuarioNaoEncontradoException("Funcionário não encontrado"));
+        }
+
+        Endereco endereco = enderecoRepository.findById(request.getIdEndereco())
+                .orElseThrow(() -> new EnderecoNaoEncontradoException("Endereço não encontrado"));
+
+        // Atualizar campos do pedido
+        pedido.setNumPedido(request.getNumPedido());
+        pedido.setUrlFotoArte(request.getUrlFotoArte());
+        pedido.setDescricao(request.getDescricao());
+        pedido.setEtapaPedido(request.getEtapaPedido());
+        pedido.setStatus(request.getStatus());
+        pedido.setValorTotal(request.getValorTotal());
+        pedido.setDataPedido(request.getDataPedido());
+        pedido.setDataInicio(request.getDataInicio());
+        pedido.setDataFinalizacao(request.getDataFinalizacao());
+        pedido.setTipoEnvio(request.getTipoEnvio());
+        pedido.setEndereco(endereco);
+        pedido.setUsuarioCliente(cliente);
+        pedido.setUsuarioResponsavel(responsavel);
+
+        pedido = pedidoRepository.save(pedido);
+
+        // Remover itens antigos
+        List<ItemPedido> itensAntigos = itemPedidoRepository.findByPedidoId(idPedido);
+        for (ItemPedido itemAntigo : itensAntigos) {
+            if (itemAntigo.getCaracteristicas() != null) {
+                caracteristicasRepository.delete(itemAntigo.getCaracteristicas());
+            }
+        }
+        itemPedidoRepository.deleteAll(itensAntigos);
+
+        // Criar novos itens
+        List<ItemPedido> itensSalvos = new ArrayList<>();
+        for (ItemPedidoRequestDto itemDto : request.getItens()) {
+            ItemPedido item = criarItemPedido(pedido, itemDto);
+            itensSalvos.add(item);
+        }
+
+        return montarPedidoResponse(pedido, itensSalvos);
+    }
+
+
     // CANCELAR PEDIDO (soft delete)
     @Transactional
     public PedidoResponseDto cancelarPedido(Integer idPedido, String motivo) {
@@ -306,6 +363,7 @@ public class PedidoService {
         response.setStatus(pedido.getStatus());
         response.setValorTotal(pedido.getValorTotal());
         response.setDataPedido(pedido.getDataPedido());
+        response.setDataInicio(pedido.getDataInicio());
         response.setDataFinalizacao(pedido.getDataFinalizacao());
         response.setTipoEnvio(pedido.getTipoEnvio());
         response.setNumNotaFiscal(pedido.getNumNotaFiscal());

@@ -49,6 +49,9 @@ public class Pedido {
     @Column(name = "data_pedido", nullable = false)
     private LocalDateTime dataPedido;
 
+    @Column(name = "data_inicio")
+    private LocalDateTime dataInicio;
+
     @Column(name = "data_finalizacao")
     private LocalDateTime dataFinalizacao;
 
@@ -117,6 +120,9 @@ public class Pedido {
 
     public LocalDateTime getDataPedido() { return dataPedido; }
     public void setDataPedido(LocalDateTime dataPedido) { this.dataPedido = dataPedido; }
+
+    public LocalDateTime getDataInicio() { return dataInicio; }
+    public void setDataInicio(LocalDateTime dataInicio) { this.dataInicio = dataInicio; }
 
     public LocalDateTime getDataFinalizacao() { return dataFinalizacao; }
     public void setDataFinalizacao(LocalDateTime dataFinalizacao) { this.dataFinalizacao = dataFinalizacao; }
