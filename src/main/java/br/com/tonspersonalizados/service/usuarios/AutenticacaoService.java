@@ -1,7 +1,9 @@
 package br.com.tonspersonalizados.service.usuarios;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
+import br.com.tonspersonalizados.entity.usuarios.Acesso;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
@@ -89,7 +91,8 @@ public class AutenticacaoService implements UserDetailsService {
         usuarioTokenDto.setNome(usuario.getNome());
         usuarioTokenDto.setCnpj(usuario.getEmpresa() != null ? usuario.getEmpresa().getCnpj() : null);
         usuarioTokenDto.setToken(token);
-
+        List<Acesso> acessos = usuario.getAcessos();
+        usuarioTokenDto.setAcessos(acessos != null && !acessos.isEmpty() ? acessos : null);
         usuario.getLogin().setUltimoLogin(LocalDateTime.now());
 
         usuarioService.atualizar(usuario);

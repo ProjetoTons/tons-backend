@@ -1,5 +1,9 @@
 package br.com.tonspersonalizados.dto.usuarios;
 
+import br.com.tonspersonalizados.entity.usuarios.Acesso;
+
+import java.util.List;
+
 public class UsuarioTokenDto {
 
     private Long id;
@@ -8,6 +12,7 @@ public class UsuarioTokenDto {
     private String telefone;
     private String cnpj;
     private String token;
+    private List<Acesso> acessos;
 
     public String getEmail() {
         return email;
@@ -55,5 +60,13 @@ public class UsuarioTokenDto {
 
     public void setCnpj(String cnpj) {
         this.cnpj = cnpj;
+    }
+
+    public List<Acesso> getAcessos() {
+        return acessos;
+    }
+
+    public void setAcessos(List<Acesso> acessos) {
+        this.acessos = acessos;
     }
 }
