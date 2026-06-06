@@ -4,12 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="58737723-9b5d-4081-b16c-19932057d09f" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/java/br/com/tonspersonalizados/exception/usuarios/CnpjInvalidoException.java" afterDir="false" />
+    <list default="true" id="58737723-9b5d-4081-b16c-19932057d09f" name="Changes" comment="Corrigindo endpoint Categorias para não exigir autenticação">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/br/com/tonspersonalizados/controller/usuarios/EmpresaController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/br/com/tonspersonalizados/controller/usuarios/EmpresaController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/br/com/tonspersonalizados/dto/usuarios/UsuarioRequestDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/br/com/tonspersonalizados/dto/usuarios/UsuarioRequestDto.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/br/com/tonspersonalizados/service/usuarios/EmpresaService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/br/com/tonspersonalizados/service/usuarios/EmpresaService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/br/com/tonspersonalizados/service/produto/CategoriaProdutoService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/br/com/tonspersonalizados/service/produto/CategoriaProdutoService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/br/com/tonspersonalizados/service/produto/ProdutoService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/br/com/tonspersonalizados/service/produto/ProdutoService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/br/com/tonspersonalizados/service/usuarios/AutenticacaoService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/br/com/tonspersonalizados/service/usuarios/AutenticacaoService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/br/com/tonspersonalizados/service/usuarios/UsuarioService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/br/com/tonspersonalizados/service/usuarios/UsuarioService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.properties" afterDir="false" />
     </list>
@@ -33,6 +32,8 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="Exception" />
+        <option value="Class" />
+        <option value="Enum" />
       </list>
     </option>
   </component>
@@ -48,7 +49,7 @@
   <component name="GithubPullRequestsUISettings">{
   &quot;selectedUrlAndAccountId&quot;: {
     &quot;url&quot;: &quot;https://github.com/ProjetoTons/tons-backend.git&quot;,
-    &quot;accountId&quot;: &quot;9eef197d-661f-4589-8dcb-6f3cc62c0396&quot;
+    &quot;accountId&quot;: &quot;9de5e8b2-789f-4796-9def-f4454f825969&quot;
   }
 }</component>
   <component name="MavenImportPreferences">
@@ -69,6 +70,8 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "Notification.DisplayName-DoNotAsk-DatabaseConfigFileWatcher.found": "New/updated database configurations found",
+    "Notification.DoNotAsk-DatabaseConfigFileWatcher.found": "true",
     "RequestMappingsPanelOrder0": "0",
     "RequestMappingsPanelOrder1": "1",
     "RequestMappingsPanelWidth0": "75",
@@ -79,7 +82,11 @@
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
     "Spring Boot.TonsApplication.executor": "Run",
     "codeWithMe.voiceChat.enabledByDefault": "false",
-    "git-widget-placeholder": "ajustes-sprint2",
+    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
+    "dart.analysis.tool.window.visible": "false",
+    "git-widget-placeholder": "tabela-logs",
+    "ignore.virus.scanning.warn.message": "true",
+    "junie.onboarding.icon.badge.shown": "true",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "C:/Users/denni/OneDrive/Documentos/Faculdade/PI-Benificiario/tons-backend",
     "node.js.detected.package.eslint": "true",
@@ -87,7 +94,9 @@
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "preferences.lookFeel"
+    "settings.editor.selected.configurable": "preferences.lookFeel",
+    "to.speed.mode.migration.done": "true",
+    "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
   <component name="RunManager">
@@ -111,6 +120,14 @@
       </list>
     </recent_temporary>
   </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-jdk-9823dce3aa75-bf35d07a577b-intellij.indexing.shared.core-IU-252.28539.33" />
+        <option value="bundled-js-predefined-d6986cc7102b-a71380e98a7c-JavaScript-IU-252.28539.33" />
+      </set>
+    </attachedChunks>
+  </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
       <changelist id="58737723-9b5d-4081-b16c-19932057d09f" name="Changes" comment="" />
@@ -118,6 +135,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1772577203557</updated>
+      <workItem from="1780239681359" duration="431000" />
     </task>
     <servers />
   </component>

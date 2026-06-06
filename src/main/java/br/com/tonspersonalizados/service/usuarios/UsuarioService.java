@@ -5,7 +5,10 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import br.com.tonspersonalizados.dto.usuarios.*;
+import br.com.tonspersonalizados.entity.AcaoLog;
+import br.com.tonspersonalizados.service.LogSistemaService;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -34,6 +37,7 @@ public class UsuarioService {
     private final PasswordEncoder passwordEncoder;
     private final WhatsAppService whatsAppService;
     private final CloudinaryService cloudinaryService;
+    private final LogSistemaService logSistemaService;
 
     @Value("${tons.cnpj}")
     private String cnpjTons;
@@ -45,7 +49,8 @@ public class UsuarioService {
             PasswordEncoder passwordEncoder,
             EnderecoRepository enderecoRepository,
             WhatsAppService whatsAppService,
-            CloudinaryService cloudinaryService) {
+            CloudinaryService cloudinaryService,
+            @Lazy LogSistemaService logSistemaService) {
         this.acessoService = acessoService;
         this.usuarioRepository = usuarioRepository;
         this.passwordEncoder = passwordEncoder;
@@ -53,6 +58,7 @@ public class UsuarioService {
         this.enderecoRepository = enderecoRepository;
         this.whatsAppService = whatsAppService;
         this.cloudinaryService = cloudinaryService;
+        this.logSistemaService = logSistemaService;
 
     }
 
@@ -95,6 +101,11 @@ public class UsuarioService {
         } catch (Exception e) {
             // Não impede o cadastro se o WhatsApp falhar
         }
+
+        logSistemaService.registrar(
+                usuario.getId(), AcaoLog.CRIAR, "Usuario",
+                usuario.getId(), "Novo usuário criado",
+                null, logSistemaService.serializar(UsuarioLogDto.from(usuario)));
     }
 
     public void cadastrarFuncionario(FuncionarioRequestDto funcionarioDto) {
@@ -120,6 +131,11 @@ public class UsuarioService {
         funcionario.setAcessos(acessos);
 
         usuarioRepository.save(funcionario);
+
+        logSistemaService.registrar(
+                funcionario.getId(), AcaoLog.CRIAR, "Funcionario",
+                funcionario.getId(), "Novo funcionário criado",
+                null, logSistemaService.serializar(UsuarioLogDto.from(funcionario)));
     }
 
     public Usuario buscarPorEmail(String email) {
@@ -194,6 +210,8 @@ public class UsuarioService {
         Usuario usuarioExistente = usuarioRepository.findById(id)
                 .orElseThrow(() -> new UsuarioNaoEncontradoException("Usuário não encontrado"));
 
+        String valorAnterior = logSistemaService.serializar(UsuarioLogDto.from(usuarioExistente));
+
         usuarioExistente.setNome(usuarioDto.getNome());
         usuarioExistente.setTelefone(usuarioDto.getTelefone());
 
@@ -237,6 +255,11 @@ public class UsuarioService {
         }
 
         usuarioRepository.save(usuarioExistente);
+
+        logSistemaService.registrar(
+                usuarioExistente.getId(), AcaoLog.ATUALIZAR, "Usuario",
+                usuarioExistente.getId(), "Usuário atualizado",
+                valorAnterior, logSistemaService.serializar(UsuarioLogDto.from(usuarioExistente)));
     }
 
     public void atualizar(Usuario usuario) {
@@ -246,6 +269,8 @@ public class UsuarioService {
     public void atualizarFuncionario(Long id, FuncionarioAtualizarRequestDto funcionarioDto) {
         Usuario funcionarioExistente = usuarioRepository.findById(id)
                 .orElseThrow(() -> new UsuarioNaoEncontradoException("Funcionário não encontrado"));
+
+        String valorAnterior = logSistemaService.serializar(UsuarioLogDto.from(funcionarioExistente));
 
         funcionarioExistente.setNome(funcionarioDto.getNome());
 
@@ -263,6 +288,11 @@ public class UsuarioService {
         funcionarioExistente.setAcessos(acessos);
 
         usuarioRepository.save(funcionarioExistente);
+
+        logSistemaService.registrar(
+                funcionarioExistente.getId(), AcaoLog.ATUALIZAR, "Funcionario",
+                funcionarioExistente.getId(), "Funcionário atualizado",
+                valorAnterior, logSistemaService.serializar(UsuarioLogDto.from(funcionarioExistente)));
     }
 
     public void deletar(Long id) {
@@ -270,9 +300,18 @@ public class UsuarioService {
         Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new UsuarioNaoEncontradoException("Usuário não encontrado"));
 
+        String entidade = Boolean.TRUE.equals(usuario.getFuncionario()) ? "Funcionario" : "Usuario";
+        String descricao = Boolean.TRUE.equals(usuario.getFuncionario()) ? "Funcionário removido" : "Usuário removido";
+        String snapshot = logSistemaService.serializar(UsuarioLogDto.from(usuario));
+
         usuario.setDataDeDeletado(LocalDateTime.now());
 
         usuarioRepository.save(usuario);
+
+        logSistemaService.registrar(
+                usuario.getId(), AcaoLog.DELETAR, entidade,
+                usuario.getId(), descricao,
+                snapshot, null);
     }
 
 
