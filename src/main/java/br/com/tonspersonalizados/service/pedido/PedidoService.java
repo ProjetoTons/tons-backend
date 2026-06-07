@@ -309,20 +309,61 @@ public class PedidoService {
 
         pedido = pedidoRepository.save(pedido);
 
-        // Remover itens antigos
-        List<ItemPedido> itensAntigos = itemPedidoRepository.findByPedidoId(idPedido);
-        for (ItemPedido itemAntigo : itensAntigos) {
-            if (itemAntigo.getCaracteristicas() != null) {
-                caracteristicasRepository.delete(itemAntigo.getCaracteristicas());
+        // Buscar itens existentes no banco
+        List<ItemPedido> itensExistentes = itemPedidoRepository.findByPedidoId(idPedido);
+
+        // IDs dos itens que vieram no request (itens que devem continuar)
+        List<Integer> idsRecebidos = request.getItens().stream()
+                .map(ItemPedidoRequestDto::getIdItemPedido)
+                .filter(id -> id != null)
+                .collect(Collectors.toList());
+
+        // 1. Remover itens que NÃO vieram no request (foram excluídos pelo frontend)
+        List<ItemPedido> itensParaRemover = itensExistentes.stream()
+                .filter(item -> !idsRecebidos.contains(item.getId()))
+                .collect(Collectors.toList());
+
+        List<CaracteristicasItemPedido> caracteristicasParaRemover = new ArrayList<>();
+        for (ItemPedido itemRemover : itensParaRemover) {
+            if (itemRemover.getCaracteristicas() != null) {
+                caracteristicasParaRemover.add(itemRemover.getCaracteristicas());
             }
         }
-        itemPedidoRepository.deleteAll(itensAntigos);
+        itemPedidoRepository.deleteAll(itensParaRemover);
+        itemPedidoRepository.flush();
+        caracteristicasRepository.deleteAll(caracteristicasParaRemover);
 
-        // Criar novos itens
+        // 2. Atualizar itens existentes e criar novos
         List<ItemPedido> itensSalvos = new ArrayList<>();
         for (ItemPedidoRequestDto itemDto : request.getItens()) {
-            ItemPedido item = criarItemPedido(pedido, itemDto);
-            itensSalvos.add(item);
+            if (itemDto.getIdItemPedido() != null) {
+                // Item existente → atualizar
+                ItemPedido itemExistente = itemPedidoRepository.findById(itemDto.getIdItemPedido())
+                        .orElseThrow(() -> new PedidoNaoEncontradoException("Item do pedido não encontrado"));
+
+                Produto produto = produtoRepository.findById(itemDto.getIdProduto())
+                        .orElseThrow(() -> new ProdutoNaoEncontradoException("Produto não encontrado"));
+
+                itemExistente.setProduto(produto);
+                itemExistente.setQuantidade(itemDto.getQuantidade());
+                itemExistente.setValorUnitario(itemDto.getValorUnitario());
+
+                // Atualizar características existentes
+                CaracteristicasItemPedido caract = itemExistente.getCaracteristicas();
+                caract.setDescricaoArte(itemDto.getCaracteristicas().getDescricaoArte());
+                caract.setCorEstampa(itemDto.getCaracteristicas().getCorEstampa());
+                caract.setCorMaterial(itemDto.getCaracteristicas().getCorMaterial());
+                caract.setComposicao(itemDto.getCaracteristicas().getComposicao());
+                caract.setTamanho(itemDto.getCaracteristicas().getTamanho());
+                caract.setFornecedor(itemDto.getCaracteristicas().getFornecedor());
+                caracteristicasRepository.save(caract);
+
+                itensSalvos.add(itemPedidoRepository.save(itemExistente));
+            } else {
+                // Item novo → criar
+                ItemPedido item = criarItemPedido(pedido, itemDto);
+                itensSalvos.add(item);
+            }
         }
 
         Long autorId = (responsavel != null) ? responsavel.getId() : cliente.getId();
