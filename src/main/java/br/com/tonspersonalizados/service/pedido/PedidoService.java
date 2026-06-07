@@ -37,6 +37,9 @@ import br.com.tonspersonalizados.repository.pedido.PedidoRepository;
 import br.com.tonspersonalizados.repository.produto.ProdutoRepository;
 import br.com.tonspersonalizados.repository.usuarios.EnderecoRepository;
 import br.com.tonspersonalizados.repository.usuarios.UsuarioRepository;
+import br.com.tonspersonalizados.entity.AcaoLog;
+import br.com.tonspersonalizados.service.LogSistemaService;
+import br.com.tonspersonalizados.dto.pedidos.PedidoLogDto;
 
 @Service
 public class PedidoService {
@@ -49,6 +52,7 @@ public class PedidoService {
     private final ProdutoRepository produtoRepository;
     private final EnderecoRepository enderecoRepository;
     private final ApplicationEventPublisher eventPublisher;
+    private final LogSistemaService logSistemaService;
 
     public PedidoService(PedidoRepository pedidoRepository,
                          ItemPedidoRepository itemPedidoRepository,
@@ -57,7 +61,8 @@ public class PedidoService {
                          UsuarioRepository usuarioRepository,
                          ProdutoRepository produtoRepository,
                          EnderecoRepository enderecoRepository,
-                         ApplicationEventPublisher eventPublisher) {
+                         ApplicationEventPublisher eventPublisher,
+                         LogSistemaService logSistemaService) {
         this.pedidoRepository = pedidoRepository;
         this.itemPedidoRepository = itemPedidoRepository;
         this.caracteristicasRepository = caracteristicasRepository;
@@ -66,6 +71,7 @@ public class PedidoService {
         this.produtoRepository = produtoRepository;
         this.enderecoRepository = enderecoRepository;
         this.eventPublisher = eventPublisher;
+        this.logSistemaService = logSistemaService;
     }
 
 
@@ -113,6 +119,10 @@ public class PedidoService {
             itensSalvos.add(item);
         }
 
+        logSistemaService.registrar(
+                cliente.getId(), AcaoLog.CRIAR, "Pedido",
+                pedido.getId().longValue(), "Novo pedido criado",
+                null, PedidoLogDto.from(pedido));
 
         return montarPedidoResponse(pedido, itensSalvos);
     }
@@ -154,6 +164,8 @@ public class PedidoService {
         Pedido pedido = pedidoRepository.findById(idPedido)
                 .orElseThrow(() -> new PedidoNaoEncontradoException("Pedido não encontrado"));
 
+        PedidoLogDto valorAnterior = PedidoLogDto.from(pedido);
+
         // Se a etapa principal mudou → responsável reseta (null)
         boolean etapaMudou = !request.getEtapa().equals(pedido.getEtapaPedido());
 
@@ -191,6 +203,11 @@ public class PedidoService {
             eventPublisher.publishEvent(new EtapaAvancadaEvent(pedido, request.getEtapa(), request.getStatus()));
         }
 
+        logSistemaService.registrar(
+                responsavelEtapa.getId(), AcaoLog.ATUALIZAR, "Pedido",
+                pedido.getId().longValue(), "Etapa do pedido alterada para " + request.getEtapa() + " - " + request.getStatus(),
+                valorAnterior, PedidoLogDto.from(pedido));
+
         return montarPedidoResponse(pedido, null);
     }
 
@@ -201,11 +218,18 @@ public class PedidoService {
         Pedido pedido = pedidoRepository.findById(idPedido)
                 .orElseThrow(() -> new PedidoNaoEncontradoException("Pedido não encontrado"));
 
+        PedidoLogDto valorAnterior = PedidoLogDto.from(pedido);
+
         Usuario responsavel = usuarioRepository.findById(idResponsavel)
                 .orElseThrow(() -> new UsuarioNaoEncontradoException("Funcionário não encontrado"));
 
         pedido.setUsuarioResponsavel(responsavel);
         pedidoRepository.save(pedido);
+
+        logSistemaService.registrar(
+                idResponsavel, AcaoLog.ATUALIZAR, "Pedido",
+                pedido.getId().longValue(), "Responsável atribuído ao pedido: " + responsavel.getNome(),
+                valorAnterior, PedidoLogDto.from(pedido));
 
         return montarPedidoResponse(pedido, null);
     }
@@ -253,6 +277,8 @@ public class PedidoService {
         Pedido pedido = pedidoRepository.findById(idPedido)
                 .orElseThrow(() -> new PedidoNaoEncontradoException("Pedido não encontrado"));
 
+        PedidoLogDto valorAnterior = PedidoLogDto.from(pedido);
+
         // Validar pessoas
         Usuario cliente = usuarioRepository.findById(request.getIdUsuarioCliente())
                 .orElseThrow(() -> new UsuarioNaoEncontradoException("Cliente não encontrado"));
@@ -299,6 +325,13 @@ public class PedidoService {
             itensSalvos.add(item);
         }
 
+        Long autorId = (responsavel != null) ? responsavel.getId() : cliente.getId();
+
+        logSistemaService.registrar(
+                autorId, AcaoLog.ATUALIZAR, "Pedido",
+                pedido.getId().longValue(), "Pedido atualizado",
+                valorAnterior, PedidoLogDto.from(pedido));
+
         return montarPedidoResponse(pedido, itensSalvos);
     }
 
@@ -313,6 +346,8 @@ public class PedidoService {
             throw new IllegalStateException("Pedido já está cancelado");
         }
 
+        PedidoLogDto valorAnterior = PedidoLogDto.from(pedido);
+
         // Mudar etapa para "Cancelado"
         pedido.setEtapaPedido("Cancelado");
         pedido.setStatus("Cancelado");
@@ -322,6 +357,13 @@ public class PedidoService {
         pedido.setDescricao(descricaoAtual + "\n\n[CANCELADO] " + motivo);
 
         pedidoRepository.save(pedido);
+
+        Long autorId = pedido.getUsuarioCliente() != null ? pedido.getUsuarioCliente().getId() : null;
+
+        logSistemaService.registrar(
+                autorId, AcaoLog.ATUALIZAR, "Pedido",
+                pedido.getId().longValue(), "Pedido cancelado. Motivo: " + motivo,
+                valorAnterior, PedidoLogDto.from(pedido));
 
         return montarPedidoResponse(pedido, null);
     }

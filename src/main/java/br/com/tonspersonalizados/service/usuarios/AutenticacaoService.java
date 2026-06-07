@@ -3,11 +3,14 @@ package br.com.tonspersonalizados.service.usuarios;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import br.com.tonspersonalizados.entity.AcaoLog;
+import br.com.tonspersonalizados.service.LogSistemaService;
 import br.com.tonspersonalizados.entity.usuarios.Acesso;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -39,17 +42,20 @@ public class AutenticacaoService implements UserDetailsService {
     private final PasswordEncoder passwordEncoder;
     private final NotificacaoService notificacaoService;
     private final GerenciadorTokenJwt gerenciadorTokenJwt;
+    private final LogSistemaService logSistemaService;
     private AuthenticationManager authenticationManager;
 
     public AutenticacaoService(UsuarioService usuarioService,
                                PasswordEncoder passwordEncoder,
                                NotificacaoService notificacaoService,
                                GerenciadorTokenJwt gerenciadorTokenJwt,
+                               LogSistemaService logSistemaService,
                                @Lazy AuthenticationManager authenticationManager) {
         this.usuarioService = usuarioService;
         this.passwordEncoder = passwordEncoder;
         this.notificacaoService = notificacaoService;
         this.gerenciadorTokenJwt = gerenciadorTokenJwt;
+        this.logSistemaService = logSistemaService;
         this.authenticationManager = authenticationManager;
     }
 
@@ -71,8 +77,20 @@ public class AutenticacaoService implements UserDetailsService {
         final UsernamePasswordAuthenticationToken credentials = new UsernamePasswordAuthenticationToken(
                 loginDto.getEmail(), loginDto.getSenha());
 
-        final Authentication authentication = this.authenticationManager.authenticate(credentials);
-
+        // Tenta autenticar; captura falha para registrar LOGIN_FALHA
+        final Authentication authentication;
+        try {
+            authentication = this.authenticationManager.authenticate(credentials);
+        } catch (BadCredentialsException ex) {
+            Usuario usuarioTentativa = usuarioService.buscarPorEmail(loginDto.getEmail());
+            Long idParaLog = usuarioTentativa != null ? usuarioTentativa.getId() : null;
+            logSistemaService.registrar(
+                    idParaLog, AcaoLog.LOGIN_FALHA, "Usuario",
+                    idParaLog,
+                    "Tentativa de login com falha",
+                    null, null);
+            throw ex;
+        }
 
         Usuario usuario = usuarioService.buscarPorEmail(loginDto.getEmail());
 
@@ -96,6 +114,11 @@ public class AutenticacaoService implements UserDetailsService {
         usuario.getLogin().setUltimoLogin(LocalDateTime.now());
 
         usuarioService.atualizar(usuario);
+
+        logSistemaService.registrar(
+                usuario.getId(), AcaoLog.LOGIN, "Usuario",
+                usuario.getId(), "Login realizado com sucesso",
+                null, null);
 
         return usuarioTokenDto;
     }
@@ -129,6 +152,11 @@ public class AutenticacaoService implements UserDetailsService {
         emailDto.setCorpo(corpo.formatted(usuario.getNome(), linkComToken));
 
         notificacaoService.enviarEmail(emailDto);
+
+        logSistemaService.registrar(
+                usuario.getId(), AcaoLog.RESET_SENHA, "Usuario",
+                usuario.getId(), "Solicitação de reset de senha",
+                null, null);
     }
 
     public void resetarSenha(String token, String novaSenha) {
