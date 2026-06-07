@@ -105,7 +105,7 @@ public class UsuarioService {
         logSistemaService.registrar(
                 usuario.getId(), AcaoLog.CRIAR, "Usuario",
                 usuario.getId(), "Novo usuário criado",
-                null, logSistemaService.serializar(UsuarioLogDto.from(usuario)));
+                null, UsuarioLogDto.from(usuario));
     }
 
     public void cadastrarFuncionario(FuncionarioRequestDto funcionarioDto) {
@@ -135,7 +135,7 @@ public class UsuarioService {
         logSistemaService.registrar(
                 funcionario.getId(), AcaoLog.CRIAR, "Funcionario",
                 funcionario.getId(), "Novo funcionário criado",
-                null, logSistemaService.serializar(UsuarioLogDto.from(funcionario)));
+                null, UsuarioLogDto.from(funcionario));
     }
 
     public Usuario buscarPorEmail(String email) {
@@ -210,7 +210,7 @@ public class UsuarioService {
         Usuario usuarioExistente = usuarioRepository.findById(id)
                 .orElseThrow(() -> new UsuarioNaoEncontradoException("Usuário não encontrado"));
 
-        String valorAnterior = logSistemaService.serializar(UsuarioLogDto.from(usuarioExistente));
+        UsuarioLogDto valorAnterior = UsuarioLogDto.from(usuarioExistente);
 
         usuarioExistente.setNome(usuarioDto.getNome());
         usuarioExistente.setTelefone(usuarioDto.getTelefone());
@@ -259,7 +259,7 @@ public class UsuarioService {
         logSistemaService.registrar(
                 usuarioExistente.getId(), AcaoLog.ATUALIZAR, "Usuario",
                 usuarioExistente.getId(), "Usuário atualizado",
-                valorAnterior, logSistemaService.serializar(UsuarioLogDto.from(usuarioExistente)));
+                valorAnterior, UsuarioLogDto.from(usuarioExistente));
     }
 
     public void atualizar(Usuario usuario) {
@@ -270,7 +270,7 @@ public class UsuarioService {
         Usuario funcionarioExistente = usuarioRepository.findById(id)
                 .orElseThrow(() -> new UsuarioNaoEncontradoException("Funcionário não encontrado"));
 
-        String valorAnterior = logSistemaService.serializar(UsuarioLogDto.from(funcionarioExistente));
+        UsuarioLogDto valorAnterior = UsuarioLogDto.from(funcionarioExistente);
 
         funcionarioExistente.setNome(funcionarioDto.getNome());
 
@@ -292,7 +292,7 @@ public class UsuarioService {
         logSistemaService.registrar(
                 funcionarioExistente.getId(), AcaoLog.ATUALIZAR, "Funcionario",
                 funcionarioExistente.getId(), "Funcionário atualizado",
-                valorAnterior, logSistemaService.serializar(UsuarioLogDto.from(funcionarioExistente)));
+                valorAnterior, UsuarioLogDto.from(funcionarioExistente));
     }
 
     public void deletar(Long id) {
@@ -302,7 +302,7 @@ public class UsuarioService {
 
         String entidade = Boolean.TRUE.equals(usuario.getFuncionario()) ? "Funcionario" : "Usuario";
         String descricao = Boolean.TRUE.equals(usuario.getFuncionario()) ? "Funcionário removido" : "Usuário removido";
-        String snapshot = logSistemaService.serializar(UsuarioLogDto.from(usuario));
+        UsuarioLogDto anterior = UsuarioLogDto.from(usuario);
 
         usuario.setDataDeDeletado(LocalDateTime.now());
 
@@ -311,7 +311,7 @@ public class UsuarioService {
         logSistemaService.registrar(
                 usuario.getId(), AcaoLog.DELETAR, entidade,
                 usuario.getId(), descricao,
-                snapshot, null);
+                anterior, null);
     }
 
 

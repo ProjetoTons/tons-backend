@@ -26,9 +26,10 @@ public class LogSistemaService {
         this.logSistemaRepository = logSistemaRepository;
     }
 
-    public String serializar(Object obj) {
+    private String serializar(Object obj) {
         if (obj == null)
             return null;
+
         try {
             return objectMapper.writeValueAsString(obj);
         } catch (Exception e) {
@@ -38,7 +39,7 @@ public class LogSistemaService {
 
     public void registrar(Long idUsuario, AcaoLog acao, String entidade,
             Long entidadeId, String descricao,
-            String valorAnterior, String valorNovo) {
+            Object valorAnterior, Object valorNovo) {
 
         Usuario usuario = null;
         if (idUsuario != null) {
@@ -51,8 +52,8 @@ public class LogSistemaService {
         log.setEntidade(entidade);
         log.setEntidadeId(entidadeId);
         log.setDescricao(descricao);
-        log.setValorAnterior(valorAnterior);
-        log.setValorNovo(valorNovo);
+        log.setValorAnterior(serializar(valorAnterior));
+        log.setValorNovo(serializar(valorNovo));
 
         logSistemaRepository.save(log);
     }

@@ -8,7 +8,6 @@ import br.com.tonspersonalizados.exception.produto.ProdutoNaoEncontradoException
 import br.com.tonspersonalizados.repository.produto.ProdutoRepository;
 import br.com.tonspersonalizados.service.LogSistemaService;
 import br.com.tonspersonalizados.service.usuarios.UsuarioService;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -47,7 +46,7 @@ public class ProdutoService {
         logSistemaService.registrar(
                 null, AcaoLog.CRIAR, "Produto",
                 salvo.getId(), "Novo produto criado",
-                null, logSistemaService.serializar(ProdutoLogDto.from(salvo)));
+                null, ProdutoLogDto.from(salvo));
 
         return salvo;
     }
@@ -56,14 +55,14 @@ public class ProdutoService {
         Produto anterior = produtoRepository.findById(produto.getId())
                 .orElseThrow(() -> new ProdutoNaoEncontradoException("Produto não encontrado"));
 
-        String valorAnterior = logSistemaService.serializar(ProdutoLogDto.from(anterior));
+        ProdutoLogDto valorAnterior = ProdutoLogDto.from(anterior);
 
         Produto atualizado = produtoRepository.save(produto);
 
         logSistemaService.registrar(
                 null, AcaoLog.ATUALIZAR, "Produto",
                 atualizado.getId(), "Produto atualizado",
-                valorAnterior, logSistemaService.serializar(ProdutoLogDto.from(atualizado)));
+                valorAnterior, ProdutoLogDto.from(atualizado));
 
         return atualizado;
     }
@@ -72,14 +71,14 @@ public class ProdutoService {
         Produto produto = produtoRepository.findById(id)
                 .orElseThrow(() -> new ProdutoNaoEncontradoException("Produto não encontrado"));
 
-        String snapshot = logSistemaService.serializar(ProdutoLogDto.from(produto));
+        ProdutoLogDto anterior = ProdutoLogDto.from(produto);
 
         produtoRepository.delete(produto);
 
         logSistemaService.registrar(
                 null, AcaoLog.DELETAR, "Produto",
                 id, "Produto removido",
-                snapshot, null);
+                anterior, null);
     }
 
     public List<Produto> listarFavoritos(Long idUsuario) {
@@ -100,10 +99,12 @@ public class ProdutoService {
         usuario.getProdutosFavoritos().add(produto);
         usuarioService.atualizar(usuario);
 
+        ProdutoLogDto logDto = ProdutoLogDto.from(produto);
+
         logSistemaService.registrar(
                 idUsuario, AcaoLog.FAVORITAR, "Produto",
                 idProduto, "Produto adicionado aos favoritos",
-                null, produto.getNome());
+                null, logDto);
     }
 
     public void removerProdutoFavoritado(Long idProduto, Long idUsuario) {
@@ -116,10 +117,12 @@ public class ProdutoService {
         usuario.getProdutosFavoritos().remove(produto);
         usuarioService.atualizar(usuario);
 
+        ProdutoLogDto logDto = ProdutoLogDto.from(produto);
+
         logSistemaService.registrar(
                 idUsuario, AcaoLog.DESFAVORITAR, "Produto",
                 idProduto, "Produto removido dos favoritos",
-                produto.getNome(), null);
+                logDto, null);
     }
 
     public List<Produto> listarInteressados(Long idUsuario) {
@@ -139,10 +142,12 @@ public class ProdutoService {
         usuario.getProdutosInterressados().add(produto);
         usuarioService.atualizar(usuario);
 
+        ProdutoLogDto logDto = ProdutoLogDto.from(produto);
+
         logSistemaService.registrar(
                 idUsuario, AcaoLog.ADICIONAR_CARRINHO, "Produto",
                 idProduto, "Produto adicionado ao interesse (carrinho)",
-                null, produto.getNome());
+                null, logDto);
     }
 
     public void removerProdutoInteressado(Long idProduto, Long idUsuario) {
@@ -155,9 +160,11 @@ public class ProdutoService {
         usuario.getProdutosInterressados().remove(produto);
         usuarioService.atualizar(usuario);
 
+        ProdutoLogDto logDto = ProdutoLogDto.from(produto);
+
         logSistemaService.registrar(
                 idUsuario, AcaoLog.REMOVER_CARRINHO, "Produto",
                 idProduto, "Produto removido do interesse (carrinho)",
-                produto.getNome(), null);
+                logDto, null);
     }
 }

@@ -122,7 +122,7 @@ public class PedidoService {
         logSistemaService.registrar(
                 cliente.getId(), AcaoLog.CRIAR, "Pedido",
                 pedido.getId().longValue(), "Novo pedido criado",
-                null, logSistemaService.serializar(PedidoLogDto.from(pedido)));
+                null, PedidoLogDto.from(pedido));
 
         return montarPedidoResponse(pedido, itensSalvos);
     }
@@ -164,7 +164,7 @@ public class PedidoService {
         Pedido pedido = pedidoRepository.findById(idPedido)
                 .orElseThrow(() -> new PedidoNaoEncontradoException("Pedido não encontrado"));
 
-        String valorAnterior = logSistemaService.serializar(PedidoLogDto.from(pedido));
+        PedidoLogDto valorAnterior = PedidoLogDto.from(pedido);
 
         // Se a etapa principal mudou → responsável reseta (null)
         boolean etapaMudou = !request.getEtapa().equals(pedido.getEtapaPedido());
@@ -206,7 +206,7 @@ public class PedidoService {
         logSistemaService.registrar(
                 responsavelEtapa.getId(), AcaoLog.ATUALIZAR, "Pedido",
                 pedido.getId().longValue(), "Etapa do pedido alterada para " + request.getEtapa() + " - " + request.getStatus(),
-                valorAnterior, logSistemaService.serializar(PedidoLogDto.from(pedido)));
+                valorAnterior, PedidoLogDto.from(pedido));
 
         return montarPedidoResponse(pedido, null);
     }
@@ -218,7 +218,7 @@ public class PedidoService {
         Pedido pedido = pedidoRepository.findById(idPedido)
                 .orElseThrow(() -> new PedidoNaoEncontradoException("Pedido não encontrado"));
 
-        String valorAnterior = logSistemaService.serializar(PedidoLogDto.from(pedido));
+        PedidoLogDto valorAnterior = PedidoLogDto.from(pedido);
 
         Usuario responsavel = usuarioRepository.findById(idResponsavel)
                 .orElseThrow(() -> new UsuarioNaoEncontradoException("Funcionário não encontrado"));
@@ -229,7 +229,7 @@ public class PedidoService {
         logSistemaService.registrar(
                 idResponsavel, AcaoLog.ATUALIZAR, "Pedido",
                 pedido.getId().longValue(), "Responsável atribuído ao pedido: " + responsavel.getNome(),
-                valorAnterior, logSistemaService.serializar(PedidoLogDto.from(pedido)));
+                valorAnterior, PedidoLogDto.from(pedido));
 
         return montarPedidoResponse(pedido, null);
     }
@@ -277,7 +277,7 @@ public class PedidoService {
         Pedido pedido = pedidoRepository.findById(idPedido)
                 .orElseThrow(() -> new PedidoNaoEncontradoException("Pedido não encontrado"));
 
-        String valorAnterior = logSistemaService.serializar(PedidoLogDto.from(pedido));
+        PedidoLogDto valorAnterior = PedidoLogDto.from(pedido);
 
         // Validar pessoas
         Usuario cliente = usuarioRepository.findById(request.getIdUsuarioCliente())
@@ -330,7 +330,7 @@ public class PedidoService {
         logSistemaService.registrar(
                 autorId, AcaoLog.ATUALIZAR, "Pedido",
                 pedido.getId().longValue(), "Pedido atualizado",
-                valorAnterior, logSistemaService.serializar(PedidoLogDto.from(pedido)));
+                valorAnterior, PedidoLogDto.from(pedido));
 
         return montarPedidoResponse(pedido, itensSalvos);
     }
@@ -346,7 +346,7 @@ public class PedidoService {
             throw new IllegalStateException("Pedido já está cancelado");
         }
 
-        String valorAnterior = logSistemaService.serializar(PedidoLogDto.from(pedido));
+        PedidoLogDto valorAnterior = PedidoLogDto.from(pedido);
 
         // Mudar etapa para "Cancelado"
         pedido.setEtapaPedido("Cancelado");
@@ -363,7 +363,7 @@ public class PedidoService {
         logSistemaService.registrar(
                 autorId, AcaoLog.ATUALIZAR, "Pedido",
                 pedido.getId().longValue(), "Pedido cancelado. Motivo: " + motivo,
-                valorAnterior, logSistemaService.serializar(PedidoLogDto.from(pedido)));
+                valorAnterior, PedidoLogDto.from(pedido));
 
         return montarPedidoResponse(pedido, null);
     }
