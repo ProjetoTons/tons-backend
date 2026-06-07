@@ -2,6 +2,7 @@ package br.com.tonspersonalizados.entity;
 
 import br.com.tonspersonalizados.entity.usuarios.Usuario;
 import jakarta.persistence.*;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
@@ -41,7 +42,8 @@ public class LogSistema {
     @Column(name = "valor_novo", columnDefinition = "JSON")
     private String valorNovo;
 
-    @Column(name = "data_log", nullable = false, updatable = false)
+    @CreationTimestamp
+    @Column(name = "data_log", nullable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime dataLog;
 
     public Usuario getUsuario() {
