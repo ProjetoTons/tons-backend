@@ -1,10 +1,18 @@
 package br.com.tonspersonalizados.entity.produtos;
 
-import br.com.tonspersonalizados.entity.usuarios.Usuario;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.*;
-
 import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import br.com.tonspersonalizados.entity.usuarios.Usuario;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
 
 @Entity
 public class Produto {
@@ -25,6 +33,12 @@ public class Produto {
     @ManyToOne
     @JoinColumn(name = "id_categoria") //fk
     private  CategoriaProduto categoriaProduto;
+
+    @Column(name = "imagem_url", length = 512)
+    private String imagemUrl;
+
+    @Column(nullable = false)
+    private Boolean destaque = false;
 
     @ManyToMany(mappedBy = "produtos") //nome da propriedade na classe usuario
     @JsonIgnore
@@ -95,5 +109,21 @@ public class Produto {
 
     public void setUsuariosInteressados(List<Usuario> usuariosInteressados) {
         this.usuariosInteressados = usuariosInteressados;
+    }
+
+    public String getImagemUrl() {
+        return imagemUrl;
+    }
+
+    public void setImagemUrl(String imagemUrl) {
+        this.imagemUrl = imagemUrl;
+    }
+
+    public Boolean getDestaque() {
+        return destaque;
+    }
+
+    public void setDestaque(Boolean destaque) {
+        this.destaque = destaque;
     }
 }
