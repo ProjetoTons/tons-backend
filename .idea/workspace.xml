@@ -5,12 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="58737723-9b5d-4081-b16c-19932057d09f" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/java/br/com/tonspersonalizados/exception/usuarios/CnpjInvalidoException.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/br/com/tonspersonalizados/controller/usuarios/EmpresaController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/br/com/tonspersonalizados/controller/usuarios/EmpresaController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/br/com/tonspersonalizados/dto/usuarios/UsuarioRequestDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/br/com/tonspersonalizados/dto/usuarios/UsuarioRequestDto.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/br/com/tonspersonalizados/service/usuarios/EmpresaService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/br/com/tonspersonalizados/service/usuarios/EmpresaService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/br/com/tonspersonalizados/service/usuarios/UsuarioService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/br/com/tonspersonalizados/service/usuarios/UsuarioService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.properties" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -29,10 +24,15 @@
       <entry key="agent-panel" value="Claude Opus 4.6" />
     </selectedModels>
   </component>
+  <component name="EmbeddingIndexingInfo">
+    <option name="cachedIndexableFilesCount" value="112" />
+    <option name="fileBasedEmbeddingIndicesEnabled" value="true" />
+  </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="Exception" />
+        <option value="Class" />
       </list>
     </option>
   </component>
@@ -58,6 +58,10 @@
       </MavenGeneralSettings>
     </option>
   </component>
+  <component name="McpProjectServerCommands">
+    <commands />
+    <urls />
+  </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 5
 }</component>
@@ -68,18 +72,24 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "JUnit.UsuarioServiceTest.executor": "Coverage",
+    "JUnit.br.com.tonspersonalizados in tons-backend.executor": "Coverage",
+    "JUnit.br.com.tonspersonalizados.service in tons-backend.executor": "Coverage",
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "RequestMappingsPanelOrder0": "0",
     "RequestMappingsPanelOrder1": "1",
     "RequestMappingsPanelWidth0": "75",
     "RequestMappingsPanelWidth1": "75",
+    "RunOnceActivity.MCP Project settings loaded": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
     "RunOnceActivity.git.unshallow": "true",
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
     "Spring Boot.TonsApplication.executor": "Run",
     "codeWithMe.voiceChat.enabledByDefault": "false",
-    "git-widget-placeholder": "ajustes-sprint2",
+    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
+    "git-widget-placeholder": "test-unit",
+    "junie.onboarding.icon.badge.shown": "true",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "C:/Users/denni/OneDrive/Documentos/Faculdade/PI-Benificiario/tons-backend",
     "node.js.detected.package.eslint": "true",
@@ -87,10 +97,54 @@
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "preferences.lookFeel"
+    "settings.editor.selected.configurable": "preferences.lookFeel",
+    "to.speed.mode.migration.done": "true"
   }
 }]]></component>
-  <component name="RunManager">
+  <component name="RunManager" selected="JUnit.br.com.tonspersonalizados in tons-backend">
+    <configuration name="UsuarioServiceTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="tons-backend" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="br.com.tonspersonalizados.service.usuarios.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="br.com.tonspersonalizados.service.usuarios" />
+      <option name="MAIN_CLASS_NAME" value="br.com.tonspersonalizados.service.usuarios.UsuarioServiceTest" />
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="br.com.tonspersonalizados in tons-backend" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="tons-backend" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="br.com.tonspersonalizados.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="br.com.tonspersonalizados" />
+      <option name="TEST_OBJECT" value="package" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="br.com.tonspersonalizados.service in tons-backend" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="tons-backend" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="br.com.tonspersonalizados.service.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="br.com.tonspersonalizados.service" />
+      <option name="TEST_OBJECT" value="package" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="TonsApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" temporary="true" nameIsGenerated="true">
       <option name="FRAME_DEACTIVATION_UPDATE_POLICY" value="UnknownPolicyInFreeMode" />
       <module name="tons-backend" />
@@ -107,6 +161,9 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="JUnit.br.com.tonspersonalizados in tons-backend" />
+        <item itemvalue="JUnit.br.com.tonspersonalizados.service in tons-backend" />
+        <item itemvalue="JUnit.UsuarioServiceTest" />
         <item itemvalue="Spring Boot.TonsApplication" />
       </list>
     </recent_temporary>
@@ -134,6 +191,17 @@
         </entry>
       </map>
     </option>
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/tons_backend$UsuarioServiceTest.ic" NAME="UsuarioServiceTest Coverage Results" MODIFIED="1781138506641" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="true">
+      <FILTER>br.com.tonspersonalizados.service.usuarios.*</FILTER>
+    </SUITE>
+    <SUITE FILE_PATH="coverage/tons_backend$br_com_tonspersonalizados_service_in_tons_backend.ic" NAME="br.com.tonspersonalizados.service in tons-backend Coverage Results" MODIFIED="1781139484362" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="true">
+      <FILTER>br.com.tonspersonalizados.service.*</FILTER>
+    </SUITE>
+    <SUITE FILE_PATH="coverage/tons_backend$br_com_tonspersonalizados_in_tons_backend.ic" NAME="br.com.tonspersonalizados in tons-backend Coverage Results" MODIFIED="1781140657680" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="true">
+      <FILTER>br.com.tonspersonalizados.*</FILTER>
+    </SUITE>
   </component>
   <component name="github-copilot-workspace">
     <instructionFileLocations>
