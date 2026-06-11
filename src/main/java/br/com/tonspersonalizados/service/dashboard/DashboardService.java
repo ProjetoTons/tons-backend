@@ -16,6 +16,7 @@ import br.com.tonspersonalizados.dto.dashboard.KpisDashboardDto;
 import br.com.tonspersonalizados.dto.dashboard.PerformanceFuncionarioDto;
 import br.com.tonspersonalizados.dto.dashboard.SubEtapaDto;
 import br.com.tonspersonalizados.entity.pedidos.Pedido;
+import br.com.tonspersonalizados.entity.usuarios.Empresa;
 import br.com.tonspersonalizados.repository.pedido.HistoricoEtapaPedidoRepository;
 import br.com.tonspersonalizados.repository.pedido.PedidoRepository;
 import br.com.tonspersonalizados.service.usuarios.EmpresaService;
@@ -57,8 +58,18 @@ public class DashboardService {
                 .filter(p -> "Enviado".equalsIgnoreCase(p.getStatus()))
                 .count();
 
+        BigDecimal metaSemanal = BigDecimal.ZERO;
+        try {
+            Empresa empresa = empresaService.buscarGrafica();
+            if (empresa.getMetaSemanal() != null) {
+                metaSemanal = empresa.getMetaSemanal();
+            }
+        } catch (Exception e) {
+            // empresa gráfica não cadastrada ainda
+        }
+
         return new KpisDashboardDto(totalValor, aguardandoArte, aguardandoRetirada, enviada,
-                empresaService.buscarGrafica().getMetaSemanal(), pedidos.size());
+                metaSemanal, pedidos.size());
     }
 
     public List<GraficoEtapaDto> graficoEtapas(LocalDate startDate, LocalDate endDate) {
@@ -68,6 +79,7 @@ public class DashboardService {
         List<Pedido> pedidos = pedidoRepository.findByDataPedidoBetween(inicio, fim);
 
         Map<String, List<Pedido>> porEtapa = pedidos.stream()
+                .filter(p -> p.getEtapaPedido() != null)
                 .collect(Collectors.groupingBy(Pedido::getEtapaPedido));
 
         return porEtapa.entrySet().stream()
