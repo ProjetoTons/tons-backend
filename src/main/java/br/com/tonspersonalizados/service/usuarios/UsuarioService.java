@@ -92,8 +92,13 @@ public class UsuarioService {
             usuarioRepository.save(usuario);
         }
         catch (DataIntegrityViolationException e){
-            // Insert violou a chave unique para CPF
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Dados inválidos.");
+            String mensagem = e.getMessage() != null ? e.getMessage().toLowerCase() : "";
+            if (mensagem.contains("cpf")) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "CPF já cadastrado no sistema.");
+            } else if (mensagem.contains("email")) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "E-mail já cadastrado no sistema.");
+            }
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Dados inválidos. Verifique as informações e tente novamente.");
         }
 
         try {
