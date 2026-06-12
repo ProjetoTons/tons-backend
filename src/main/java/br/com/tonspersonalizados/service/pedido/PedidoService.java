@@ -142,7 +142,7 @@ public class PedidoService {
     // LISTAR PEDIDOS
     public List<PedidoResponseDto> listarTodos() {
         return pedidoRepository.findAllByOrderByDataPedidoDesc().stream()
-                .map(pedido -> montarPedidoResponse(pedido, null))
+                .map(pedido -> montarPedidoResponse(pedido, itemPedidoRepository.findByPedidoId(pedido.getId())))
                 .collect(Collectors.toList());
     }
 
@@ -268,7 +268,7 @@ public class PedidoService {
         return pedidoRepository
                 .findByUsuarioClienteIdAndEtapaPedidoNotOrderByDataPedidoDesc(idCliente, EtapaPedido.FINALIZADO.getLabel())
                 .stream()
-                .map(pedido -> montarPedidoResponse(pedido, null))
+                .map(pedido -> montarPedidoResponse(pedido, itemPedidoRepository.findByPedidoId(pedido.getId())))
                 .collect(Collectors.toList());
     }
 
@@ -277,7 +277,7 @@ public class PedidoService {
         return pedidoRepository
                 .findByUsuarioClienteIdAndEtapaPedidoOrderByDataFinalizacaoDesc(idCliente, EtapaPedido.FINALIZADO.getLabel())
                 .stream()
-                .map(pedido -> montarPedidoResponse(pedido, null))
+                .map(pedido -> montarPedidoResponse(pedido, itemPedidoRepository.findByPedidoId(pedido.getId())))
                 .collect(Collectors.toList());
     }
 
