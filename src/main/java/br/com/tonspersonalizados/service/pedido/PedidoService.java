@@ -39,6 +39,7 @@ import br.com.tonspersonalizados.repository.usuarios.EnderecoRepository;
 import br.com.tonspersonalizados.repository.usuarios.UsuarioRepository;
 import br.com.tonspersonalizados.entity.AcaoLog;
 import br.com.tonspersonalizados.service.LogSistemaService;
+import br.com.tonspersonalizados.service.usuarios.CloudinaryService;
 import br.com.tonspersonalizados.dto.pedidos.PedidoLogDto;
 
 @Service
@@ -53,6 +54,7 @@ public class PedidoService {
     private final EnderecoRepository enderecoRepository;
     private final ApplicationEventPublisher eventPublisher;
     private final LogSistemaService logSistemaService;
+    private final CloudinaryService cloudinaryService;
 
     public PedidoService(PedidoRepository pedidoRepository,
                          ItemPedidoRepository itemPedidoRepository,
@@ -62,7 +64,8 @@ public class PedidoService {
                          ProdutoRepository produtoRepository,
                          EnderecoRepository enderecoRepository,
                          ApplicationEventPublisher eventPublisher,
-                         LogSistemaService logSistemaService) {
+                         LogSistemaService logSistemaService,
+                         CloudinaryService cloudinaryService) {
         this.pedidoRepository = pedidoRepository;
         this.itemPedidoRepository = itemPedidoRepository;
         this.caracteristicasRepository = caracteristicasRepository;
@@ -72,6 +75,7 @@ public class PedidoService {
         this.enderecoRepository = enderecoRepository;
         this.eventPublisher = eventPublisher;
         this.logSistemaService = logSistemaService;
+        this.cloudinaryService = cloudinaryService;
     }
 
 
@@ -89,6 +93,12 @@ public class PedidoService {
                     .orElseThrow(() -> new UsuarioNaoEncontradoException("Funcionário não encontrado"));
         }
 
+        Usuario vendedor = cliente;
+        if (request.getIdUsuarioVendedor() != null) {
+            vendedor = usuarioRepository.findById(request.getIdUsuarioVendedor())
+                    .orElseThrow(() -> new UsuarioNaoEncontradoException("Vendedor não encontrado"));
+        }
+
         // 2. Buscar endereço existente
         Endereco endereco = enderecoRepository.findById(request.getIdEndereco())
                 .orElseThrow(() -> new EnderecoNaoEncontradoException("Endereço não encontrado"));
@@ -98,6 +108,7 @@ public class PedidoService {
         pedido.setNumPedido(request.getNumPedido());
         pedido.setUrlFotoArte(request.getUrlFotoArte());
         pedido.setDescricao(request.getDescricao());
+        pedido.setObservacao(request.getObservacao());
         pedido.setEtapaPedido(request.getEtapaPedido());
         pedido.setStatus(request.getStatus());
         pedido.setValorTotal(request.getValorTotal());
@@ -107,7 +118,7 @@ public class PedidoService {
         pedido.setTipoEnvio(request.getTipoEnvio());
         pedido.setEndereco(endereco);
         pedido.setUsuarioCliente(cliente);
-        pedido.setUsuario(cliente);
+        pedido.setUsuario(vendedor);
         pedido.setUsuarioResponsavel(responsavel);
 
         pedido = pedidoRepository.save(pedido);
@@ -289,13 +300,34 @@ public class PedidoService {
                     .orElseThrow(() -> new UsuarioNaoEncontradoException("Funcionário não encontrado"));
         }
 
+        Usuario vendedor = pedido.getUsuario();
+        if (request.getIdUsuarioVendedor() != null) {
+            vendedor = usuarioRepository.findById(request.getIdUsuarioVendedor())
+                    .orElseThrow(() -> new UsuarioNaoEncontradoException("Vendedor não encontrado"));
+        }
+
         Endereco endereco = enderecoRepository.findById(request.getIdEndereco())
                 .orElseThrow(() -> new EnderecoNaoEncontradoException("Endereço não encontrado"));
+
+        // Deletar imagem antiga do Cloudinary se a URL mudou
+        String urlAntiga = pedido.getUrlFotoArte();
+        String urlNova = request.getUrlFotoArte();
+        if (urlAntiga != null && !urlAntiga.isBlank() && !urlAntiga.equals(urlNova)) {
+            try {
+                String publicId = cloudinaryService.extrairPublicId(urlAntiga);
+                if (publicId != null) {
+                    cloudinaryService.deletar(publicId);
+                }
+            } catch (Exception e) {
+                // Não bloqueia a atualização do pedido
+            }
+        }
 
         // Atualizar campos do pedido
         pedido.setNumPedido(request.getNumPedido());
         pedido.setUrlFotoArte(request.getUrlFotoArte());
         pedido.setDescricao(request.getDescricao());
+        pedido.setObservacao(request.getObservacao());
         pedido.setEtapaPedido(request.getEtapaPedido());
         pedido.setStatus(request.getStatus());
         pedido.setValorTotal(request.getValorTotal());
@@ -305,6 +337,7 @@ public class PedidoService {
         pedido.setTipoEnvio(request.getTipoEnvio());
         pedido.setEndereco(endereco);
         pedido.setUsuarioCliente(cliente);
+        pedido.setUsuario(vendedor);
         pedido.setUsuarioResponsavel(responsavel);
 
         pedido = pedidoRepository.save(pedido);
@@ -450,6 +483,7 @@ public class PedidoService {
         response.setDataFinalizacao(pedido.getDataFinalizacao());
         response.setTipoEnvio(pedido.getTipoEnvio());
         response.setNumNotaFiscal(pedido.getNumNotaFiscal());
+        response.setObservacao(pedido.getObservacao());
 
         if (pedido.getUsuarioCliente() != null) {
             ClienteResumoDto clienteResumo = new ClienteResumoDto();
@@ -467,6 +501,13 @@ public class PedidoService {
             funcionarioResumo.setId(pedido.getUsuarioResponsavel().getId());
             funcionarioResumo.setNome(pedido.getUsuarioResponsavel().getNome());
             response.setResponsavel(funcionarioResumo);
+        }
+
+        if (pedido.getUsuario() != null) {
+            FuncionarioResumoDto vendedorResumo = new FuncionarioResumoDto();
+            vendedorResumo.setId(pedido.getUsuario().getId());
+            vendedorResumo.setNome(pedido.getUsuario().getNome());
+            response.setVendedor(vendedorResumo);
         }
 
         if (pedido.getEndereco() != null) {

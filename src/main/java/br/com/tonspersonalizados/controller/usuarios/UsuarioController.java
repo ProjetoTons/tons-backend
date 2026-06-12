@@ -98,6 +98,17 @@ public class UsuarioController {
         return ResponseEntity.ok(usuarioService.listarFuncionarios());
     }
 
+    @Operation(summary = "Buscar clientes", description = "Recupera todos os clientes ativos (não funcionários). Requer autenticação.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Clientes encontrados com sucesso"),
+            @ApiResponse(responseCode = "403", description = "Acesso não autorizado")
+    })
+    @GetMapping("clientes")
+    @SecurityRequirement(name = "Bearer")
+    public ResponseEntity<List<ClienteResponseDto>> buscarTodosClientes() {
+        return ResponseEntity.ok(usuarioService.listarClientes());
+    }
+
     @Operation(summary = "Atualizar usuário", description = "Atualiza os dados de um usuário existente. Requer autenticação.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Usuário atualizado com sucesso"),

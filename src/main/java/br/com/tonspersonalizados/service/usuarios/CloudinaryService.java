@@ -29,4 +29,17 @@ public class CloudinaryService {
             throw new RuntimeException("Erro ao comunicar com Cloudinary", e);
         }
     }
+
+    public String extrairPublicId(String url) {
+        if (url == null || url.isBlank()) return null;
+        try {
+            String[] parts = url.split("/upload/");
+            if (parts.length < 2) return null;
+            String path = parts[1];
+            path = path.replaceFirst("v\\d+/", "");
+            return path.replaceFirst("\\.[^.]+$", "");
+        } catch (Exception e) {
+            return null;
+        }
+    }
 }

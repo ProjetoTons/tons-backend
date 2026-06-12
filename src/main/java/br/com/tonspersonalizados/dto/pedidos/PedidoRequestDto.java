@@ -22,6 +22,8 @@ public class PedidoRequestDto {
 
     private String descricao;
 
+    private String observacao;
+
     @NotBlank(message = "Etapa é obrigatória")
     @Size(max = 45)
     private String etapaPedido;
@@ -52,6 +54,9 @@ public class PedidoRequestDto {
 
     // Opcional na criação — fica null até alguém pegar o pedido
     private Long idUsuarioResponsavel;
+
+    // Vendedor que registrou o pedido (opcional)
+    private Long idUsuarioVendedor;
 
     @NotEmpty(message = "Pedido deve ter ao menos 1 item")
     @Valid
@@ -84,6 +89,14 @@ public class PedidoRequestDto {
 
     public void setDescricao(String descricao) {
         this.descricao = descricao;
+    }
+
+    public String getObservacao() {
+        return observacao;
+    }
+
+    public void setObservacao(String observacao) {
+        this.observacao = observacao;
     }
 
     public String getEtapaPedido() {
@@ -164,6 +177,14 @@ public class PedidoRequestDto {
 
     public void setIdUsuarioResponsavel(Long idUsuarioResponsavel) {
         this.idUsuarioResponsavel = idUsuarioResponsavel;
+    }
+
+    public Long getIdUsuarioVendedor() {
+        return idUsuarioVendedor;
+    }
+
+    public void setIdUsuarioVendedor(Long idUsuarioVendedor) {
+        this.idUsuarioVendedor = idUsuarioVendedor;
     }
 
     public List<ItemPedidoRequestDto> getItens() {

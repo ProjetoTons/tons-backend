@@ -17,8 +17,6 @@ public class ItemPedidoRequestDto {
     @Positive(message = "Quantidade deve ser positiva")
     private Integer quantidade;
 
-    @NotNull(message = "Valor unitário é obrigatório")
-    @Positive(message = "Valor unitário deve ser positivo")
     private BigDecimal valorUnitario;
 
     @NotNull(message = "Características são obrigatórias")

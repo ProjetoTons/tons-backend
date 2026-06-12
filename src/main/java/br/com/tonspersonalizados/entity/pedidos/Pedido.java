@@ -82,6 +82,9 @@ public class Pedido {
     @JoinColumn(name = "fk_usuario_responsavel")
     private Usuario usuarioResponsavel;
 
+    @Column(name = "observacao", columnDefinition = "TEXT")
+    private String observacao;
+
     // Itens do pedido — LAZY para não carregar em listagens
     @OneToMany(mappedBy = "pedido", fetch = FetchType.LAZY)
     private List<ItemPedido> itens;
@@ -144,6 +147,9 @@ public class Pedido {
 
     public Usuario getUsuarioResponsavel() { return usuarioResponsavel; }
     public void setUsuarioResponsavel(Usuario usuarioResponsavel) { this.usuarioResponsavel = usuarioResponsavel; }
+
+    public String getObservacao() { return observacao; }
+    public void setObservacao(String observacao) { this.observacao = observacao; }
 
     public List<ItemPedido> getItens() { return itens; }
     public void setItens(List<ItemPedido> itens) { this.itens = itens; }

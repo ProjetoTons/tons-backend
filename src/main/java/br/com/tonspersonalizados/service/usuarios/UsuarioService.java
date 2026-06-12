@@ -206,6 +206,23 @@ public class UsuarioService {
                 }).toList();
     }
 
+    public List<ClienteResponseDto> listarClientes() {
+        return usuarioRepository.findAllByIsFuncionarioIsFalseAndDataDeDeletadoIsNull()
+                .stream()
+                .map(cliente -> {
+                    ClienteResponseDto dto = new ClienteResponseDto();
+                    dto.setId(cliente.getId());
+                    dto.setNome(cliente.getNome());
+                    dto.setCpf(cliente.getCpf());
+                    dto.setTelefone(cliente.getTelefone());
+                    if (cliente.getEmpresa() != null) {
+                        dto.setNomeEmpresa(cliente.getEmpresa().getRazaoSocial());
+                        dto.setCnpj(cliente.getEmpresa().getCnpj());
+                    }
+                    return dto;
+                }).toList();
+    }
+
     public void atualizar(Long id, UsuarioAtualizarRequestDto usuarioDto) {
         Usuario usuarioExistente = usuarioRepository.findById(id)
                 .orElseThrow(() -> new UsuarioNaoEncontradoException("Usuário não encontrado"));
