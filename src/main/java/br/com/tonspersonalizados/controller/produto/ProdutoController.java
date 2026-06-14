@@ -62,6 +62,13 @@ public class ProdutoController {
 
     }
 
+    @DeleteMapping("/interesse")
+    public ResponseEntity<Void> limparInteresse() {
+        Long userId = (Long) SecurityContextHolder.getContext().getAuthentication().getDetails();
+        produtoService.limparInteresse(userId);
+        return ResponseEntity.noContent().build();
+    }
+
     @GetMapping("/favoritos")
     public ResponseEntity<List<Produto>> listarProdutosFavoritos(){
         Long userId = (Long) SecurityContextHolder.getContext().getAuthentication().getDetails();
@@ -86,5 +93,12 @@ public class ProdutoController {
         produtoService.removerProdutoFavoritado(idProduto, userId);
 
         return ResponseEntity.status(204).build();
+    }
+
+    @DeleteMapping("/favoritos")
+    public ResponseEntity<Void> limparFavoritos() {
+        Long userId = (Long) SecurityContextHolder.getContext().getAuthentication().getDetails();
+        produtoService.limparFavoritos(userId);
+        return ResponseEntity.noContent().build();
     }
 }

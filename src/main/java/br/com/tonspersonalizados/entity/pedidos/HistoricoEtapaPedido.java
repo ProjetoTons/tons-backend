@@ -25,7 +25,7 @@ public class HistoricoEtapaPedido {
 
     // Funcionário responsável por esta etapa
     @ManyToOne
-    @JoinColumn(name = "fk_usuario_etapa_responsavel", nullable = false)
+    @JoinColumn(name = "fk_usuario_etapa_responsavel", nullable = true)
     private Usuario responsavelEtapa;
 
     @Column(name = "data_entrada", nullable = false)

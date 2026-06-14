@@ -296,8 +296,10 @@ public class UsuarioService {
 
         funcionarioExistente.setNome(funcionarioDto.getNome());
 
-        if (!funcionarioDto.getFotoUrl().isBlank() && !funcionarioExistente.getFotoUrl().equals(funcionarioDto.getFotoUrl())){
-            cloudinaryService.deletar(funcionarioExistente.getFotoPublicId());
+        if (funcionarioDto.getFotoUrl() != null && !funcionarioDto.getFotoUrl().isBlank() && !funcionarioDto.getFotoUrl().equals(funcionarioExistente.getFotoUrl())){
+            if (funcionarioExistente.getFotoPublicId() != null && !funcionarioExistente.getFotoPublicId().isBlank()) {
+                cloudinaryService.deletar(funcionarioExistente.getFotoPublicId());
+            }
 
             funcionarioExistente.setFotoUrl(funcionarioDto.getFotoUrl());
             funcionarioExistente.setFotoPublicId(funcionarioDto.getFotoPublicId());

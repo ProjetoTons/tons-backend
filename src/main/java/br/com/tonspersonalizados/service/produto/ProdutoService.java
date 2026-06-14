@@ -125,6 +125,17 @@ public class ProdutoService {
                 logDto, null);
     }
 
+    public void limparFavoritos(Long idUsuario) {
+        Usuario usuario = usuarioService.buscarPorId(idUsuario);
+        usuario.getProdutosFavoritos().clear();
+        usuarioService.atualizar(usuario);
+
+        logSistemaService.registrar(
+                idUsuario, AcaoLog.DESFAVORITAR, "Produto",
+                null, "Lista de favoritos limpa",
+                null, null);
+    }
+
     public List<Produto> listarInteressados(Long idUsuario) {
         Usuario usuario = usuarioService.buscarPorId(idUsuario);
 
@@ -166,5 +177,16 @@ public class ProdutoService {
                 idUsuario, AcaoLog.REMOVER_CARRINHO, "Produto",
                 idProduto, "Produto removido do interesse (carrinho)",
                 logDto, null);
+    }
+
+    public void limparInteresse(Long idUsuario) {
+        Usuario usuario = usuarioService.buscarPorId(idUsuario);
+        usuario.getProdutosInterressados().clear();
+        usuarioService.atualizar(usuario);
+
+        logSistemaService.registrar(
+                idUsuario, AcaoLog.REMOVER_CARRINHO, "Produto",
+                null, "Lista de interesse limpa (carrinho esvaziado)",
+                null, null);
     }
 }
