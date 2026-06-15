@@ -117,49 +117,26 @@ public class DashboardService {
         LocalDateTime inicio = startDate.atStartOfDay();
         LocalDateTime fim = endDate.atTime(23, 59, 59);
 
-        List<Object[]> rows = historicoRepository.countByResponsavelAndEtapa(inicio, fim);
+        List<Object[]> rows = pedidoRepository.countTarefasAtivasPorFuncionario(inicio, fim);
 
-        Map<Long, Map<String, Object>> agrupado = new LinkedHashMap<>();
-
-        for (Object[] row : rows) {
+        return rows.stream().map(row -> {
             Long idFunc = ((Number) row[0]).longValue();
             String nomeFunc = (String) row[1];
-            String etapa = (String) row[2];
-            int count = ((Number) row[3]).intValue();
+            int countDesign = ((Number) row[2]).intValue();
+            int countProducao = ((Number) row[3]).intValue();
+            int countEmbalagem = ((Number) row[4]).intValue();
+            int countLogistica = ((Number) row[5]).intValue();
 
-            agrupado.computeIfAbsent(idFunc, k -> {
-                Map<String, Object> m = new HashMap<>();
-                m.put("nome", nomeFunc);
-                m.put("design", 0);
-                m.put("producao", 0);
-                m.put("embalagem", 0);
-                m.put("logistica", 0);
-                return m;
-            });
-
-            Map<String, Object> func = agrupado.get(idFunc);
-            switch (etapa) {
-                case "Design" -> func.put("design", count);
-                case "Produção" -> func.put("producao", count);
-                case "Embalagem" -> func.put("embalagem", count);
-                case "Logística" -> func.put("logistica", count);
-            }
-        }
-
-        return agrupado.entrySet().stream()
-                .map(entry -> {
-                    Map<String, Object> data = entry.getValue();
-                    return new PerformanceFuncionarioDto(
-                            entry.getKey(),
-                            (String) data.get("nome"),
-                            new PerformanceFuncionarioDto.TarefasDto(
-                                    (int) data.get("design"),
-                                    (int) data.get("producao"),
-                                    (int) data.get("embalagem"),
-                                    (int) data.get("logistica")
-                            )
-                    );
-                })
-                .collect(Collectors.toList());
+            return new PerformanceFuncionarioDto(
+                    idFunc,
+                    nomeFunc,
+                    new PerformanceFuncionarioDto.TarefasDto(
+                            countDesign,
+                            countProducao,
+                            countEmbalagem,
+                            countLogistica
+                    )
+            );
+        }).collect(Collectors.toList());
     }
 }
