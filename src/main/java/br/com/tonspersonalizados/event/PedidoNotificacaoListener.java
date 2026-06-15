@@ -30,8 +30,7 @@ public class PedidoNotificacaoListener {
         String numPedido = pedido.getNumPedido();
 
         String mensagem = "Olá " + cliente.getNome() + "! Seu pedido #" + numPedido
-                + " avançou para: " + event.getEtapa() + " - " + event.getStatus()
-                + ". Acompanhe pelo nosso sistema!";
+                + " avançou para: " + event.getEtapa() + ". Acompanhe pelo nosso sistema em: " + "http://localhost:5173/meus-pedidos";
 
         // WhatsApp
         try {
