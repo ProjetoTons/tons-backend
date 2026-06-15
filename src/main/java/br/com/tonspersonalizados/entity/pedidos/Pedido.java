@@ -49,6 +49,9 @@ public class Pedido {
     @Column(name = "data_pedido", nullable = false)
     private LocalDateTime dataPedido;
 
+    @Column(name = "data_inicio")
+    private LocalDateTime dataInicio;
+
     @Column(name = "data_finalizacao")
     private LocalDateTime dataFinalizacao;
 
@@ -78,6 +81,9 @@ public class Pedido {
     @ManyToOne
     @JoinColumn(name = "fk_usuario_responsavel")
     private Usuario usuarioResponsavel;
+
+    @Column(name = "observacao", columnDefinition = "TEXT")
+    private String observacao;
 
     // Itens do pedido — LAZY para não carregar em listagens
     @OneToMany(mappedBy = "pedido", fetch = FetchType.LAZY)
@@ -118,6 +124,9 @@ public class Pedido {
     public LocalDateTime getDataPedido() { return dataPedido; }
     public void setDataPedido(LocalDateTime dataPedido) { this.dataPedido = dataPedido; }
 
+    public LocalDateTime getDataInicio() { return dataInicio; }
+    public void setDataInicio(LocalDateTime dataInicio) { this.dataInicio = dataInicio; }
+
     public LocalDateTime getDataFinalizacao() { return dataFinalizacao; }
     public void setDataFinalizacao(LocalDateTime dataFinalizacao) { this.dataFinalizacao = dataFinalizacao; }
 
@@ -138,6 +147,9 @@ public class Pedido {
 
     public Usuario getUsuarioResponsavel() { return usuarioResponsavel; }
     public void setUsuarioResponsavel(Usuario usuarioResponsavel) { this.usuarioResponsavel = usuarioResponsavel; }
+
+    public String getObservacao() { return observacao; }
+    public void setObservacao(String observacao) { this.observacao = observacao; }
 
     public List<ItemPedido> getItens() { return itens; }
     public void setItens(List<ItemPedido> itens) { this.itens = itens; }

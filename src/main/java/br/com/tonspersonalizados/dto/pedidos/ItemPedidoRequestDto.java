@@ -8,6 +8,8 @@ import jakarta.validation.constraints.Positive;
 
 public class ItemPedidoRequestDto {
 
+    private Integer idItemPedido; // null = item novo, preenchido = item existente (update)
+
     @NotNull(message = "Produto é obrigatório")
     private Long idProduto;
 
@@ -15,8 +17,6 @@ public class ItemPedidoRequestDto {
     @Positive(message = "Quantidade deve ser positiva")
     private Integer quantidade;
 
-    @NotNull(message = "Valor unitário é obrigatório")
-    @Positive(message = "Valor unitário deve ser positivo")
     private BigDecimal valorUnitario;
 
     @NotNull(message = "Características são obrigatórias")
@@ -27,6 +27,14 @@ public class ItemPedidoRequestDto {
 
 
     // Getters e Setters
+    public Integer getIdItemPedido() {
+        return idItemPedido;
+    }
+
+    public void setIdItemPedido(Integer idItemPedido) {
+        this.idItemPedido = idItemPedido;
+    }
+
     public Long getIdProduto() {
         return idProduto;
     }

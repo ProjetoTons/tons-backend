@@ -6,7 +6,7 @@ import jakarta.validation.constraints.Size;
 public class EnderecoRequestDto {
 
     @NotNull
-    private String logadouro;
+    private String logradouro;
 
     @NotNull
     private String numero;
@@ -33,8 +33,8 @@ public class EnderecoRequestDto {
         return complemento;
     }
 
-    public String getLogadouro() {
-        return logadouro;
+    public String getLogradouro() {
+        return logradouro;
     }
 
     public String getNumero() {

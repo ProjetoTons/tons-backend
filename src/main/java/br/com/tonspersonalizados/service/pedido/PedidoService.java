@@ -1,26 +1,46 @@
 package br.com.tonspersonalizados.service.pedido;
 
-import br.com.tonspersonalizados.dto.pedidos.*;
-import br.com.tonspersonalizados.entity.pedidos.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import br.com.tonspersonalizados.dto.pedidos.CaracteristicasRequestDto;
+import br.com.tonspersonalizados.dto.pedidos.ClienteResumoDto;
+import br.com.tonspersonalizados.dto.pedidos.EtapaRequestDto;
+import br.com.tonspersonalizados.dto.pedidos.FuncionarioResumoDto;
+import br.com.tonspersonalizados.dto.pedidos.HistoricoEtapaResponseDto;
+import br.com.tonspersonalizados.dto.pedidos.ItemPedidoRequestDto;
+import br.com.tonspersonalizados.dto.pedidos.ItemPedidoResponseDto;
+import br.com.tonspersonalizados.dto.pedidos.PedidoRequestDto;
+import br.com.tonspersonalizados.dto.pedidos.PedidoResponseDto;
+import br.com.tonspersonalizados.entity.pedidos.CaracteristicasItemPedido;
+import br.com.tonspersonalizados.entity.pedidos.EtapaPedido;
+import br.com.tonspersonalizados.entity.pedidos.HistoricoEtapaPedido;
+import br.com.tonspersonalizados.entity.pedidos.ItemPedido;
+import br.com.tonspersonalizados.entity.pedidos.Pedido;
 import br.com.tonspersonalizados.entity.produtos.Produto;
 import br.com.tonspersonalizados.entity.usuarios.Endereco;
 import br.com.tonspersonalizados.entity.usuarios.Usuario;
 import br.com.tonspersonalizados.event.EtapaAvancadaEvent;
 import br.com.tonspersonalizados.exception.pedido.PedidoNaoEncontradoException;
+import br.com.tonspersonalizados.exception.produto.ProdutoNaoEncontradoException;
 import br.com.tonspersonalizados.exception.usuarios.EnderecoNaoEncontradoException;
 import br.com.tonspersonalizados.exception.usuarios.UsuarioNaoEncontradoException;
-import br.com.tonspersonalizados.exception.produto.ProdutoNaoEncontradoException;
-import br.com.tonspersonalizados.repository.pedido.*;
+import br.com.tonspersonalizados.repository.pedido.CaracteristicasItemPedidoRepository;
+import br.com.tonspersonalizados.repository.pedido.HistoricoEtapaPedidoRepository;
+import br.com.tonspersonalizados.repository.pedido.ItemPedidoRepository;
+import br.com.tonspersonalizados.repository.pedido.PedidoRepository;
 import br.com.tonspersonalizados.repository.produto.ProdutoRepository;
 import br.com.tonspersonalizados.repository.usuarios.EnderecoRepository;
 import br.com.tonspersonalizados.repository.usuarios.UsuarioRepository;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
+import br.com.tonspersonalizados.entity.AcaoLog;
+import br.com.tonspersonalizados.service.LogSistemaService;
+import br.com.tonspersonalizados.service.usuarios.CloudinaryService;
+import br.com.tonspersonalizados.dto.pedidos.PedidoLogDto;
 
 @Service
 public class PedidoService {
@@ -33,6 +53,8 @@ public class PedidoService {
     private final ProdutoRepository produtoRepository;
     private final EnderecoRepository enderecoRepository;
     private final ApplicationEventPublisher eventPublisher;
+    private final LogSistemaService logSistemaService;
+    private final CloudinaryService cloudinaryService;
 
     public PedidoService(PedidoRepository pedidoRepository,
                          ItemPedidoRepository itemPedidoRepository,
@@ -41,7 +63,9 @@ public class PedidoService {
                          UsuarioRepository usuarioRepository,
                          ProdutoRepository produtoRepository,
                          EnderecoRepository enderecoRepository,
-                         ApplicationEventPublisher eventPublisher) {
+                         ApplicationEventPublisher eventPublisher,
+                         LogSistemaService logSistemaService,
+                         CloudinaryService cloudinaryService) {
         this.pedidoRepository = pedidoRepository;
         this.itemPedidoRepository = itemPedidoRepository;
         this.caracteristicasRepository = caracteristicasRepository;
@@ -50,6 +74,8 @@ public class PedidoService {
         this.produtoRepository = produtoRepository;
         this.enderecoRepository = enderecoRepository;
         this.eventPublisher = eventPublisher;
+        this.logSistemaService = logSistemaService;
+        this.cloudinaryService = cloudinaryService;
     }
 
 
@@ -67,6 +93,12 @@ public class PedidoService {
                     .orElseThrow(() -> new UsuarioNaoEncontradoException("Funcionário não encontrado"));
         }
 
+        Usuario vendedor = cliente;
+        if (request.getIdUsuarioVendedor() != null) {
+            vendedor = usuarioRepository.findById(request.getIdUsuarioVendedor())
+                    .orElseThrow(() -> new UsuarioNaoEncontradoException("Vendedor não encontrado"));
+        }
+
         // 2. Buscar endereço existente
         Endereco endereco = enderecoRepository.findById(request.getIdEndereco())
                 .orElseThrow(() -> new EnderecoNaoEncontradoException("Endereço não encontrado"));
@@ -76,15 +108,17 @@ public class PedidoService {
         pedido.setNumPedido(request.getNumPedido());
         pedido.setUrlFotoArte(request.getUrlFotoArte());
         pedido.setDescricao(request.getDescricao());
+        pedido.setObservacao(request.getObservacao());
         pedido.setEtapaPedido(request.getEtapaPedido());
         pedido.setStatus(request.getStatus());
         pedido.setValorTotal(request.getValorTotal());
         pedido.setDataPedido(request.getDataPedido());
+        pedido.setDataInicio(request.getDataInicio());
         pedido.setDataFinalizacao(request.getDataFinalizacao());
         pedido.setTipoEnvio(request.getTipoEnvio());
         pedido.setEndereco(endereco);
         pedido.setUsuarioCliente(cliente);
-        pedido.setUsuario(cliente);
+        pedido.setUsuario(vendedor);
         pedido.setUsuarioResponsavel(responsavel);
 
         pedido = pedidoRepository.save(pedido);
@@ -96,6 +130,10 @@ public class PedidoService {
             itensSalvos.add(item);
         }
 
+        logSistemaService.registrar(
+                cliente.getId(), AcaoLog.CRIAR, "Pedido",
+                pedido.getId().longValue(), "Novo pedido criado",
+                null, PedidoLogDto.from(pedido));
 
         return montarPedidoResponse(pedido, itensSalvos);
     }
@@ -104,7 +142,7 @@ public class PedidoService {
     // LISTAR PEDIDOS
     public List<PedidoResponseDto> listarTodos() {
         return pedidoRepository.findAllByOrderByDataPedidoDesc().stream()
-                .map(pedido -> montarPedidoResponse(pedido, null))
+                .map(pedido -> montarPedidoResponse(pedido, itemPedidoRepository.findByPedidoId(pedido.getId())))
                 .collect(Collectors.toList());
     }
 
@@ -136,6 +174,8 @@ public class PedidoService {
 
         Pedido pedido = pedidoRepository.findById(idPedido)
                 .orElseThrow(() -> new PedidoNaoEncontradoException("Pedido não encontrado"));
+
+        PedidoLogDto valorAnterior = PedidoLogDto.from(pedido);
 
         // Se a etapa principal mudou → responsável reseta (null)
         boolean etapaMudou = !request.getEtapa().equals(pedido.getEtapaPedido());
@@ -174,6 +214,11 @@ public class PedidoService {
             eventPublisher.publishEvent(new EtapaAvancadaEvent(pedido, request.getEtapa(), request.getStatus()));
         }
 
+        logSistemaService.registrar(
+                responsavelEtapa.getId(), AcaoLog.ATUALIZAR, "Pedido",
+                pedido.getId().longValue(), "Etapa do pedido alterada para " + request.getEtapa() + " - " + request.getStatus(),
+                valorAnterior, PedidoLogDto.from(pedido));
+
         return montarPedidoResponse(pedido, null);
     }
 
@@ -184,11 +229,18 @@ public class PedidoService {
         Pedido pedido = pedidoRepository.findById(idPedido)
                 .orElseThrow(() -> new PedidoNaoEncontradoException("Pedido não encontrado"));
 
+        PedidoLogDto valorAnterior = PedidoLogDto.from(pedido);
+
         Usuario responsavel = usuarioRepository.findById(idResponsavel)
                 .orElseThrow(() -> new UsuarioNaoEncontradoException("Funcionário não encontrado"));
 
         pedido.setUsuarioResponsavel(responsavel);
         pedidoRepository.save(pedido);
+
+        logSistemaService.registrar(
+                idResponsavel, AcaoLog.ATUALIZAR, "Pedido",
+                pedido.getId().longValue(), "Responsável atribuído ao pedido: " + responsavel.getNome(),
+                valorAnterior, PedidoLogDto.from(pedido));
 
         return montarPedidoResponse(pedido, null);
     }
@@ -216,7 +268,7 @@ public class PedidoService {
         return pedidoRepository
                 .findByUsuarioClienteIdAndEtapaPedidoNotOrderByDataPedidoDesc(idCliente, EtapaPedido.FINALIZADO.getLabel())
                 .stream()
-                .map(pedido -> montarPedidoResponse(pedido, null))
+                .map(pedido -> montarPedidoResponse(pedido, itemPedidoRepository.findByPedidoId(pedido.getId())))
                 .collect(Collectors.toList());
     }
 
@@ -225,8 +277,169 @@ public class PedidoService {
         return pedidoRepository
                 .findByUsuarioClienteIdAndEtapaPedidoOrderByDataFinalizacaoDesc(idCliente, EtapaPedido.FINALIZADO.getLabel())
                 .stream()
-                .map(pedido -> montarPedidoResponse(pedido, null))
+                .map(pedido -> montarPedidoResponse(pedido, itemPedidoRepository.findByPedidoId(pedido.getId())))
                 .collect(Collectors.toList());
+    }
+
+
+    // ATUALIZAR PEDIDO COMPLETO
+    @Transactional
+    public PedidoResponseDto atualizarPedido(Integer idPedido, PedidoRequestDto request) {
+        Pedido pedido = pedidoRepository.findById(idPedido)
+                .orElseThrow(() -> new PedidoNaoEncontradoException("Pedido não encontrado"));
+
+        PedidoLogDto valorAnterior = PedidoLogDto.from(pedido);
+
+        // Validar pessoas
+        Usuario cliente = usuarioRepository.findById(request.getIdUsuarioCliente())
+                .orElseThrow(() -> new UsuarioNaoEncontradoException("Cliente não encontrado"));
+
+        Usuario responsavel = null;
+        if (request.getIdUsuarioResponsavel() != null) {
+            responsavel = usuarioRepository.findById(request.getIdUsuarioResponsavel())
+                    .orElseThrow(() -> new UsuarioNaoEncontradoException("Funcionário não encontrado"));
+        }
+
+        Usuario vendedor = pedido.getUsuario();
+        if (request.getIdUsuarioVendedor() != null) {
+            vendedor = usuarioRepository.findById(request.getIdUsuarioVendedor())
+                    .orElseThrow(() -> new UsuarioNaoEncontradoException("Vendedor não encontrado"));
+        }
+
+        Endereco endereco = enderecoRepository.findById(request.getIdEndereco())
+                .orElseThrow(() -> new EnderecoNaoEncontradoException("Endereço não encontrado"));
+
+        // Deletar imagem antiga do Cloudinary se a URL mudou
+        String urlAntiga = pedido.getUrlFotoArte();
+        String urlNova = request.getUrlFotoArte();
+        if (urlAntiga != null && !urlAntiga.isBlank() && !urlAntiga.equals(urlNova)) {
+            try {
+                String publicId = cloudinaryService.extrairPublicId(urlAntiga);
+                if (publicId != null) {
+                    cloudinaryService.deletar(publicId);
+                }
+            } catch (Exception e) {
+                // Não bloqueia a atualização do pedido
+            }
+        }
+
+        // Atualizar campos do pedido
+        pedido.setNumPedido(request.getNumPedido());
+        pedido.setUrlFotoArte(request.getUrlFotoArte());
+        pedido.setDescricao(request.getDescricao());
+        pedido.setObservacao(request.getObservacao());
+        pedido.setEtapaPedido(request.getEtapaPedido());
+        pedido.setStatus(request.getStatus());
+        pedido.setValorTotal(request.getValorTotal());
+        pedido.setDataPedido(request.getDataPedido());
+        pedido.setDataInicio(request.getDataInicio());
+        pedido.setDataFinalizacao(request.getDataFinalizacao());
+        pedido.setTipoEnvio(request.getTipoEnvio());
+        pedido.setEndereco(endereco);
+        pedido.setUsuarioCliente(cliente);
+        pedido.setUsuario(vendedor);
+        pedido.setUsuarioResponsavel(responsavel);
+
+        pedido = pedidoRepository.save(pedido);
+
+        // Buscar itens existentes no banco
+        List<ItemPedido> itensExistentes = itemPedidoRepository.findByPedidoId(idPedido);
+
+        // IDs dos itens que vieram no request (itens que devem continuar)
+        List<Integer> idsRecebidos = request.getItens().stream()
+                .map(ItemPedidoRequestDto::getIdItemPedido)
+                .filter(id -> id != null)
+                .collect(Collectors.toList());
+
+        // 1. Remover itens que NÃO vieram no request (foram excluídos pelo frontend)
+        List<ItemPedido> itensParaRemover = itensExistentes.stream()
+                .filter(item -> !idsRecebidos.contains(item.getId()))
+                .collect(Collectors.toList());
+
+        List<CaracteristicasItemPedido> caracteristicasParaRemover = new ArrayList<>();
+        for (ItemPedido itemRemover : itensParaRemover) {
+            if (itemRemover.getCaracteristicas() != null) {
+                caracteristicasParaRemover.add(itemRemover.getCaracteristicas());
+            }
+        }
+        itemPedidoRepository.deleteAll(itensParaRemover);
+        itemPedidoRepository.flush();
+        caracteristicasRepository.deleteAll(caracteristicasParaRemover);
+
+        // 2. Atualizar itens existentes e criar novos
+        List<ItemPedido> itensSalvos = new ArrayList<>();
+        for (ItemPedidoRequestDto itemDto : request.getItens()) {
+            if (itemDto.getIdItemPedido() != null) {
+                // Item existente → atualizar
+                ItemPedido itemExistente = itemPedidoRepository.findById(itemDto.getIdItemPedido())
+                        .orElseThrow(() -> new PedidoNaoEncontradoException("Item do pedido não encontrado"));
+
+                Produto produto = produtoRepository.findById(itemDto.getIdProduto())
+                        .orElseThrow(() -> new ProdutoNaoEncontradoException("Produto não encontrado"));
+
+                itemExistente.setProduto(produto);
+                itemExistente.setQuantidade(itemDto.getQuantidade());
+                itemExistente.setValorUnitario(itemDto.getValorUnitario());
+
+                // Atualizar características existentes
+                CaracteristicasItemPedido caract = itemExistente.getCaracteristicas();
+                caract.setDescricaoArte(itemDto.getCaracteristicas().getDescricaoArte());
+                caract.setCorEstampa(itemDto.getCaracteristicas().getCorEstampa());
+                caract.setCorMaterial(itemDto.getCaracteristicas().getCorMaterial());
+                caract.setComposicao(itemDto.getCaracteristicas().getComposicao());
+                caract.setTamanho(itemDto.getCaracteristicas().getTamanho());
+                caract.setFornecedor(itemDto.getCaracteristicas().getFornecedor());
+                caracteristicasRepository.save(caract);
+
+                itensSalvos.add(itemPedidoRepository.save(itemExistente));
+            } else {
+                // Item novo → criar
+                ItemPedido item = criarItemPedido(pedido, itemDto);
+                itensSalvos.add(item);
+            }
+        }
+
+        Long autorId = (responsavel != null) ? responsavel.getId() : cliente.getId();
+
+        logSistemaService.registrar(
+                autorId, AcaoLog.ATUALIZAR, "Pedido",
+                pedido.getId().longValue(), "Pedido atualizado",
+                valorAnterior, PedidoLogDto.from(pedido));
+
+        return montarPedidoResponse(pedido, itensSalvos);
+    }
+
+
+    // CANCELAR PEDIDO (soft delete)
+    @Transactional
+    public PedidoResponseDto cancelarPedido(Integer idPedido, String motivo) {
+        Pedido pedido = pedidoRepository.findById(idPedido)
+                .orElseThrow(() -> new PedidoNaoEncontradoException("Pedido não encontrado"));
+
+        if ("Cancelado".equals(pedido.getEtapaPedido())) {
+            throw new IllegalStateException("Pedido já está cancelado");
+        }
+
+        PedidoLogDto valorAnterior = PedidoLogDto.from(pedido);
+
+        // Mudar etapa para "Cancelado"
+        pedido.setEtapaPedido("Cancelado");
+        pedido.setStatus("Cancelado");
+
+        // Concatenar motivo na descrição
+        String descricaoAtual = pedido.getDescricao() != null ? pedido.getDescricao() : "";
+        pedido.setDescricao(descricaoAtual + "\n\n[CANCELADO] " + motivo);
+
+        pedidoRepository.save(pedido);
+
+        Long autorId = pedido.getUsuarioCliente() != null ? pedido.getUsuarioCliente().getId() : null;
+
+        logSistemaService.registrar(
+                autorId, AcaoLog.ATUALIZAR, "Pedido",
+                pedido.getId().longValue(), "Pedido cancelado. Motivo: " + motivo,
+                valorAnterior, PedidoLogDto.from(pedido));
+
+        return montarPedidoResponse(pedido, null);
     }
 
 
@@ -266,9 +479,11 @@ public class PedidoService {
         response.setStatus(pedido.getStatus());
         response.setValorTotal(pedido.getValorTotal());
         response.setDataPedido(pedido.getDataPedido());
+        response.setDataInicio(pedido.getDataInicio());
         response.setDataFinalizacao(pedido.getDataFinalizacao());
         response.setTipoEnvio(pedido.getTipoEnvio());
         response.setNumNotaFiscal(pedido.getNumNotaFiscal());
+        response.setObservacao(pedido.getObservacao());
 
         if (pedido.getUsuarioCliente() != null) {
             ClienteResumoDto clienteResumo = new ClienteResumoDto();
@@ -286,6 +501,13 @@ public class PedidoService {
             funcionarioResumo.setId(pedido.getUsuarioResponsavel().getId());
             funcionarioResumo.setNome(pedido.getUsuarioResponsavel().getNome());
             response.setResponsavel(funcionarioResumo);
+        }
+
+        if (pedido.getUsuario() != null) {
+            FuncionarioResumoDto vendedorResumo = new FuncionarioResumoDto();
+            vendedorResumo.setId(pedido.getUsuario().getId());
+            vendedorResumo.setNome(pedido.getUsuario().getNome());
+            response.setVendedor(vendedorResumo);
         }
 
         if (pedido.getEndereco() != null) {

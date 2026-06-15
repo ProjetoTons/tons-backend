@@ -1,16 +1,25 @@
 package br.com.tonspersonalizados.service.dashboard;
 
-import br.com.tonspersonalizados.dto.dashboard.*;
-import br.com.tonspersonalizados.entity.pedidos.Pedido;
-import br.com.tonspersonalizados.repository.pedido.HistoricoEtapaPedidoRepository;
-import br.com.tonspersonalizados.repository.pedido.PedidoRepository;
-import br.com.tonspersonalizados.service.usuarios.EmpresaService;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
+
 import org.springframework.stereotype.Service;
+
+import br.com.tonspersonalizados.dto.dashboard.GraficoEtapaDto;
+import br.com.tonspersonalizados.dto.dashboard.KpisDashboardDto;
+import br.com.tonspersonalizados.dto.dashboard.PerformanceFuncionarioDto;
+import br.com.tonspersonalizados.dto.dashboard.SubEtapaDto;
+import br.com.tonspersonalizados.entity.pedidos.Pedido;
+import br.com.tonspersonalizados.entity.usuarios.Empresa;
+import br.com.tonspersonalizados.repository.pedido.HistoricoEtapaPedidoRepository;
+import br.com.tonspersonalizados.repository.pedido.PedidoRepository;
+import br.com.tonspersonalizados.service.usuarios.EmpresaService;
 
 @Service
 public class DashboardService {
@@ -41,13 +50,26 @@ public class DashboardService {
                 .filter(p -> "Aguardando arte".equalsIgnoreCase(p.getStatus()))
                 .count();
 
-        int enviadoRetirada = (int) pedidos.stream()
-                .filter(p -> "Enviado".equalsIgnoreCase(p.getStatus())
-                        || "Aguardando retirada".equalsIgnoreCase(p.getStatus()))
+        int aguardandoRetirada = (int) pedidos.stream()
+                .filter(p -> "Aguardando retirada".equalsIgnoreCase(p.getStatus()))
                 .count();
 
-        return new KpisDashboardDto(totalValor, aguardandoArte, enviadoRetirada,
-                empresaService.buscarGrafica().getMetaSemanal(), pedidos.size());
+        int enviada = (int) pedidos.stream()
+                .filter(p -> "Enviado".equalsIgnoreCase(p.getStatus()))
+                .count();
+
+        BigDecimal metaSemanal = BigDecimal.ZERO;
+        try {
+            Empresa empresa = empresaService.buscarGrafica();
+            if (empresa.getMetaSemanal() != null) {
+                metaSemanal = empresa.getMetaSemanal();
+            }
+        } catch (Exception e) {
+            // empresa gráfica não cadastrada ainda
+        }
+
+        return new KpisDashboardDto(totalValor, aguardandoArte, aguardandoRetirada, enviada,
+                metaSemanal, pedidos.size());
     }
 
     public List<GraficoEtapaDto> graficoEtapas(LocalDate startDate, LocalDate endDate) {
@@ -57,6 +79,7 @@ public class DashboardService {
         List<Pedido> pedidos = pedidoRepository.findByDataPedidoBetween(inicio, fim);
 
         Map<String, List<Pedido>> porEtapa = pedidos.stream()
+                .filter(p -> p.getEtapaPedido() != null)
                 .collect(Collectors.groupingBy(Pedido::getEtapaPedido));
 
         return porEtapa.entrySet().stream()
@@ -94,49 +117,26 @@ public class DashboardService {
         LocalDateTime inicio = startDate.atStartOfDay();
         LocalDateTime fim = endDate.atTime(23, 59, 59);
 
-        List<Object[]> rows = historicoRepository.countByResponsavelAndEtapa(inicio, fim);
+        List<Object[]> rows = pedidoRepository.countTarefasAtivasPorFuncionario(inicio, fim);
 
-        Map<Long, Map<String, Object>> agrupado = new LinkedHashMap<>();
-
-        for (Object[] row : rows) {
+        return rows.stream().map(row -> {
             Long idFunc = ((Number) row[0]).longValue();
             String nomeFunc = (String) row[1];
-            String etapa = (String) row[2];
-            int count = ((Number) row[3]).intValue();
+            int countDesign = ((Number) row[2]).intValue();
+            int countProducao = ((Number) row[3]).intValue();
+            int countEmbalagem = ((Number) row[4]).intValue();
+            int countLogistica = ((Number) row[5]).intValue();
 
-            agrupado.computeIfAbsent(idFunc, k -> {
-                Map<String, Object> m = new HashMap<>();
-                m.put("nome", nomeFunc);
-                m.put("design", 0);
-                m.put("producao", 0);
-                m.put("embalagem", 0);
-                m.put("logistica", 0);
-                return m;
-            });
-
-            Map<String, Object> func = agrupado.get(idFunc);
-            switch (etapa) {
-                case "Design" -> func.put("design", count);
-                case "Produção" -> func.put("producao", count);
-                case "Embalagem" -> func.put("embalagem", count);
-                case "Logística" -> func.put("logistica", count);
-            }
-        }
-
-        return agrupado.entrySet().stream()
-                .map(entry -> {
-                    Map<String, Object> data = entry.getValue();
-                    return new PerformanceFuncionarioDto(
-                            entry.getKey(),
-                            (String) data.get("nome"),
-                            new PerformanceFuncionarioDto.TarefasDto(
-                                    (int) data.get("design"),
-                                    (int) data.get("producao"),
-                                    (int) data.get("embalagem"),
-                                    (int) data.get("logistica")
-                            )
-                    );
-                })
-                .collect(Collectors.toList());
+            return new PerformanceFuncionarioDto(
+                    idFunc,
+                    nomeFunc,
+                    new PerformanceFuncionarioDto.TarefasDto(
+                            countDesign,
+                            countProducao,
+                            countEmbalagem,
+                            countLogistica
+                    )
+            );
+        }).collect(Collectors.toList());
     }
 }

@@ -9,6 +9,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 
 public class PedidoRequestDto {
@@ -22,6 +23,8 @@ public class PedidoRequestDto {
 
     private String descricao;
 
+    private String observacao;
+
     @NotBlank(message = "Etapa é obrigatória")
     @Size(max = 45)
     private String etapaPedido;
@@ -31,11 +34,13 @@ public class PedidoRequestDto {
     private String status;
 
     @NotNull(message = "Valor total é obrigatório")
-    @Positive(message = "Valor total deve ser positivo")
+    @PositiveOrZero(message = "Valor total não pode ser negativo")
     private BigDecimal valorTotal;
 
     @NotNull(message = "Data do pedido é obrigatória")
     private LocalDateTime dataPedido;
+
+    private LocalDateTime dataInicio;
 
     private LocalDateTime dataFinalizacao;
 
@@ -50,6 +55,9 @@ public class PedidoRequestDto {
 
     // Opcional na criação — fica null até alguém pegar o pedido
     private Long idUsuarioResponsavel;
+
+    // Vendedor que registrou o pedido (opcional)
+    private Long idUsuarioVendedor;
 
     @NotEmpty(message = "Pedido deve ter ao menos 1 item")
     @Valid
@@ -84,6 +92,14 @@ public class PedidoRequestDto {
         this.descricao = descricao;
     }
 
+    public String getObservacao() {
+        return observacao;
+    }
+
+    public void setObservacao(String observacao) {
+        this.observacao = observacao;
+    }
+
     public String getEtapaPedido() {
         return etapaPedido;
     }
@@ -114,6 +130,14 @@ public class PedidoRequestDto {
 
     public void setDataPedido(LocalDateTime dataPedido) {
         this.dataPedido = dataPedido;
+    }
+
+    public LocalDateTime getDataInicio() {
+        return dataInicio;
+    }
+
+    public void setDataInicio(LocalDateTime dataInicio) {
+        this.dataInicio = dataInicio;
     }
 
     public LocalDateTime getDataFinalizacao() {
@@ -154,6 +178,14 @@ public class PedidoRequestDto {
 
     public void setIdUsuarioResponsavel(Long idUsuarioResponsavel) {
         this.idUsuarioResponsavel = idUsuarioResponsavel;
+    }
+
+    public Long getIdUsuarioVendedor() {
+        return idUsuarioVendedor;
+    }
+
+    public void setIdUsuarioVendedor(Long idUsuarioVendedor) {
+        this.idUsuarioVendedor = idUsuarioVendedor;
     }
 
     public List<ItemPedidoRequestDto> getItens() {

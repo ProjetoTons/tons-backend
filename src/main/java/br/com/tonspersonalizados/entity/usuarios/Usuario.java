@@ -37,7 +37,7 @@ public class Usuario {
     private LocalDate dataNascimento;
 
     @CreationTimestamp
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime dataDeCadastro;
 
     private LocalDateTime dataDeDeletado;

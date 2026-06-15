@@ -1,9 +1,10 @@
 package br.com.tonspersonalizados.dto.pedidos;
 
-import br.com.tonspersonalizados.entity.usuarios.Endereco;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+
+import br.com.tonspersonalizados.entity.usuarios.Endereco;
 
 public class PedidoResponseDto {
     private Integer idPedido;
@@ -14,11 +15,14 @@ public class PedidoResponseDto {
     private String status;
     private BigDecimal valorTotal;
     private LocalDateTime dataPedido;
+    private LocalDateTime dataInicio;
     private LocalDateTime dataFinalizacao;
     private String tipoEnvio;
     private String numNotaFiscal;
+    private String observacao;
     private ClienteResumoDto cliente;
     private FuncionarioResumoDto responsavel;
+    private FuncionarioResumoDto vendedor;
     private Endereco endereco;
     private List<ItemPedidoResponseDto> itens;
 
@@ -91,6 +95,14 @@ public class PedidoResponseDto {
         this.dataPedido = dataPedido;
     }
 
+    public LocalDateTime getDataInicio() {
+        return dataInicio;
+    }
+
+    public void setDataInicio(LocalDateTime dataInicio) {
+        this.dataInicio = dataInicio;
+    }
+
     public LocalDateTime getDataFinalizacao() {
         return dataFinalizacao;
     }
@@ -115,6 +127,14 @@ public class PedidoResponseDto {
         this.numNotaFiscal = numNotaFiscal;
     }
 
+    public String getObservacao() {
+        return observacao;
+    }
+
+    public void setObservacao(String observacao) {
+        this.observacao = observacao;
+    }
+
     public ClienteResumoDto getCliente() {
         return cliente;
     }
@@ -129,6 +149,14 @@ public class PedidoResponseDto {
 
     public void setResponsavel(FuncionarioResumoDto responsavel) {
         this.responsavel = responsavel;
+    }
+
+    public FuncionarioResumoDto getVendedor() {
+        return vendedor;
+    }
+
+    public void setVendedor(FuncionarioResumoDto vendedor) {
+        this.vendedor = vendedor;
     }
 
     public Endereco getEndereco() {

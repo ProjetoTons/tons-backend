@@ -15,8 +15,7 @@ public class CategoriaProdutoService {
         this.categoriaReposirory = categoriaReposirory;
     }
 
-
-    //listar sessão
+    // listar sessão
     public List<CategoriaProduto> listarTodos() {
         return categoriaReposirory.findAll();
 

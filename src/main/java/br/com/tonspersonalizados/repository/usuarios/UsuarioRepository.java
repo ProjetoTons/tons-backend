@@ -15,6 +15,8 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
 
     List<Usuario> findAllByIsFuncionarioIsTrueAndDataDeDeletadoIsNull();
 
+    List<Usuario> findAllByIsFuncionarioIsFalseAndDataDeDeletadoIsNull();
+
     Optional<Usuario> findByCpfAndIsFuncionarioIsFalseAndDataDeDeletadoIsNull(String cpf);
 
 }

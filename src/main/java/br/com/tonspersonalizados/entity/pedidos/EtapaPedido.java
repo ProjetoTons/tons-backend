@@ -27,6 +27,7 @@ public enum EtapaPedido {
     )),
 
     LOGISTICA("Logística", List.of(
+            "Não Iniciado",
             "Enviado",
             "Aguardando retirada"
     )),

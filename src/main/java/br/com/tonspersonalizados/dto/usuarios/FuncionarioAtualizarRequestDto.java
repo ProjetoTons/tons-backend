@@ -26,7 +26,6 @@ public class FuncionarioAtualizarRequestDto {
     @URL
     private String fotoUrl;
 
-    @NotEmpty
     private String fotoPublicId;
 
 

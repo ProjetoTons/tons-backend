@@ -5,7 +5,10 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import br.com.tonspersonalizados.dto.usuarios.*;
+import br.com.tonspersonalizados.entity.AcaoLog;
+import br.com.tonspersonalizados.service.LogSistemaService;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -34,6 +37,7 @@ public class UsuarioService {
     private final PasswordEncoder passwordEncoder;
     private final WhatsAppService whatsAppService;
     private final CloudinaryService cloudinaryService;
+    private final LogSistemaService logSistemaService;
 
     @Value("${tons.cnpj}")
     private String cnpjTons;
@@ -45,7 +49,8 @@ public class UsuarioService {
             PasswordEncoder passwordEncoder,
             EnderecoRepository enderecoRepository,
             WhatsAppService whatsAppService,
-            CloudinaryService cloudinaryService) {
+            CloudinaryService cloudinaryService,
+            @Lazy LogSistemaService logSistemaService) {
         this.acessoService = acessoService;
         this.usuarioRepository = usuarioRepository;
         this.passwordEncoder = passwordEncoder;
@@ -53,6 +58,7 @@ public class UsuarioService {
         this.enderecoRepository = enderecoRepository;
         this.whatsAppService = whatsAppService;
         this.cloudinaryService = cloudinaryService;
+        this.logSistemaService = logSistemaService;
 
     }
 
@@ -86,8 +92,13 @@ public class UsuarioService {
             usuarioRepository.save(usuario);
         }
         catch (DataIntegrityViolationException e){
-            // Insert violou a chave unique para CPF
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Dados inválidos.");
+            String mensagem = e.getMessage() != null ? e.getMessage().toLowerCase() : "";
+            if (mensagem.contains("cpf")) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "CPF já cadastrado no sistema.");
+            } else if (mensagem.contains("email")) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "E-mail já cadastrado no sistema.");
+            }
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Dados inválidos. Verifique as informações e tente novamente.");
         }
 
         try {
@@ -95,6 +106,11 @@ public class UsuarioService {
         } catch (Exception e) {
             // Não impede o cadastro se o WhatsApp falhar
         }
+
+        logSistemaService.registrar(
+                usuario.getId(), AcaoLog.CRIAR, "Usuario",
+                usuario.getId(), "Novo usuário criado",
+                null, UsuarioLogDto.from(usuario));
     }
 
     public void cadastrarFuncionario(FuncionarioRequestDto funcionarioDto) {
@@ -120,6 +136,11 @@ public class UsuarioService {
         funcionario.setAcessos(acessos);
 
         usuarioRepository.save(funcionario);
+
+        logSistemaService.registrar(
+                funcionario.getId(), AcaoLog.CRIAR, "Funcionario",
+                funcionario.getId(), "Novo funcionário criado",
+                null, UsuarioLogDto.from(funcionario));
     }
 
     public Usuario buscarPorEmail(String email) {
@@ -190,9 +211,28 @@ public class UsuarioService {
                 }).toList();
     }
 
+    public List<ClienteResponseDto> listarClientes() {
+        return usuarioRepository.findAllByIsFuncionarioIsFalseAndDataDeDeletadoIsNull()
+                .stream()
+                .map(cliente -> {
+                    ClienteResponseDto dto = new ClienteResponseDto();
+                    dto.setId(cliente.getId());
+                    dto.setNome(cliente.getNome());
+                    dto.setCpf(cliente.getCpf());
+                    dto.setTelefone(cliente.getTelefone());
+                    if (cliente.getEmpresa() != null) {
+                        dto.setNomeEmpresa(cliente.getEmpresa().getRazaoSocial());
+                        dto.setCnpj(cliente.getEmpresa().getCnpj());
+                    }
+                    return dto;
+                }).toList();
+    }
+
     public void atualizar(Long id, UsuarioAtualizarRequestDto usuarioDto) {
         Usuario usuarioExistente = usuarioRepository.findById(id)
                 .orElseThrow(() -> new UsuarioNaoEncontradoException("Usuário não encontrado"));
+
+        UsuarioLogDto valorAnterior = UsuarioLogDto.from(usuarioExistente);
 
         usuarioExistente.setNome(usuarioDto.getNome());
         usuarioExistente.setTelefone(usuarioDto.getTelefone());
@@ -215,7 +255,7 @@ public class UsuarioService {
             EnderecoRequestDto endDto = usuarioDto.getEndereco();
             if (usuarioExistente.getEndereco() != null) {
                 Endereco endExistente = usuarioExistente.getEndereco();
-                endExistente.setLogradouro(endDto.getLogadouro());
+                endExistente.setLogradouro(endDto.getLogradouro());
                 endExistente.setNumero(endDto.getNumero());
                 endExistente.setCep(endDto.getCep());
                 endExistente.setComplemento(endDto.getComplemento());
@@ -225,7 +265,7 @@ public class UsuarioService {
             } else {
                 Endereco novoEndereco = new Endereco();
                 novoEndereco.setUsuario(usuarioExistente);
-                novoEndereco.setLogradouro(endDto.getLogadouro());
+                novoEndereco.setLogradouro(endDto.getLogradouro());
                 novoEndereco.setNumero(endDto.getNumero());
                 novoEndereco.setCep(endDto.getCep());
                 novoEndereco.setComplemento(endDto.getComplemento());
@@ -237,6 +277,11 @@ public class UsuarioService {
         }
 
         usuarioRepository.save(usuarioExistente);
+
+        logSistemaService.registrar(
+                usuarioExistente.getId(), AcaoLog.ATUALIZAR, "Usuario",
+                usuarioExistente.getId(), "Usuário atualizado",
+                valorAnterior, UsuarioLogDto.from(usuarioExistente));
     }
 
     public void atualizar(Usuario usuario) {
@@ -247,10 +292,14 @@ public class UsuarioService {
         Usuario funcionarioExistente = usuarioRepository.findById(id)
                 .orElseThrow(() -> new UsuarioNaoEncontradoException("Funcionário não encontrado"));
 
+        UsuarioLogDto valorAnterior = UsuarioLogDto.from(funcionarioExistente);
+
         funcionarioExistente.setNome(funcionarioDto.getNome());
 
-        if (!funcionarioDto.getFotoUrl().isBlank() && !funcionarioExistente.getFotoUrl().equals(funcionarioDto.getFotoUrl())){
-            cloudinaryService.deletar(funcionarioExistente.getFotoPublicId());
+        if (funcionarioDto.getFotoUrl() != null && !funcionarioDto.getFotoUrl().isBlank() && !funcionarioDto.getFotoUrl().equals(funcionarioExistente.getFotoUrl())){
+            if (funcionarioExistente.getFotoPublicId() != null && !funcionarioExistente.getFotoPublicId().isBlank()) {
+                cloudinaryService.deletar(funcionarioExistente.getFotoPublicId());
+            }
 
             funcionarioExistente.setFotoUrl(funcionarioDto.getFotoUrl());
             funcionarioExistente.setFotoPublicId(funcionarioDto.getFotoPublicId());
@@ -263,6 +312,11 @@ public class UsuarioService {
         funcionarioExistente.setAcessos(acessos);
 
         usuarioRepository.save(funcionarioExistente);
+
+        logSistemaService.registrar(
+                funcionarioExistente.getId(), AcaoLog.ATUALIZAR, "Funcionario",
+                funcionarioExistente.getId(), "Funcionário atualizado",
+                valorAnterior, UsuarioLogDto.from(funcionarioExistente));
     }
 
     public void deletar(Long id) {
@@ -270,9 +324,18 @@ public class UsuarioService {
         Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new UsuarioNaoEncontradoException("Usuário não encontrado"));
 
+        String entidade = Boolean.TRUE.equals(usuario.getFuncionario()) ? "Funcionario" : "Usuario";
+        String descricao = Boolean.TRUE.equals(usuario.getFuncionario()) ? "Funcionário removido" : "Usuário removido";
+        UsuarioLogDto anterior = UsuarioLogDto.from(usuario);
+
         usuario.setDataDeDeletado(LocalDateTime.now());
 
         usuarioRepository.save(usuario);
+
+        logSistemaService.registrar(
+                usuario.getId(), AcaoLog.DELETAR, entidade,
+                usuario.getId(), descricao,
+                anterior, null);
     }
 
 
@@ -283,7 +346,7 @@ public class UsuarioService {
 
         Endereco endereco = new Endereco();
         endereco.setUsuario(usuario);
-        endereco.setLogradouro(enderecoDto.getLogadouro());
+        endereco.setLogradouro(enderecoDto.getLogradouro());
         endereco.setNumero(enderecoDto.getNumero());
         endereco.setCep(enderecoDto.getCep());
         endereco.setComplemento(enderecoDto.getComplemento());
@@ -310,7 +373,7 @@ public class UsuarioService {
         Endereco enderecoExistente = enderecoRepository.findByUsuarioId(id)
                 .orElseThrow(() -> new EnderecoNaoEncontradoException("Endereço não encontrado"));
 
-        enderecoExistente.setLogradouro(enderecoDto.getLogadouro());
+        enderecoExistente.setLogradouro(enderecoDto.getLogradouro());
         enderecoExistente.setNumero(enderecoDto.getNumero());
         enderecoExistente.setCep(enderecoDto.getCep());
         enderecoExistente.setComplemento(enderecoDto.getComplemento());
