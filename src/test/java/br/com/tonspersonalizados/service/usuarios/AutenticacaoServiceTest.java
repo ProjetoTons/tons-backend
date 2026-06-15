@@ -45,6 +45,7 @@ class AutenticacaoServiceTest {
     @Mock private NotificacaoService notificacaoService;
     @Mock private GerenciadorTokenJwt gerenciadorTokenJwt;
     @Mock private AuthenticationManager authenticationManager;
+    @Mock private br.com.tonspersonalizados.service.LogSistemaService logSistemaService;
     @InjectMocks private AutenticacaoService autenticacaoService;
 
     private Usuario usuarioCompleto() {

@@ -56,6 +56,7 @@ class UsuarioServiceTest {
     @Mock private PasswordEncoder passwordEncoder;
     @Mock private WhatsAppService whatsAppService;
     @Mock private CloudinaryService cloudinaryService;
+    @Mock private br.com.tonspersonalizados.service.LogSistemaService logSistemaService;
 
     @InjectMocks private UsuarioService usuarioService;
 
@@ -129,7 +130,7 @@ class UsuarioServiceTest {
         }
 
         @Test
-        @DisplayName("Deve traduzir violação de CPF único em ResponseStatusException 400")
+        @DisplayName("Deve traduzir violação de CPF único em ResponseStatusException 409")
         void deveTraduzirViolacaoEm400() {
             // Arrange
             when(empresaService.buscarPorId(10L)).thenReturn(new Empresa());
@@ -140,7 +141,7 @@ class UsuarioServiceTest {
             // Act + Assert
             ResponseStatusException ex =
                     assertThrows(ResponseStatusException.class, () -> usuarioService.cadastrar(dtoValido()));
-            assertEquals(400, ex.getStatusCode().value());
+            assertEquals(409, ex.getStatusCode().value());
         }
     }
 
@@ -272,7 +273,7 @@ class UsuarioServiceTest {
             when(empresaService.buscarPorId(5L)).thenReturn(new Empresa());
 
             EnderecoRequestDto endDto = mock(EnderecoRequestDto.class);
-            when(endDto.getLogadouro()).thenReturn("Rua A");
+            when(endDto.getLogradouro()).thenReturn("Rua A");
             UsuarioAtualizarRequestDto dto = mock(UsuarioAtualizarRequestDto.class);
             when(dto.getNome()).thenReturn("Novo");
             when(dto.getIdEmpresa()).thenReturn(5L);
@@ -300,7 +301,7 @@ class UsuarioServiceTest {
             when(usuarioRepository.findById(1L)).thenReturn(Optional.of(existente));
 
             EnderecoRequestDto endDto = mock(EnderecoRequestDto.class);
-            when(endDto.getLogadouro()).thenReturn("Rua Nova");
+            when(endDto.getLogradouro()).thenReturn("Rua Nova");
             UsuarioAtualizarRequestDto dto = mock(UsuarioAtualizarRequestDto.class);
             when(dto.getNome()).thenReturn("X");
             when(dto.getIdEmpresa()).thenReturn(null);
@@ -399,7 +400,7 @@ class UsuarioServiceTest {
             Usuario usuario = usuarioComLogin("a@a.com");
             when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuario));
             EnderecoRequestDto endDto = mock(EnderecoRequestDto.class);
-            when(endDto.getLogadouro()).thenReturn("Rua B");
+            when(endDto.getLogradouro()).thenReturn("Rua B");
 
             // Act
             Endereco resultado = usuarioService.cadastrarEnderecoUsuario(endDto, 1L);
@@ -445,7 +446,7 @@ class UsuarioServiceTest {
             when(enderecoRepository.findByUsuarioId(1L)).thenReturn(Optional.of(existente));
             when(enderecoRepository.save(existente)).thenReturn(existente);
             EnderecoRequestDto endDto = mock(EnderecoRequestDto.class);
-            when(endDto.getLogadouro()).thenReturn("Nova");
+            when(endDto.getLogradouro()).thenReturn("Nova");
 
             // Act
             Endereco resultado = usuarioService.atualizarEndereco(endDto, 1L);

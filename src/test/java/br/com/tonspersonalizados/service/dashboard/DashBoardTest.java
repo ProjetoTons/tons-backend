@@ -206,13 +206,11 @@ class DashboardServiceTest {
         @DisplayName("Deve montar performance dos funcionários por etapa")
         void deveMontarPerformanceDosFuncionariosPorEtapa() {
             // Arrange
-            Object[] row1 = new Object[]{1L, "Gustavo", "Design", 3};
-            Object[] row2 = new Object[]{1L, "Gustavo", "Produção", 2};
-            Object[] row3 = new Object[]{2L, "João", "Embalagem", 4};
-            Object[] row4 = new Object[]{2L, "João", "Logística", 1};
+            Object[] row1 = new Object[]{1L, "Gustavo", 3, 2, 0, 0};
+            Object[] row2 = new Object[]{2L, "João", 0, 0, 4, 1};
 
-            when(historicoRepository.countByResponsavelAndEtapa(any(LocalDateTime.class), any(LocalDateTime.class)))
-                    .thenReturn(List.of(row1, row2, row3, row4));
+            when(pedidoRepository.countTarefasAtivasPorFuncionario(any(LocalDateTime.class), any(LocalDateTime.class)))
+                    .thenReturn(List.of(row1, row2));
 
             // Act
             List<PerformanceFuncionarioDto> resultado =
@@ -221,16 +219,16 @@ class DashboardServiceTest {
             // Assert
             assertNotNull(resultado);
             assertEquals(2, resultado.size());
-            verify(historicoRepository).countByResponsavelAndEtapa(any(LocalDateTime.class), any(LocalDateTime.class));
+            verify(pedidoRepository).countTarefasAtivasPorFuncionario(any(LocalDateTime.class), any(LocalDateTime.class));
         }
 
         @Test
-        @DisplayName("Deve ignorar etapa desconhecida e manter funcionário na lista")
-        void deveIgnorarEtapaDesconhecidaEManterFuncionarioNaLista() {
+        @DisplayName("Deve retornar funcionário com todas as contagens zeradas")
+        void deveRetornarFuncionarioComContagensZeradas() {
             // Arrange
-            Object[] row = new Object[]{1L, "Gustavo", "Etapa desconhecida", 5};
+            Object[] row = new Object[]{1L, "Gustavo", 0, 0, 0, 0};
 
-            when(historicoRepository.countByResponsavelAndEtapa(any(LocalDateTime.class), any(LocalDateTime.class)))
+            when(pedidoRepository.countTarefasAtivasPorFuncionario(any(LocalDateTime.class), any(LocalDateTime.class)))
                     .thenReturn(List.<Object[]>of(row));
 
             // Act
@@ -240,14 +238,14 @@ class DashboardServiceTest {
             // Assert
             assertNotNull(resultado);
             assertEquals(1, resultado.size());
-            verify(historicoRepository).countByResponsavelAndEtapa(any(LocalDateTime.class), any(LocalDateTime.class));
+            verify(pedidoRepository).countTarefasAtivasPorFuncionario(any(LocalDateTime.class), any(LocalDateTime.class));
         }
 
         @Test
         @DisplayName("Deve retornar lista vazia quando não houver histórico")
         void deveRetornarListaVaziaQuandoNaoHouverHistorico() {
             // Arrange
-            when(historicoRepository.countByResponsavelAndEtapa(any(LocalDateTime.class), any(LocalDateTime.class)))
+            when(pedidoRepository.countTarefasAtivasPorFuncionario(any(LocalDateTime.class), any(LocalDateTime.class)))
                     .thenReturn(List.of());
 
             // Act
@@ -257,7 +255,7 @@ class DashboardServiceTest {
             // Assert
             assertNotNull(resultado);
             assertTrue(resultado.isEmpty());
-            verify(historicoRepository).countByResponsavelAndEtapa(any(LocalDateTime.class), any(LocalDateTime.class));
+            verify(pedidoRepository).countTarefasAtivasPorFuncionario(any(LocalDateTime.class), any(LocalDateTime.class));
         }
     }
 }

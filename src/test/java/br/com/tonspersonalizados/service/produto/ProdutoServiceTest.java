@@ -34,6 +34,7 @@ class ProdutoServiceTest {
 
     @Mock private ProdutoRepository produtoRepository;
     @Mock private UsuarioService usuarioService;
+    @Mock private br.com.tonspersonalizados.service.LogSistemaService logSistemaService;
     @InjectMocks private ProdutoService produtoService;
 
     /** Usuário com as duas coleções inicializadas (o new Usuario() as deixa nulas). */
@@ -102,6 +103,7 @@ class ProdutoServiceTest {
         void deveFavoritar() {
             // Arrange
             Produto produto = new Produto();
+            produto.setId(10L);
             Usuario usuario = usuarioComListas(List.of(), List.of());
             when(produtoRepository.findById(10L)).thenReturn(Optional.of(produto));
             when(usuarioService.buscarPorId(1L)).thenReturn(usuario);
@@ -119,6 +121,7 @@ class ProdutoServiceTest {
         void deveRemoverFavorito() {
             // Arrange
             Produto produto = new Produto();
+            produto.setId(10L);
             Usuario usuario = usuarioComListas(List.of(produto), List.of());
             when(produtoRepository.findById(10L)).thenReturn(Optional.of(produto));
             when(usuarioService.buscarPorId(1L)).thenReturn(usuario);
@@ -152,6 +155,7 @@ class ProdutoServiceTest {
         void deveSalvarInteresse() {
             // Arrange
             Produto produto = new Produto();
+            produto.setId(10L);
             Usuario usuario = usuarioComListas(List.of(), List.of());
             when(produtoRepository.findById(10L)).thenReturn(Optional.of(produto));
             when(usuarioService.buscarPorId(1L)).thenReturn(usuario);
@@ -169,6 +173,7 @@ class ProdutoServiceTest {
         void deveRemoverInteresse() {
             // Arrange
             Produto produto = new Produto();
+            produto.setId(10L);
             Usuario usuario = usuarioComListas(List.of(), List.of(produto));
             when(produtoRepository.findById(10L)).thenReturn(Optional.of(produto));
             when(usuarioService.buscarPorId(1L)).thenReturn(usuario);

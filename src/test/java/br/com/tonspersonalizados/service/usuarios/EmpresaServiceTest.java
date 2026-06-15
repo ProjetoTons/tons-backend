@@ -138,7 +138,7 @@ class EmpresaServiceTest {
             Empresa empresa = new Empresa();
             when(empresaRepository.findById(1L)).thenReturn(Optional.of(empresa));
             EnderecoRequestDto endDto = mock(EnderecoRequestDto.class);
-            when(endDto.getLogadouro()).thenReturn("Rua X");
+            when(endDto.getLogradouro()).thenReturn("Rua X");
 
             // Act
             Endereco resultado = empresaService.cadastrarEnderecoEmpresa(endDto, 1L);
@@ -167,7 +167,7 @@ class EmpresaServiceTest {
             when(enderecoRepository.findByEmpresaId(1L)).thenReturn(Optional.of(existente));
             when(enderecoRepository.save(existente)).thenReturn(existente);
             EnderecoRequestDto endDto = mock(EnderecoRequestDto.class);
-            when(endDto.getLogadouro()).thenReturn("Rua Nova");
+            when(endDto.getLogradouro()).thenReturn("Rua Nova");
 
             // Act
             Endereco resultado = empresaService.atualizarEndereco(endDto, 1L);

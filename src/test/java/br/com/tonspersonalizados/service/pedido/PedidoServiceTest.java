@@ -51,6 +51,7 @@ class PedidoServiceTest {
     @Mock private ProdutoRepository produtoRepository;
     @Mock private EnderecoRepository enderecoRepository;
     @Mock private ApplicationEventPublisher eventPublisher;
+    @Mock private br.com.tonspersonalizados.service.LogSistemaService logSistemaService;
     @InjectMocks private PedidoService pedidoService;
 
     private Usuario cliente() {
@@ -96,7 +97,11 @@ class PedidoServiceTest {
             when(enderecoRepository.findById(3L)).thenReturn(Optional.of(new Endereco()));
             when(produtoRepository.findById(5L)).thenReturn(Optional.of(produto));
             // Devolve o próprio objeto recebido para que o montarResponse veja os dados setados
-            when(pedidoRepository.save(any(Pedido.class))).thenAnswer(inv -> inv.getArgument(0));
+            when(pedidoRepository.save(any(Pedido.class))).thenAnswer(inv -> {
+                Pedido p = inv.getArgument(0);
+                p.setId(1);
+                return p;
+            });
             when(caracteristicasRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
             when(itemPedidoRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
@@ -218,6 +223,7 @@ class PedidoServiceTest {
         void deveAvancarComMudancaDeEtapa() {
             // Arrange — pedido em "Design", request muda para "Produção"
             Pedido pedido = new Pedido();
+            pedido.setId(1);
             pedido.setEtapaPedido("Design");
             when(pedidoRepository.findById(1)).thenReturn(Optional.of(pedido));
             when(usuarioRepository.findById(2L)).thenReturn(Optional.of(new Usuario()));
@@ -236,6 +242,7 @@ class PedidoServiceTest {
         void deveAvancarSemMudancaDeEtapa() {
             // Arrange — etapa continua "Design"
             Pedido pedido = new Pedido();
+            pedido.setId(1);
             pedido.setEtapaPedido("Design");
             Usuario responsavel = new Usuario();
             when(pedidoRepository.findById(1)).thenReturn(Optional.of(pedido));
@@ -268,6 +275,7 @@ class PedidoServiceTest {
         void deveAtribuir() {
             // Arrange
             Pedido pedido = new Pedido();
+            pedido.setId(1);
             Usuario responsavel = new Usuario();
             when(pedidoRepository.findById(1)).thenReturn(Optional.of(pedido));
             when(usuarioRepository.findById(2L)).thenReturn(Optional.of(responsavel));
