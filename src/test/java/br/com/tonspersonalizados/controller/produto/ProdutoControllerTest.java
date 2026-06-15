@@ -12,13 +12,15 @@ import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
@@ -78,5 +80,92 @@ class ProdutoControllerTest {
         // Act + Assert
         mockMvc.perform(get("/produtos/{id}", 99))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("GET /produtos/categorias/{id} deve retornar 200")
+    void deveListarPorCategoria() throws Exception {
+        when(produtoService.obterProdutosPorCategoria(1L)).thenReturn(List.of());
+        mockMvc.perform(get("/produtos/categorias/{id}", 1))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("GET /produtos/favoritos deve retornar 200")
+    void deveListarFavoritos() throws Exception {
+        setSecurityContext(1L);
+        when(produtoService.listarFavoritos(1L)).thenReturn(List.of());
+        mockMvc.perform(get("/produtos/favoritos"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("POST /produtos/{id}/favorito deve retornar 204")
+    void deveFavoritar() throws Exception {
+        setSecurityContext(1L);
+        mockMvc.perform(post("/produtos/{id}/favorito", 10))
+                .andExpect(status().isNoContent());
+        verify(produtoService).favoritarProduto(10L, 1L);
+    }
+
+    @Test
+    @DisplayName("DELETE /produtos/{id}/favorito deve retornar 204")
+    void deveRemoverFavorito() throws Exception {
+        setSecurityContext(1L);
+        mockMvc.perform(delete("/produtos/{id}/favorito", 10))
+                .andExpect(status().isNoContent());
+        verify(produtoService).removerProdutoFavoritado(10L, 1L);
+    }
+
+    @Test
+    @DisplayName("DELETE /produtos/favoritos deve retornar 204")
+    void deveLimparFavoritos() throws Exception {
+        setSecurityContext(1L);
+        mockMvc.perform(delete("/produtos/favoritos"))
+                .andExpect(status().isNoContent());
+        verify(produtoService).limparFavoritos(1L);
+    }
+
+    @Test
+    @DisplayName("GET /produtos/interessados deve retornar 200")
+    void deveListarInteressados() throws Exception {
+        setSecurityContext(1L);
+        when(produtoService.listarInteressados(1L)).thenReturn(List.of());
+        mockMvc.perform(get("/produtos/interessados"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("POST /produtos/{id}/interesse deve retornar 200")
+    void deveSalvarInteresse() throws Exception {
+        setSecurityContext(1L);
+        mockMvc.perform(post("/produtos/{id}/interesse", 10))
+                .andExpect(status().isOk());
+        verify(produtoService).salvarProdutoDeInteresse(10L, 1L);
+    }
+
+    @Test
+    @DisplayName("DELETE /produtos/{id}/interesse deve retornar 200")
+    void deveRemoverInteresse() throws Exception {
+        setSecurityContext(1L);
+        mockMvc.perform(delete("/produtos/{id}/interesse", 10))
+                .andExpect(status().isOk());
+        verify(produtoService).removerProdutoInteressado(10L, 1L);
+    }
+
+    @Test
+    @DisplayName("DELETE /produtos/interesse deve retornar 204")
+    void deveLimparInteresse() throws Exception {
+        setSecurityContext(1L);
+        mockMvc.perform(delete("/produtos/interesse"))
+                .andExpect(status().isNoContent());
+        verify(produtoService).limparInteresse(1L);
+    }
+
+    private void setSecurityContext(Long userId) {
+        UsernamePasswordAuthenticationToken auth =
+                new UsernamePasswordAuthenticationToken("user", null, List.of());
+        auth.setDetails(userId);
+        SecurityContextHolder.getContext().setAuthentication(auth);
     }
 }
