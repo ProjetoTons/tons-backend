@@ -5,8 +5,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="58737723-9b5d-4081-b16c-19932057d09f" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/src/test/java/br/com/tonspersonalizados/controller/notificacoes/NotificacaoControllerTest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/java/br/com/tonspersonalizados/controller/notificacoes/WhatsAppControllerTest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/java/br/com/tonspersonalizados/controller/produto/CategoriaControllerTest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/java/br/com/tonspersonalizados/controller/usuarios/AcessosControllerTest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/java/br/com/tonspersonalizados/service/dashboard/DashBoardTest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/java/br/com/tonspersonalizados/service/notificacoes/NotificacaoServiceTest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/java/br/com/tonspersonalizados/service/notificacoes/WhatsAppServiceTest.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/br/com/tonspersonalizados/controller/usuarios/EmpresaControllerTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/br/com/tonspersonalizados/controller/usuarios/EmpresaControllerTest.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -25,13 +32,14 @@
     </selectedModels>
   </component>
   <component name="EmbeddingIndexingInfo">
-    <option name="cachedIndexableFilesCount" value="112" />
+    <option name="cachedIndexableFilesCount" value="122" />
     <option name="fileBasedEmbeddingIndicesEnabled" value="true" />
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="Exception" />
+        <option value="package-info" />
         <option value="Class" />
       </list>
     </option>
@@ -72,9 +80,11 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "JUnit.DashboardServiceTest.executor": "Run",
     "JUnit.UsuarioServiceTest.executor": "Coverage",
     "JUnit.br.com.tonspersonalizados in tons-backend.executor": "Coverage",
     "JUnit.br.com.tonspersonalizados.service in tons-backend.executor": "Coverage",
+    "JUnit.tonspersonalizados in tons-backend.executor": "Coverage",
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "RequestMappingsPanelOrder0": "0",
     "RequestMappingsPanelOrder1": "1",
@@ -89,9 +99,10 @@
     "codeWithMe.voiceChat.enabledByDefault": "false",
     "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
     "git-widget-placeholder": "test-unit",
+    "ignore.virus.scanning.warn.message": "true",
     "junie.onboarding.icon.badge.shown": "true",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/denni/OneDrive/Documentos/Faculdade/PI-Benificiario/tons-backend",
+    "last_opened_file_path": "C:/Users/Gustavo Pimentel/OneDrive/Desktop/Trabalhos Faculdade/3° Semestre/Projeto Hesfesto/tons-backend",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -101,7 +112,22 @@
     "to.speed.mode.migration.done": "true"
   }
 }]]></component>
-  <component name="RunManager" selected="JUnit.br.com.tonspersonalizados in tons-backend">
+  <component name="RunManager" selected="JUnit.tonspersonalizados in tons-backend">
+    <configuration name="DashboardServiceTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="tons-backend" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="br.com.tonspersonalizados.service.dashboard.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="br.com.tonspersonalizados.service.dashboard" />
+      <option name="MAIN_CLASS_NAME" value="br.com.tonspersonalizados.service.dashboard.DashboardServiceTest" />
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="UsuarioServiceTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="tons-backend" />
       <extension name="coverage">
@@ -145,26 +171,21 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="TonsApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" temporary="true" nameIsGenerated="true">
-      <option name="FRAME_DEACTIVATION_UPDATE_POLICY" value="UnknownPolicyInFreeMode" />
+    <configuration name="tonspersonalizados in tons-backend" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="tons-backend" />
-      <option name="SPRING_BOOT_MAIN_CLASS" value="br.com.tonspersonalizados.TonsApplication" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="br.com.tonspersonalizados.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
+      <option name="TEST_OBJECT" value="directory" />
+      <dir value="$PROJECT_DIR$/src/test/java/br/com/tonspersonalizados" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="JUnit.tonspersonalizados in tons-backend" />
+        <item itemvalue="JUnit.DashboardServiceTest" />
         <item itemvalue="JUnit.br.com.tonspersonalizados in tons-backend" />
         <item itemvalue="JUnit.br.com.tonspersonalizados.service in tons-backend" />
         <item itemvalue="JUnit.UsuarioServiceTest" />
-        <item itemvalue="Spring Boot.TonsApplication" />
       </list>
     </recent_temporary>
   </component>
@@ -202,6 +223,7 @@
     <SUITE FILE_PATH="coverage/tons_backend$br_com_tonspersonalizados_in_tons_backend.ic" NAME="br.com.tonspersonalizados in tons-backend Coverage Results" MODIFIED="1781140657680" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="true">
       <FILTER>br.com.tonspersonalizados.*</FILTER>
     </SUITE>
+    <SUITE FILE_PATH="coverage/tons_backend$tonspersonalizados_in_tons_backend.ic" NAME="tonspersonalizados in tons-backend Coverage Results" MODIFIED="1781537341880" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="true" />
   </component>
   <component name="github-copilot-workspace">
     <instructionFileLocations>
