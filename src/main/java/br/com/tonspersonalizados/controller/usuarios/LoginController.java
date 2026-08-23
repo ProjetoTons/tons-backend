@@ -4,13 +4,18 @@ import br.com.tonspersonalizados.dto.usuarios.LoginRequestDto;
 import br.com.tonspersonalizados.dto.usuarios.ResetSenhaRequestDto;
 import br.com.tonspersonalizados.dto.usuarios.UsuarioTokenDto;
 import br.com.tonspersonalizados.service.usuarios.AutenticacaoService;
+import io.github.resilience4j.ratelimiter.RequestNotPermitted;
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/login")
@@ -29,7 +34,7 @@ public class LoginController {
             @ApiResponse(responseCode = "400", description = "Dados da requisição inválidos")
     })
     @PostMapping
-    //usando o post por ser mais seguro já que ele possui uma critografia própria, melhor para transitar com a senha do usuário
+    @RateLimiter(name = "loginLimiter", fallbackMethod = "rateLimitFallback")
     public ResponseEntity<UsuarioTokenDto> login(@RequestBody @Valid LoginRequestDto loginDto) {
 
         UsuarioTokenDto loginValidado = autenticacaoService.login(loginDto);
@@ -60,5 +65,11 @@ public class LoginController {
     public ResponseEntity<Void> resetarSenha(@RequestBody @Valid ResetSenhaRequestDto request) {
         autenticacaoService.resetarSenha(request.getToken(), request.getNovaSenha());
         return ResponseEntity.noContent().build();
+    }
+
+    // Fallback precisa ter a mesma assinatura + o parâmetro da exceção
+    private ResponseEntity<?> rateLimitFallback(LoginRequestDto request, RequestNotPermitted ex) {
+        return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+                .body(Map.of("error", "Muitas tentativas. Tente novamente em instantes."));
     }
 }
