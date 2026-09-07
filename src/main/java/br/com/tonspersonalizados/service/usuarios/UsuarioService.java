@@ -12,6 +12,9 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import br.com.tonspersonalizados.entity.usuarios.Acesso;
@@ -229,6 +232,8 @@ public class UsuarioService {
     }
 
     public void atualizar(Long id, UsuarioAtualizarRequestDto usuarioDto) {
+        validarProprietarioOuFalhar(id);
+
         Usuario usuarioExistente = usuarioRepository.findById(id)
                 .orElseThrow(() -> new UsuarioNaoEncontradoException("Usuário não encontrado"));
 
@@ -282,6 +287,15 @@ public class UsuarioService {
                 usuarioExistente.getId(), AcaoLog.ATUALIZAR, "Usuario",
                 usuarioExistente.getId(), "Usuário atualizado",
                 valorAnterior, UsuarioLogDto.from(usuarioExistente));
+    }
+
+    private void validarProprietarioOuFalhar(Long idUsuario) {
+        Authentication autenticacao = SecurityContextHolder.getContext().getAuthentication();
+        Object detalhe = autenticacao == null ? null : autenticacao.getDetails();
+
+        if (!(detalhe instanceof Long idAutenticado) || !idAutenticado.equals(idUsuario)) {
+            throw new AccessDeniedException("Usuário não autorizado a alterar este recurso");
+        }
     }
 
     public void atualizar(Usuario usuario) {

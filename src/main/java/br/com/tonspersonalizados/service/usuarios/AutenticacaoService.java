@@ -6,13 +6,16 @@ import java.util.List;
 import br.com.tonspersonalizados.entity.AcaoLog;
 import br.com.tonspersonalizados.service.LogSistemaService;
 import br.com.tonspersonalizados.entity.usuarios.Acesso;
+import br.com.tonspersonalizados.entity.usuarios.Login;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -33,6 +36,9 @@ import br.com.tonspersonalizados.service.notificacoes.NotificacaoService;
 
 @Service
 public class AutenticacaoService implements UserDetailsService {
+
+    private static final int LIMITE_TENTATIVAS_LOGIN = 3;
+    private static final int MINUTOS_BLOQUEIO_LOGIN = 30;
 
     //por a rota do frontend onde a pessoa vai digitar a nova senha
     @Value("${jwt.resetSenhaUrl}")
@@ -74,6 +80,12 @@ public class AutenticacaoService implements UserDetailsService {
 
     public UsuarioTokenDto login(LoginRequestDto loginDto) {
 
+        Usuario usuarioTentativa = usuarioService.buscarPorEmail(loginDto.getEmail());
+        if (usuarioTentativa != null && estaBloqueado(usuarioTentativa)) {
+            throw new ResponseStatusException(HttpStatus.TOO_MANY_REQUESTS,
+                    "Muitas tentativas de login. Tente novamente mais tarde.");
+        }
+
         final UsernamePasswordAuthenticationToken credentials = new UsernamePasswordAuthenticationToken(
                 loginDto.getEmail(), loginDto.getSenha());
 
@@ -82,8 +94,8 @@ public class AutenticacaoService implements UserDetailsService {
         try {
             authentication = this.authenticationManager.authenticate(credentials);
         } catch (BadCredentialsException ex) {
-            Usuario usuarioTentativa = usuarioService.buscarPorEmail(loginDto.getEmail());
             Long idParaLog = usuarioTentativa != null ? usuarioTentativa.getId() : null;
+            registrarFalhaLogin(usuarioTentativa);
             logSistemaService.registrar(
                     idParaLog, AcaoLog.LOGIN_FALHA, "Usuario",
                     idParaLog,
@@ -112,6 +124,8 @@ public class AutenticacaoService implements UserDetailsService {
         List<Acesso> acessos = usuario.getAcessos();
         usuarioTokenDto.setAcessos(acessos != null && !acessos.isEmpty() ? acessos : null);
         usuario.getLogin().setUltimoLogin(LocalDateTime.now());
+        usuario.getLogin().setTentativasLogin(0);
+        usuario.getLogin().setBloqueadoAte(null);
 
         usuarioService.atualizar(usuario);
 
@@ -121,6 +135,34 @@ public class AutenticacaoService implements UserDetailsService {
                 null, null);
 
         return usuarioTokenDto;
+    }
+
+    private boolean estaBloqueado(Usuario usuario) {
+        LocalDateTime bloqueadoAte = usuario.getLogin().getBloqueadoAte();
+        if (bloqueadoAte == null || !bloqueadoAte.isAfter(LocalDateTime.now())) {
+            if (bloqueadoAte != null) {
+                usuario.getLogin().setBloqueadoAte(null);
+                usuario.getLogin().setTentativasLogin(0);
+                usuarioService.atualizar(usuario);
+            }
+            return false;
+        }
+        return true;
+    }
+
+    private void registrarFalhaLogin(Usuario usuario) {
+        if (usuario == null) {
+            return;
+        }
+
+        Login login = usuario.getLogin();
+        int tentativas = login.getTentativasLogin() == null ? 0 : login.getTentativasLogin();
+        tentativas++;
+        login.setTentativasLogin(tentativas);
+        if (tentativas >= LIMITE_TENTATIVAS_LOGIN) {
+            login.setBloqueadoAte(LocalDateTime.now().plusMinutes(MINUTOS_BLOQUEIO_LOGIN));
+        }
+        usuarioService.atualizar(usuario);
     }
 
     public void enviarEmailResetSenha(String email) {
@@ -174,9 +216,24 @@ public class AutenticacaoService implements UserDetailsService {
     }
 
     public void alterarSenha(Long userId, String senhaAtual, String novaSenha) {
+        Authentication autenticacao = SecurityContextHolder.getContext().getAuthentication();
+        Object detalhe = autenticacao == null ? null : autenticacao.getDetails();
+        boolean eProprioUsuario = detalhe instanceof Long idAutenticado && idAutenticado.equals(userId);
+        boolean eAdministrador = autenticacao != null && autenticacao.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+            .anyMatch(autoridade -> autoridade.equalsIgnoreCase("Adm"));
+
+        if (!eProprioUsuario && !eAdministrador) {
+            throw new AccessDeniedException("Usuário não autorizado a alterar esta senha");
+        }
+
         Usuario usuario = usuarioService.buscarPorId(userId);
 
-        if (!passwordEncoder.matches(senhaAtual, usuario.getLogin().getSenhaHash())) {
+        if (eProprioUsuario && (senhaAtual == null || senhaAtual.isBlank())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Senha atual é obrigatória.");
+        }
+
+        if (eProprioUsuario && !passwordEncoder.matches(senhaAtual, usuario.getLogin().getSenhaHash())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Senha atual incorreta.");
         }
 

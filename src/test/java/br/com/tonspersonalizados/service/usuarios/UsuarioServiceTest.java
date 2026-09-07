@@ -23,6 +23,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -66,6 +68,16 @@ class UsuarioServiceTest {
     void setUp() {
         // @Value não é resolvido sem contexto Spring; injetamos manualmente.
         ReflectionTestUtils.setField(usuarioService, "cnpjTons", CNPJ_TONS);
+
+        UsernamePasswordAuthenticationToken autenticacao =
+                new UsernamePasswordAuthenticationToken("a@a.com", null);
+        autenticacao.setDetails(1L);
+        SecurityContextHolder.getContext().setAuthentication(autenticacao);
+    }
+
+    @org.junit.jupiter.api.AfterEach
+    void limparContextoDeSeguranca() {
+        SecurityContextHolder.clearContext();
     }
 
     private Usuario usuarioComLogin(String email) {
@@ -314,6 +326,16 @@ class UsuarioServiceTest {
             assertNull(existente.getEmpresa());                       // desvinculado
             assertSame(enderecoAtual, existente.getEndereco());        // mesma instância
             assertEquals("Rua Nova", enderecoAtual.getLogradouro());   // atualizada
+        }
+
+        @Test
+        @DisplayName("Deve rejeitar atualização de outro usuário")
+        void deveRejeitarAtualizacaoDeOutroUsuario() {
+            UsuarioAtualizarRequestDto dto = mock(UsuarioAtualizarRequestDto.class);
+
+            assertThrows(org.springframework.security.access.AccessDeniedException.class,
+                    () -> usuarioService.atualizar(2L, dto));
+            verifyNoInteractions(usuarioRepository);
         }
     }
 

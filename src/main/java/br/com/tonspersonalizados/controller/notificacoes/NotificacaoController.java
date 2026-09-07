@@ -1,5 +1,7 @@
 package br.com.tonspersonalizados.controller.notificacoes;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,6 +17,7 @@ import br.com.tonspersonalizados.service.notificacoes.NotificacaoService;
 @CrossOrigin(origins = "*")
 public class NotificacaoController {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(NotificacaoController.class);
     private final NotificacaoService service;
 
     public NotificacaoController(NotificacaoService service) {
@@ -27,8 +30,9 @@ public class NotificacaoController {
             service.enviarEmail(dto);
             return ResponseEntity.ok("E-mail enviado com sucesso!");
         } catch (Exception e) {
+            LOGGER.error("Falha ao enviar e-mail de notificacao", e);
             return ResponseEntity.internalServerError()
-                    .body("Erro ao enviar e-mail: " + e.getMessage());
+                .body("Nao foi possivel enviar o e-mail");
         }
     }
 }

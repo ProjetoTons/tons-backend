@@ -5,7 +5,6 @@ import jakarta.validation.constraints.Size;
 
 public class AlterarSenhaRequestDto {
 
-    @NotBlank
     private String senhaAtual;
 
     @NotBlank

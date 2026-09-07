@@ -9,18 +9,26 @@ import br.com.tonspersonalizados.entity.usuarios.Usuario;
 import br.com.tonspersonalizados.exception.usuarios.LoginInvalidoException;
 import br.com.tonspersonalizados.exception.usuarios.UsuarioNaoEncontradoException;
 import br.com.tonspersonalizados.service.notificacoes.NotificacaoService;
+import java.time.LocalDateTime;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -47,6 +55,19 @@ class AutenticacaoServiceTest {
     @Mock private AuthenticationManager authenticationManager;
     @Mock private br.com.tonspersonalizados.service.LogSistemaService logSistemaService;
     @InjectMocks private AutenticacaoService autenticacaoService;
+
+    @BeforeEach
+    void configurarUsuarioAutenticado() {
+        UsernamePasswordAuthenticationToken autenticacao =
+                new UsernamePasswordAuthenticationToken("joao@email.com", null);
+        autenticacao.setDetails(1L);
+        SecurityContextHolder.getContext().setAuthentication(autenticacao);
+    }
+
+    @AfterEach
+    void limparContextoDeSeguranca() {
+        SecurityContextHolder.clearContext();
+    }
 
     private Usuario usuarioCompleto() {
         Usuario u = new Usuario();
@@ -125,6 +146,42 @@ class AutenticacaoServiceTest {
 
             // Act + Assert
             assertThrows(LoginInvalidoException.class, () -> autenticacaoService.login(loginDto));
+        }
+
+        @Test
+        @DisplayName("Deve bloquear a conta após três falhas de login")
+        void deveBloquearAposTresFalhas() {
+            LoginRequestDto loginDto = mock(LoginRequestDto.class);
+            when(loginDto.getEmail()).thenReturn("joao@email.com");
+            when(loginDto.getSenha()).thenReturn("senha-incorreta");
+            Usuario usuario = usuarioCompleto();
+            usuario.getLogin().setTentativasLogin(2);
+            when(usuarioService.buscarPorEmail("joao@email.com")).thenReturn(usuario);
+            when(authenticationManager.authenticate(any()))
+                    .thenThrow(new BadCredentialsException("Credenciais inválidas"));
+
+            assertThrows(BadCredentialsException.class, () -> autenticacaoService.login(loginDto));
+
+            assertEquals(3, usuario.getLogin().getTentativasLogin());
+            assertTrue(usuario.getLogin().getBloqueadoAte().isAfter(LocalDateTime.now()));
+            verify(usuarioService).atualizar(usuario);
+        }
+
+        @Test
+        @DisplayName("Deve recusar login durante o bloqueio temporário")
+        void deveRecusarLoginDuranteBloqueio() {
+            LoginRequestDto loginDto = mock(LoginRequestDto.class);
+            when(loginDto.getEmail()).thenReturn("joao@email.com");
+            Usuario usuario = usuarioCompleto();
+            usuario.getLogin().setTentativasLogin(5);
+            usuario.getLogin().setBloqueadoAte(LocalDateTime.now().plusMinutes(10));
+            when(usuarioService.buscarPorEmail("joao@email.com")).thenReturn(usuario);
+
+            ResponseStatusException excecao = assertThrows(ResponseStatusException.class,
+                    () -> autenticacaoService.login(loginDto));
+
+            assertEquals(HttpStatus.TOO_MANY_REQUESTS, excecao.getStatusCode());
+            verifyNoInteractions(authenticationManager);
         }
     }
 
@@ -230,6 +287,36 @@ class AutenticacaoServiceTest {
             assertThrows(ResponseStatusException.class,
                     () -> autenticacaoService.alterarSenha(1L, "errada", "nova"));
             verify(usuarioService, never()).atualizar(any());
+        }
+
+        @Test
+        @DisplayName("Deve rejeitar alteração da senha de outro usuário")
+        void deveRejeitarSenhaDeOutroUsuario() {
+            assertThrows(org.springframework.security.access.AccessDeniedException.class,
+                    () -> autenticacaoService.alterarSenha(2L, "atual", "nova"));
+            verifyNoInteractions(usuarioService, passwordEncoder);
+        }
+
+        @Test
+        @DisplayName("Deve permitir que ADMIN altere a senha de um funcionário")
+        void devePermitirAdminAlterarSenhaDeFuncionario() {
+            SecurityContextHolder.clearContext();
+            UsernamePasswordAuthenticationToken autenticacao =
+                    new UsernamePasswordAuthenticationToken(
+                            "admin@tons.com", null,
+                            java.util.List.of(new SimpleGrantedAuthority("Adm")));
+            autenticacao.setDetails(99L);
+            SecurityContextHolder.getContext().setAuthentication(autenticacao);
+
+            Usuario funcionario = usuarioCompleto();
+            when(usuarioService.buscarPorId(2L)).thenReturn(funcionario);
+            when(passwordEncoder.encode("nova")).thenReturn("hashNovo");
+
+            autenticacaoService.alterarSenha(2L, null, "nova");
+
+            assertEquals("hashNovo", funcionario.getLogin().getSenhaHash());
+            verify(usuarioService).atualizar(funcionario);
+            verify(passwordEncoder, never()).matches(anyString(), anyString());
         }
     }
 }

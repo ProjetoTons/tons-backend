@@ -18,6 +18,7 @@ public class Login {
     private String senhaHash;
     private LocalDateTime ultimoLogin;
     private Integer tentativasLogin;
+    private LocalDateTime bloqueadoAte;
 
     //relacionamento:
     @OneToOne
@@ -48,6 +49,14 @@ public class Login {
 
     public void setTentativasLogin(Integer tentativasLogin) {
         this.tentativasLogin = tentativasLogin;
+    }
+
+    public LocalDateTime getBloqueadoAte() {
+        return bloqueadoAte;
+    }
+
+    public void setBloqueadoAte(LocalDateTime bloqueadoAte) {
+        this.bloqueadoAte = bloqueadoAte;
     }
 
     public Long getId() {

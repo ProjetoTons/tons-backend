@@ -54,7 +54,7 @@ class NotificacaoControllerTest {
             ResponseEntity<String> resposta = controller.enviarEmail(dto);
 
             assertEquals(500, resposta.getStatusCode().value());
-            assertEquals("Erro ao enviar e-mail: SMTP indisponível", resposta.getBody());
+            assertEquals("Nao foi possivel enviar o e-mail", resposta.getBody());
 
             verify(service).enviarEmail(dto);
         }
