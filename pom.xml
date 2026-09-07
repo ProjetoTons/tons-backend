@@ -63,12 +63,6 @@
             <scope>runtime</scope>
         </dependency>
 
-        <!-- E-mail (notificacao) -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-mail</artifactId>
-        </dependency>
-
         <!-- Observabilidade (usuarios) -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

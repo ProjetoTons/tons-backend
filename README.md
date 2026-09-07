@@ -180,15 +180,15 @@ CREATE DATABASE tonsDb;
 
 ### 2. Configurar credenciais
 
-Edite [src/main/resources/application.properties](src/main/resources/application.properties) (ou exporte variáveis de ambiente equivalentes) ajustando:
+Configure as variáveis de ambiente antes de iniciar a aplicação. O arquivo [src/main/resources/application.properties](src/main/resources/application.properties) contém apenas referências a essas variáveis:
 
 - `spring.datasource.url`
 - `spring.datasource.username`
 - `spring.datasource.password`
 - `jwt.secret` (mínimo 32 caracteres)
-- `spring.mail.username` / `spring.mail.password` (se for usar e-mail)
+- `EMAIL_SERVICE_URL` / `EMAIL_SERVICE_TOKEN` (microserviço de e-mail)
 
-> ⚠️ **Não commit credenciais em produção.** Mover para variáveis de ambiente é recomendado.
+> **Não commit credenciais.** Os valores reais devem ficar somente no ambiente de execução ou em um gerenciador de segredos.
 
 ### 3. Build e execução
 
@@ -226,10 +226,27 @@ Configurações principais em [src/main/resources/application.properties](src/ma
 | `spring.jpa.hibernate.ddl-auto`| Estratégia DDL                         | `update`                            |
 | `jwt.validity`                 | Expiração do token (ms)                | `3600000` (1h)                      |
 | `jwt.secret`                   | Chave de assinatura JWT                | —                                   |
-| `spring.mail.host`             | Host SMTP                              | `smtp.gmail.com`                    |
-| `spring.mail.port`             | Porta SMTP                             | `587`                               |
-| `spring.mail.username`         | Usuário SMTP                           | —                                   |
-| `spring.mail.password`         | Senha de aplicativo SMTP               | —                                   |
+| `EMAIL_SERVICE_URL`             | URL do microserviço de e-mail          | `http://localhost:8081`             |
+| `EMAIL_SERVICE_TOKEN`          | Token Bearer do microserviço           | —                                   |
+| `JWT_RESET_SECRET`             | Chave dos tokens de recuperação        | —                                   |
+| `RESET_SENHA_URL`              | URL do frontend para reset             | `http://localhost:5173/login/reset-senha?token=` |
+| `WHATSAPP_PHONE_NUMBER_ID`     | ID do telefone da API WhatsApp         | —                                   |
+| `WHATSAPP_ACCESS_TOKEN`        | Token da API WhatsApp                  | —                                   |
+| `CLOUDINARY_URL`                | URL de conexão do Cloudinary           | —                                   |
+
+No PowerShell, configure a sessão antes de executar:
+
+```powershell
+$env:DB_PASSWORD = "sua-senha"
+$env:JWT_SECRET = "chave-aleatoria-com-pelo-menos-32-caracteres"
+$env:JWT_RESET_SECRET = "outra-chave-aleatoria-com-pelo-menos-32-caracteres"
+$env:EMAIL_SERVICE_URL = "http://localhost:8081"
+$env:EMAIL_SERVICE_TOKEN = "seu-token-do-microservico"
+$env:WHATSAPP_PHONE_NUMBER_ID = "seu-id"
+$env:WHATSAPP_ACCESS_TOKEN = "seu-token"
+$env:CLOUDINARY_URL = "sua-url"
+./mvnw spring-boot:run
+```
 
 ---
 

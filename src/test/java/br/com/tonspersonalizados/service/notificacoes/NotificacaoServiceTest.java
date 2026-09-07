@@ -9,8 +9,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -19,7 +17,7 @@ import static org.mockito.Mockito.*;
 class NotificacaoServiceTest {
 
     @Mock
-    private JavaMailSender mailSender;
+    private EmailServiceClient emailServiceClient;
 
     @InjectMocks
     private NotificacaoService notificacaoService;
@@ -47,20 +45,7 @@ class NotificacaoServiceTest {
             notificacaoService.enviarEmail(dto);
 
             // Assert
-            ArgumentCaptor<SimpleMailMessage> captor =
-                    ArgumentCaptor.forClass(SimpleMailMessage.class);
-
-            verify(mailSender).send(captor.capture());
-
-            SimpleMailMessage mensagem = captor.getValue();
-
-            assertEquals("tonspersonalizadosdev@gmail.com", mensagem.getFrom());
-            assertArrayEquals(
-                    new String[]{"teste@email.com"},
-                    mensagem.getTo()
-            );
-            assertEquals("Assunto Teste", mensagem.getSubject());
-            assertEquals("Corpo Teste", mensagem.getText());
+                verify(emailServiceClient).enviarEmail(dto);
         }
 
         @Test
@@ -70,9 +55,9 @@ class NotificacaoServiceTest {
             // Arrange
             NotificacaoDto dto = criarDto();
 
-            doThrow(new RuntimeException("SMTP indisponível"))
-                    .when(mailSender)
-                    .send(any(SimpleMailMessage.class));
+                doThrow(new RuntimeException("Microservico indisponível"))
+                    .when(emailServiceClient)
+                    .enviarEmail(dto);
 
             // Act + Assert
             RuntimeException exception = assertThrows(
@@ -82,10 +67,10 @@ class NotificacaoServiceTest {
 
             assertTrue(
                     exception.getMessage()
-                            .contains("Erro ao enviar email")
+                            .contains("Microservico indisponível")
             );
 
-            verify(mailSender).send(any(SimpleMailMessage.class));
+            verify(emailServiceClient).enviarEmail(dto);
         }
     }
 }
