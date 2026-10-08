@@ -66,6 +66,21 @@ class UsuarioControllerTest {
     }
 
     @Test
+    @DisplayName("POST /usuarios/funcionario deve aceitar cadastro sem foto")
+    void deveCadastrarFuncionarioSemFoto() throws Exception {
+        String body = """
+                {"nome":"Ana Silva","email":"ana@email.com",
+                 "telefone":"11999998888","senha":"senha123",
+                 "dataNascimento":"1995-01-01","acessos":[1]}
+                """;
+
+        mockMvc.perform(post("/usuarios/funcionario")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body))
+                .andExpect(status().isCreated());
+    }
+
+    @Test
     @DisplayName("GET /usuarios/{id} deve retornar 200 quando existir")
     void deveBuscarPorId() throws Exception {
         // Arrange

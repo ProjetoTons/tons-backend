@@ -3,6 +3,7 @@ package br.com.tonspersonalizados.controller.pedido;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -39,6 +40,7 @@ public class PedidoController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAuthority('Adm')")
     @Operation(summary = "Criar pedido completo com itens")
     public ResponseEntity<PedidoResponseDto> criarPedido(@Valid @RequestBody PedidoRequestDto request) {
         return ResponseEntity.status(201).body(pedidoService.criarPedido(request));
