@@ -28,7 +28,7 @@ public class NotificacaoController {
     public ResponseEntity<String> enviarEmail(@RequestBody NotificacaoDto dto) {
         try {
             service.enviarEmail(dto);
-            return ResponseEntity.ok("E-mail enviado com sucesso!");
+            return ResponseEntity.ok("Solicitação de envio de e-mail enfileirada.");
         } catch (Exception e) {
             LOGGER.error("Falha ao enviar e-mail de notificacao", e);
             return ResponseEntity.internalServerError()

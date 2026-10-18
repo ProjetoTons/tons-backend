@@ -1,11 +1,11 @@
 package br.com.tonspersonalizados.service.notificacoes;
 
 import br.com.tonspersonalizados.dto.notificacoes.NotificacaoDto;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -17,7 +17,7 @@ import static org.mockito.Mockito.*;
 class NotificacaoServiceTest {
 
     @Mock
-    private EmailServiceClient emailServiceClient;
+    private RabbitTemplate rabbitTemplate;
 
     @InjectMocks
     private NotificacaoService notificacaoService;
@@ -45,19 +45,18 @@ class NotificacaoServiceTest {
             notificacaoService.enviarEmail(dto);
 
             // Assert
-                verify(emailServiceClient).enviarEmail(dto);
+            verify(rabbitTemplate).convertAndSend(dto);
         }
 
         @Test
-        @DisplayName("Deve lançar RuntimeException quando ocorrer erro ao enviar e-mail")
-        void deveLancarRuntimeExceptionQuandoOcorrerErroAoEnviarEmail() {
+        @DisplayName("Deve propagar erro quando RabbitMQ falhar")
+        void devePropagarErroQuandoRabbitMqFalhar() {
 
             // Arrange
             NotificacaoDto dto = criarDto();
+            RuntimeException erro = new RuntimeException("RabbitMQ indisponível");
 
-                doThrow(new RuntimeException("Microservico indisponível"))
-                    .when(emailServiceClient)
-                    .enviarEmail(dto);
+            doThrow(erro).when(rabbitTemplate).convertAndSend(dto);
 
             // Act + Assert
             RuntimeException exception = assertThrows(
@@ -65,12 +64,9 @@ class NotificacaoServiceTest {
                     () -> notificacaoService.enviarEmail(dto)
             );
 
-            assertTrue(
-                    exception.getMessage()
-                            .contains("Microservico indisponível")
-            );
+            assertSame(erro, exception);
 
-            verify(emailServiceClient).enviarEmail(dto);
+            verify(rabbitTemplate).convertAndSend(dto);
         }
     }
 }

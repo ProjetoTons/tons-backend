@@ -28,8 +28,8 @@ class NotificacaoControllerTest {
     class EnviarEmailTest {
 
         @Test
-        @DisplayName("Deve retornar 200 quando e-mail for enviado com sucesso")
-        void deveRetornarOkQuandoEmailForEnviadoComSucesso() {
+        @DisplayName("Deve retornar 200 quando solicitação for enfileirada")
+        void deveRetornarOkQuandoSolicitacaoForEnfileirada() {
             NotificacaoDto dto = new NotificacaoDto();
 
             doNothing().when(service).enviarEmail(dto);
@@ -37,7 +37,7 @@ class NotificacaoControllerTest {
             ResponseEntity<String> resposta = controller.enviarEmail(dto);
 
             assertEquals(200, resposta.getStatusCode().value());
-            assertEquals("E-mail enviado com sucesso!", resposta.getBody());
+            assertEquals("Solicitação de envio de e-mail enfileirada.", resposta.getBody());
 
             verify(service).enviarEmail(dto);
         }

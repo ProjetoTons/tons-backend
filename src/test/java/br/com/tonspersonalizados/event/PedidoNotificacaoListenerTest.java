@@ -6,13 +6,15 @@ import br.com.tonspersonalizados.entity.usuarios.Login;
 import br.com.tonspersonalizados.entity.usuarios.Usuario;
 import br.com.tonspersonalizados.service.notificacoes.NotificacaoService;
 import br.com.tonspersonalizados.service.notificacoes.WhatsAppService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
@@ -23,7 +25,13 @@ class PedidoNotificacaoListenerTest {
 
     @Mock private WhatsAppService whatsAppService;
     @Mock private NotificacaoService notificacaoService;
-    @InjectMocks private PedidoNotificacaoListener listener;
+    private PedidoNotificacaoListener listener;
+
+    @BeforeEach
+    void setUp() {
+        listener = new PedidoNotificacaoListener(
+                whatsAppService, notificacaoService, "https://tons.example.com");
+    }
 
     private EtapaAvancadaEvent criarEvento(String telefone, String email) {
         Usuario cliente = new Usuario();
@@ -49,7 +57,9 @@ class PedidoNotificacaoListenerTest {
 
         listener.onEtapaAvancada(event);
 
-        verify(whatsAppService).enviarMensagem(anyString(), anyString());
+        ArgumentCaptor<String> mensagem = ArgumentCaptor.forClass(String.class);
+        verify(whatsAppService).enviarMensagem(anyString(), mensagem.capture());
+        assertTrue(mensagem.getValue().contains("https://tons.example.com/meus-pedidos"));
         verify(notificacaoService).enviarEmail(any(NotificacaoDto.class));
     }
 
