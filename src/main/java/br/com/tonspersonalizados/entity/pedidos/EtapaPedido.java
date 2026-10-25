@@ -34,6 +34,10 @@ public enum EtapaPedido {
 
     FINALIZADO("Finalizado", List.of(
             "Concluído"
+    )),
+
+    FINALIZADOS("Finalizados", List.of(
+            "Concluído"
     ));
 
     private final String label;

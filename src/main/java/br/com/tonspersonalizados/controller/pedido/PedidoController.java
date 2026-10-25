@@ -6,6 +6,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -48,8 +52,15 @@ public class PedidoController {
 
     @GetMapping
     @Operation(summary = "Listar todos os pedidos")
-    public ResponseEntity<List<PedidoResponseDto>> listarTodos() {
-        return ResponseEntity.ok(pedidoService.listarTodos());
+    public ResponseEntity<Page<PedidoResponseDto>> listarTodos(
+            @PageableDefault(size = 20, sort = "dataPedido", direction = Sort.Direction.DESC) Pageable pageable,
+            @RequestParam(required = false) String etapa,
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) String busca,
+            @RequestParam(required = false) Long responsavelId,
+            @RequestParam(defaultValue = "false") boolean somenteAtivos) {
+        return ResponseEntity.ok(pedidoService.listarTodos(
+                pageable, etapa, status, busca, responsavelId, somenteAtivos));
     }
 
     @GetMapping("/meus")
@@ -64,6 +75,15 @@ public class PedidoController {
     public ResponseEntity<List<PedidoResponseDto>> meusPedidosHistorico() {
         Integer idCliente = getUsuarioAutenticadoId();
         return ResponseEntity.ok(pedidoService.listarMeusPedidosFinalizados(idCliente));
+    }
+
+    @GetMapping("/meus/historico/paginado")
+    @Operation(summary = "Listar histórico paginado do cliente autenticado")
+    public ResponseEntity<Page<PedidoResponseDto>> meusPedidosHistoricoPaginado(
+            @RequestParam(defaultValue = "TODOS") String filtro,
+            @PageableDefault(size = 20) Pageable pageable) {
+        Integer idCliente = getUsuarioAutenticadoId();
+        return ResponseEntity.ok(pedidoService.listarMeuHistoricoPaginado(idCliente, filtro, pageable));
     }
 
     @GetMapping("/{id}")

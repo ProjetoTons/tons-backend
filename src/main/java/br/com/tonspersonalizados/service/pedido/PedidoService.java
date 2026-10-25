@@ -2,11 +2,18 @@ package br.com.tonspersonalizados.service.pedido;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import br.com.tonspersonalizados.dto.pedidos.CaracteristicasRequestDto;
 import br.com.tonspersonalizados.dto.pedidos.ClienteResumoDto;
@@ -140,10 +147,55 @@ public class PedidoService {
 
 
     // LISTAR PEDIDOS
-    public List<PedidoResponseDto> listarTodos() {
-        return pedidoRepository.findAllByOrderByDataPedidoDesc().stream()
-                .map(pedido -> montarPedidoResponse(pedido, itemPedidoRepository.findByPedidoId(pedido.getId())))
-                .collect(Collectors.toList());
+    public Page<PedidoResponseDto> listarTodos(
+            Pageable pageable,
+            String etapa,
+            String status,
+            String busca,
+            Long responsavelId,
+            boolean somenteAtivos) {
+        Sort sort = mapearOrdenacao(pageable.getSort());
+        Pageable pageableOrdenado = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
+        Page<Pedido> pedidos = pedidoRepository.buscarPedidos(
+                normalizarFiltro(etapa),
+                normalizarFiltro(status),
+                normalizarFiltro(busca),
+                responsavelId,
+                somenteAtivos,
+                pageableOrdenado);
+
+        return pedidos.map(pedido ->
+                montarPedidoResponse(pedido, itemPedidoRepository.findByPedidoId(pedido.getId())));
+    }
+
+    private Sort mapearOrdenacao(Sort sortSolicitado) {
+        List<Sort.Order> ordens = new ArrayList<>();
+        boolean possuiDesempate = false;
+
+        for (Sort.Order ordem : sortSolicitado) {
+            String propriedade = switch (ordem.getProperty()) {
+                case "dataPedido" -> "dataPedido";
+                case "dataFinalizacao" -> "dataFinalizacao";
+                case "valorTotal" -> "valorTotal";
+                case "id", "idPedido" -> "id";
+                default -> throw new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST, "Campo de ordenação inválido: " + ordem.getProperty());
+            };
+            ordens.add(ordem.withProperty(propriedade));
+            possuiDesempate |= "id".equals(propriedade);
+        }
+
+        if (ordens.isEmpty()) {
+            ordens.add(Sort.Order.desc("dataPedido"));
+        }
+        if (!possuiDesempate) {
+            ordens.add(Sort.Order.asc("id"));
+        }
+        return Sort.by(ordens);
+    }
+
+    private String normalizarFiltro(String valor) {
+        return valor == null || valor.isBlank() ? null : valor.trim();
     }
 
 
@@ -263,22 +315,44 @@ public class PedidoService {
     }
 
 
-    // MEUS PEDIDOS (em andamento — etapa != "Finalizado")
+    // MEUS PEDIDOS (em andamento)
     public List<PedidoResponseDto> listarMeusPedidosEmAndamento(Integer idCliente) {
         return pedidoRepository
-                .findByUsuarioClienteIdAndEtapaPedidoNotOrderByDataPedidoDesc(idCliente, EtapaPedido.FINALIZADO.getLabel())
+                .findByUsuarioClienteIdAndEtapaPedidoNotInOrderByDataPedidoDesc(
+                        idCliente, List.of(EtapaPedido.FINALIZADO.getLabel(), EtapaPedido.FINALIZADOS.getLabel()))
                 .stream()
                 .map(pedido -> montarPedidoResponse(pedido, itemPedidoRepository.findByPedidoId(pedido.getId())))
                 .collect(Collectors.toList());
     }
 
-    // MEUS PEDIDOS (histórico — etapa = "Finalizado")
+    // MEUS PEDIDOS (histórico)
     public List<PedidoResponseDto> listarMeusPedidosFinalizados(Integer idCliente) {
         return pedidoRepository
-                .findByUsuarioClienteIdAndEtapaPedidoOrderByDataFinalizacaoDesc(idCliente, EtapaPedido.FINALIZADO.getLabel())
+                .findByUsuarioClienteIdAndEtapaPedidoInOrderByDataFinalizacaoDesc(
+                        idCliente, List.of(EtapaPedido.FINALIZADO.getLabel(), EtapaPedido.FINALIZADOS.getLabel()))
                 .stream()
                 .map(pedido -> montarPedidoResponse(pedido, itemPedidoRepository.findByPedidoId(pedido.getId())))
                 .collect(Collectors.toList());
+    }
+
+    public Page<PedidoResponseDto> listarMeuHistoricoPaginado(
+            Integer idCliente, String filtro, Pageable pageable) {
+        String filtroNormalizado = filtro == null ? "TODOS" : filtro.trim().toUpperCase(Locale.ROOT);
+        List<String> etapas = switch (filtroNormalizado) {
+            case "TODOS" -> List.of("finalizado", "finalizados", "cancelado");
+            case "FINALIZADOS" -> List.of("finalizado", "finalizados");
+            case "CANCELADOS" -> List.of("cancelado");
+            default -> throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "Filtro de histórico inválido: " + filtro);
+        };
+        Pageable pageableOrdenado = PageRequest.of(
+                pageable.getPageNumber(),
+                pageable.getPageSize(),
+                Sort.by(Sort.Order.desc("dataPedido"), Sort.Order.desc("id")));
+
+        Page<Pedido> pedidos = pedidoRepository.buscarHistoricoClientePaginado(idCliente, etapas, pageableOrdenado);
+        return pedidos.map(pedido ->
+                montarPedidoResponse(pedido, itemPedidoRepository.findByPedidoId(pedido.getId())));
     }
 
 
@@ -388,7 +462,6 @@ public class PedidoService {
                 caract.setCorMaterial(itemDto.getCaracteristicas().getCorMaterial());
                 caract.setComposicao(itemDto.getCaracteristicas().getComposicao());
                 caract.setTamanho(itemDto.getCaracteristicas().getTamanho());
-                caract.setFornecedor(itemDto.getCaracteristicas().getFornecedor());
                 caracteristicasRepository.save(caract);
 
                 itensSalvos.add(itemPedidoRepository.save(itemExistente));
@@ -455,7 +528,6 @@ public class PedidoService {
         caract.setCorMaterial(dto.getCaracteristicas().getCorMaterial());
         caract.setComposicao(dto.getCaracteristicas().getComposicao());
         caract.setTamanho(dto.getCaracteristicas().getTamanho());
-        caract.setFornecedor(dto.getCaracteristicas().getFornecedor());
         caract = caracteristicasRepository.save(caract);
 
         // Criar item — @ManyToOne resolve as FKs automaticamente
@@ -528,7 +600,6 @@ public class PedidoService {
                     caracteristica.setCorMaterial(item.getCaracteristicas().getCorMaterial());
                     caracteristica.setComposicao(item.getCaracteristicas().getComposicao());
                     caracteristica.setTamanho(item.getCaracteristicas().getTamanho());
-                    caracteristica.setFornecedor(item.getCaracteristicas().getFornecedor());
                     itemPedido.setCaracteristicas(caracteristica);
                 }
                 return itemPedido;
