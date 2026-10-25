@@ -18,9 +18,6 @@ public class CaracteristicasRequestDto {
     @Size(max = 45)
     private String tamanho;
 
-    @Size(max = 45)
-    private String fornecedor;
-
     public CaracteristicasRequestDto() {}
 
 
@@ -66,11 +63,4 @@ public class CaracteristicasRequestDto {
         this.tamanho = tamanho;
     }
 
-    public String getFornecedor() {
-        return fornecedor;
-    }
-
-    public void setFornecedor(String fornecedor) {
-        this.fornecedor = fornecedor;
-    }
 }

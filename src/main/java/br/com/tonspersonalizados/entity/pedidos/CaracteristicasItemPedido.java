@@ -26,9 +26,6 @@ public class CaracteristicasItemPedido {
     @Column(name = "tamanho", length = 45)
     private String tamanho;
 
-    @Column(name = "fornecedor", length = 45)
-    private String fornecedor;
-
     public CaracteristicasItemPedido() {}
 
 
@@ -53,6 +50,4 @@ public class CaracteristicasItemPedido {
     public String getTamanho() { return tamanho; }
     public void setTamanho(String tamanho) { this.tamanho = tamanho; }
 
-    public String getFornecedor() { return fornecedor; }
-    public void setFornecedor(String fornecedor) { this.fornecedor = fornecedor; }
 }

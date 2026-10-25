@@ -18,6 +18,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -29,6 +33,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 /**
@@ -136,12 +141,52 @@ class PedidoServiceTest {
 
         // Pedido "pelado" cobre os ramos FALSOS de montarPedidoResponse (cliente/responsável/endereço nulos).
         @Test
-        @DisplayName("Deve listar todos os pedidos ordenados por data")
+        @DisplayName("Deve retornar página de pedidos e acrescentar desempate por ID")
         void deveListarTodos() {
-            // Arrange
-            when(pedidoRepository.findAllByOrderByDataPedidoDesc()).thenReturn(List.of(new Pedido()));
-            // Act + Assert
-            assertEquals(1, pedidoService.listarTodos().size());
+            Pedido pedido = new Pedido();
+            pedido.setId(1);
+            when(pedidoRepository.buscarPedidos(
+                    eq("Finalizados"), eq("Concluído"), eq("cliente"), eq(7L), eq(true), any(Pageable.class)))
+                    .thenAnswer(invocation -> {
+                        Pageable pageable = invocation.getArgument(5);
+                        return new PageImpl<>(List.of(pedido), pageable, 1);
+                    });
+            when(itemPedidoRepository.findByPedidoId(1)).thenReturn(List.of());
+
+            var resultado = pedidoService.listarTodos(
+                    PageRequest.of(0, 10), "Finalizados", "Concluído", " cliente ", 7L, true);
+
+            assertEquals(1, resultado.getTotalElements());
+            assertEquals(1, resultado.getContent().size());
+            var ordem = org.mockito.ArgumentCaptor.forClass(Pageable.class);
+            verify(pedidoRepository).buscarPedidos(
+                    eq("Finalizados"), eq("Concluído"), eq("cliente"), eq(7L), eq(true), ordem.capture());
+            assertEquals(List.of("dataPedido", "id"), ordem.getValue().getSort().stream()
+                    .map(order -> order.getProperty()).toList());
+            assertEquals(List.of(org.springframework.data.domain.Sort.Direction.DESC,
+                            org.springframework.data.domain.Sort.Direction.ASC),
+                    ordem.getValue().getSort().stream().map(order -> order.getDirection()).toList());
+        }
+
+        @Test
+        @DisplayName("Deve mapear ordenação por data de finalização e preservar a página")
+        void deveMapearOrdenacaoEPaginacao() {
+            when(pedidoRepository.buscarPedidos(
+                    eq(null), eq(null), eq(null), eq(null), eq(false), any(Pageable.class)))
+                    .thenAnswer(invocation ->
+                            new PageImpl<>(List.of(), invocation.getArgument(5), 0));
+
+            Pageable solicitada = PageRequest.of(2, 5, Sort.by(Sort.Order.desc("dataFinalizacao")));
+            pedidoService.listarTodos(solicitada, null, null, null, null, false);
+
+            var pageable = org.mockito.ArgumentCaptor.forClass(Pageable.class);
+            verify(pedidoRepository).buscarPedidos(
+                    eq(null), eq(null), eq(null), eq(null), eq(false), pageable.capture());
+            assertEquals(2, pageable.getValue().getPageNumber());
+            assertEquals(5, pageable.getValue().getPageSize());
+            assertEquals(List.of("dataFinalizacao", "id"), pageable.getValue().getSort().stream()
+                    .map(order -> order.getProperty()).toList());
+            assertEquals(Sort.Direction.DESC, pageable.getValue().getSort().iterator().next().getDirection());
         }
 
         @Test
@@ -189,7 +234,8 @@ class PedidoServiceTest {
         @DisplayName("Deve listar meus pedidos em andamento")
         void deveListarEmAndamento() {
             // Arrange
-            when(pedidoRepository.findByUsuarioClienteIdAndEtapaPedidoNotOrderByDataPedidoDesc(1, "Finalizado"))
+            when(pedidoRepository.findByUsuarioClienteIdAndEtapaPedidoNotInOrderByDataPedidoDesc(
+                    1, List.of("Finalizado", "Finalizados")))
                     .thenReturn(List.of(new Pedido()));
             // Act + Assert
             assertEquals(1, pedidoService.listarMeusPedidosEmAndamento(1).size());
@@ -199,10 +245,42 @@ class PedidoServiceTest {
         @DisplayName("Deve listar meus pedidos finalizados")
         void deveListarFinalizados() {
             // Arrange
-            when(pedidoRepository.findByUsuarioClienteIdAndEtapaPedidoOrderByDataFinalizacaoDesc(1, "Finalizado"))
+            when(pedidoRepository.findByUsuarioClienteIdAndEtapaPedidoInOrderByDataFinalizacaoDesc(
+                    1, List.of("Finalizado", "Finalizados")))
                     .thenReturn(List.of(new Pedido()));
             // Act + Assert
             assertEquals(1, pedidoService.listarMeusPedidosFinalizados(1).size());
+        }
+
+        @Test
+        @DisplayName("Deve paginar histórico do cliente e combinar finalizados e cancelados")
+        void devePaginarHistoricoDoCliente() {
+            when(pedidoRepository.buscarHistoricoClientePaginado(
+                    eq(1), eq(List.of("finalizado", "finalizados", "cancelado")), any(Pageable.class)))
+                    .thenAnswer(invocation -> new PageImpl<>(
+                            List.of(), invocation.getArgument(2), 0));
+
+            var resultado = pedidoService.listarMeuHistoricoPaginado(
+                    1, "todos", PageRequest.of(1, 5));
+
+            assertEquals(1, resultado.getNumber());
+            assertEquals(5, resultado.getSize());
+            var pageable = org.mockito.ArgumentCaptor.forClass(Pageable.class);
+            verify(pedidoRepository).buscarHistoricoClientePaginado(
+                    eq(1), eq(List.of("finalizado", "finalizados", "cancelado")), pageable.capture());
+            assertEquals(List.of("dataPedido", "id"), pageable.getValue().getSort().stream()
+                    .map(Sort.Order::getProperty).toList());
+            assertEquals(List.of(Sort.Direction.DESC, Sort.Direction.DESC), pageable.getValue().getSort().stream()
+                    .map(Sort.Order::getDirection).toList());
+        }
+
+        @Test
+        @DisplayName("Deve rejeitar filtro de histórico desconhecido")
+        void deveRejeitarFiltroHistoricoDesconhecido() {
+            assertThrows(org.springframework.web.server.ResponseStatusException.class,
+                    () -> pedidoService.listarMeuHistoricoPaginado(
+                            1, "EM_ANDAMENTO", PageRequest.of(0, 10)));
+            verifyNoInteractions(pedidoRepository);
         }
     }
 
@@ -254,6 +332,22 @@ class PedidoServiceTest {
             // Assert
             assertSame(responsavel, pedido.getUsuarioResponsavel());      // etapa não mudou -> mantém
             verify(eventPublisher, never()).publishEvent(any());
+        }
+
+        @Test
+        @DisplayName("Deve aceitar e persistir etapa Finalizados")
+        void deveAceitarEtapaFinalizados() {
+            Pedido pedido = new Pedido();
+            pedido.setId(1);
+            pedido.setEtapaPedido("Design");
+            when(pedidoRepository.findById(1)).thenReturn(Optional.of(pedido));
+            when(usuarioRepository.findById(2L)).thenReturn(Optional.of(new Usuario()));
+
+            pedidoService.avancarEtapa(1, etapaRequest("Finalizados", "Concluído"));
+
+            assertEquals("Finalizados", pedido.getEtapaPedido());
+            assertEquals("Concluído", pedido.getStatus());
+            verify(pedidoRepository).save(pedido);
         }
 
         @Test
